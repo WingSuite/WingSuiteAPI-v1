@@ -1,6 +1,10 @@
 # WingSuiteApp
 Application that runs the WingSuite web app
 
+## Requirements
+* `Miniconda` (latest version)
+* `Postman` (latest version, optional)
+
 ## Setup
 1. Create a conda environment: `conda create -n Det025 python=3.8`
 2. Install the dependencies: `pip install -r packages.txt`
