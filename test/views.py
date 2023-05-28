@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from models import User
 import db
 import pymongo
+from bson.json_util import dumps, loads
 
 # Test endpoint
 @home.route('')
@@ -14,30 +15,17 @@ def test_handler():
 def login_handler():
     try:
         if request.headers.get('Content-Type') == 'application/json':
-            data = request.get_json()
-            
+            data = request.get_json('http://localhost:2501/')
             email = data['email']
             password = data['password']
-
-            response_data = {
-                'email': email,
-                'password': password,
-                'profileImage': "",
-                'refresh': "",
-                'access': "",
-                'success': "success"
-            }
             
-            response_json = jsonify(response_data)
-            
-            return response_json
+            response_data = db.check_user(email, password)
+            return response_data
         else:
             return jsonify({'error': 'Invalid Content-Type. Expected application/json.'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-    #return "Login Page"
 
 @dashboard.route('/dashboard/')
 def dashboard_handler():
