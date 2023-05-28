@@ -11,38 +11,39 @@ def test_handler():
     return "Home"
 
 @login.route('/login/', methods=['POST', 'GET'])
-def test_handler():
-        try:
-            if request.headers.get('Content-Type') == 'application/json':
-                data = request.json()
-                
-                email = data['email']
-                password = data['password']
+def login_handler():
+    try:
+        if request.headers.get('Content-Type') == 'application/json':
+            data = request.get_json()
+            
+            email = data['email']
+            password = data['password']
 
-                response_data = {
-                    'eamil': email,
-                    'password': password,
-                    'profileImage': "",
-                    'refresh': "",
-                    'access': "",
-                    'success': "success"
-                }
-                response_json = jsonify(response_data)
-
-                return response_json
-            else:
-                 return jsonify({'error': 'Invalid Content-Type. Expected application/json.'}), 400
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            response_data = {
+                'email': email,
+                'password': password,
+                'profileImage': "",
+                'refresh': "",
+                'access': "",
+                'success': "success"
+            }
+            
+            response_json = jsonify(response_data)
+            
+            return response_json
+        else:
+            return jsonify({'error': 'Invalid Content-Type. Expected application/json.'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
     #return "Login Page"
 
 @dashboard.route('/dashboard/')
-def test_handler():
+def dashboard_handler():
     return User().info()
 
 
 @signout.route('/signout/')
-def test_handler():
+def signout_handler():
     return "Signout"
