@@ -1,7 +1,48 @@
 # Import the test blueprint
-from . import test_bp
+from . import home, login, dashboard, signout
+from flask import Flask, jsonify, request
+from models import User
+import db
+import pymongo
 
 # Test endpoint
-@test_bp.route('/test')
+@home.route('')
 def test_handler():
-    return {"key" : "value"}
+    return "Home"
+
+@login.route('/login/', methods=['POST', 'GET'])
+def test_handler():
+        try:
+            if request.headers.get('Content-Type') == 'application/json':
+                data = request.json()
+                
+                email = data['email']
+                password = data['password']
+
+                response_data = {
+                    'eamil': email,
+                    'password': password,
+                    'profileImage': "",
+                    'refresh': "",
+                    'access': "",
+                    'success': "success"
+                }
+                response_json = jsonify(response_data)
+
+                return response_json
+            else:
+                 return jsonify({'error': 'Invalid Content-Type. Expected application/json.'}), 400
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+
+    #return "Login Page"
+
+@dashboard.route('/dashboard/')
+def test_handler():
+    return User().info()
+
+
+@signout.route('/signout/')
+def test_handler():
+    return "Signout"
