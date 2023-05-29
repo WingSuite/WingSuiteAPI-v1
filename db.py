@@ -30,14 +30,12 @@ def check_user(email, password):
 		"email": email,
 		"password": password
 	}
-
 	user_data = collection.find_one(user)
-	user_data.pop('_id', None)
-	#user_data.pop('password', None)
-	resp = jsonify(user_data)
 
 
 	if user_data == None:
 		return ""
 	else:
-		return resp
+		user_data.pop('_id', None)
+		#user_data.pop('password', None)
+		return user_data
