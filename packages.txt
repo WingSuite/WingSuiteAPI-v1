@@ -9,3 +9,4 @@ MarkupSafe==2.1.2
 pymongo==4.3.3
 Werkzeug==2.3.4
 zipp==3.15.0
+flask_cors==3.0.10
