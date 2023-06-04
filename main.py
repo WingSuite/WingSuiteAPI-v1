@@ -13,6 +13,8 @@ app.register_blueprint(home, url_prefix="/home/")
 app.register_blueprint(login, url_prefix="/user/")
 app.register_blueprint(register, url_prefix="/user/")
 app.register_blueprint(authorize, url_prefix="/user/")
+app.register_blueprint(add_permission, url_prefix="/user/")
+app.register_blueprint(delete_permission, url_prefix="/user/")
 app.register_blueprint(dashboard, url_prefix="/user/")
 app.register_blueprint(signout, url_prefix="/user/")
 

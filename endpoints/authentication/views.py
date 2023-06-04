@@ -14,14 +14,14 @@ def login_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.get_user(**data)
+        response_data = UserAccess.login(**data)
 
         # If the response data results in an error, return 400 and error message
         if (response_data["status"] != "success"):
             return response_data, 400
         
         # Return response data except for the password
-        return {k: v for k, v in response_data.items() if k != "password"}, 200
+        return response_data, 200
 
     # Error handling
     except Exception as e:
@@ -57,6 +57,44 @@ def authorize_user_endpoint():
 
         # Get the user's instance based on the given information
         response_data = UserAccess.add_user(**data)
+
+        # Return response data
+        return response_data, (200 if response_data["status"] == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@add_permission.route('/add_permission/', methods=['POST'])
+def add_permission_endpoint():
+    """Method to handle the adding of new permissions to the user"""
+    
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add permission to the user's data
+        response_data = UserAccess.change_permission("add", **data)
+
+        # Return response data
+        return response_data, (200 if response_data["status"] == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@add_permission.route('/delete_permission/', methods=['POST'])
+def delete_permission_endpoint():
+    """Method to handle the adding of new permissions to the user"""
+    
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add permission to the user's data
+        response_data = UserAccess.change_permission("delete", **data)
 
         # Return response data
         return response_data, (200 if response_data["status"] == "success" else 400)

@@ -16,3 +16,19 @@ class DataAccessBase:
     # Set config constants    
     REQ_ARGS = config.neededArguments.DataAccess
     CONFIG = config
+    
+    @staticmethod
+    def args_checker(args, key):
+        """Check if the given args is sufficient"""
+
+        # Check if the given arumgents has the minimum arguments
+        for arg in DataAccessBase.REQ_ARGS[key]:
+            if arg not in args:
+                return {
+                    "status": "error", 
+                    "message": "Call needs the following arguments: " \
+                        + ", ".join(DataAccessBase.REQ_ARGS[key])
+                }
+
+        # Return None if nothing else
+        return None

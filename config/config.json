@@ -1,6 +1,10 @@
 {
   "neededArguments": {
     "DataAccess": {
+      "login": [
+        "email",
+        "password"
+      ],
       "add_user": [
         "email"
       ],
@@ -11,9 +15,9 @@
         "phone_number",
         "password"
       ],
-      "get_user": [
-        "email",
-        "password"
+      "change_permission": [
+        "_id",
+        "permission"
       ]
     },
     "Users": {
@@ -30,5 +34,6 @@
     "domain": "localhost",
     "port": "27018",
     "db": "Det025"
-  }
+  },
+  "privateInfo": ["password"]
 }
