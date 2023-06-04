@@ -1,12 +1,33 @@
-# Import
-from flask import Flask
-from endpoints.authentication import *
+# Flask Imports
+from flask_jwt_extended import (
+    JWTManager, 
+    jwt_required, 
+    create_access_token, 
+    get_jwt_identity, 
+    create_refresh_token, 
+    jwt_refresh_token_required
+)
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, create_refresh_token, jwt_refresh_token_required
+from flask import Flask
 
-# Make app name and initialize CORS
+# Endpoint Imports
+from endpoints.authentication import *
+
+# Miscellaneous Imports
+from config.config import config
+from datetime import timedelta
+
+# Make app instance
 app = Flask(__name__)
+
+# Set CORS for the application
 CORS(app, methods=['POST', 'GET'])
+
+# Initialize JWT functionalities
+app.config['JWT_SECRET_KEY'] = config.JWT.secret 
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=config.JWT.accessExpiry)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(hours=config.JWT.refreshExpiry)
+jwt = JWTManager(app)
 
 # Register all blueprints
 app.register_blueprint(home, url_prefix="/home/")
