@@ -1,6 +1,6 @@
 # Import
 from flask import Flask
-from authentication import *
+from endpoints.authentication import *
 from flask_cors import CORS
 
 

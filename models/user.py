@@ -1,5 +1,5 @@
 # Imports
-from config import config
+from config.config import config
 import json
 
 class User:
