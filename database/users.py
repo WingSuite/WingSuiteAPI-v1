@@ -8,11 +8,11 @@ class UserAccess(DataAccessBase):
     """Class that handles user information"""
     
     @staticmethod
-    def get_user(**kwargs):
-        """Method that returns the user object based on the given information"""
+    def get_user_by_userpass(**kwargs):
+        """Method that returns the user object based on the given user and pass"""
         
         # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "get_user")
+        check = DataAccessBase.args_checker(kwargs, "get_user_by_userpass")
         if check:
             return check
         
@@ -21,6 +21,28 @@ class UserAccess(DataAccessBase):
             kwargs["password"], 
             DataAccessBase.CONFIG.database.spicer
         )
+        
+        # Get the results from the query
+        user_data = DataAccessBase.USER_COL.find_one(kwargs)
+
+        # Return if the given user is not in the database
+        if user_data == None:
+            return {"status": "error", "message": "Check your inputted credentials"}
+        # Return the user object
+        else:
+            return {
+                "status": "success", 
+                "content": User(**user_data).get_generic_info()
+            }
+    
+    @staticmethod
+    def get_user_by_id(**kwargs):
+        """Method that returns the user object based on the given id"""
+        
+        # Check if kwargs has the minimum arguments
+        check = DataAccessBase.args_checker(kwargs, "get_user_by_id")
+        if check:
+            return check
         
         # Get the results from the query
         user_data = DataAccessBase.USER_COL.find_one(kwargs)

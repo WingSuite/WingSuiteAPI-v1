@@ -14,7 +14,7 @@ def login_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.get_user(**data)
+        response_data = UserAccess.get_user_by_userpass(**data)
 
         # If the response data results in an error, return 400 and error message
         if (response_data["status"] != "success"):
