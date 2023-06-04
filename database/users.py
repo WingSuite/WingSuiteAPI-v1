@@ -30,7 +30,10 @@ class UserAccess(DataAccessBase):
             return {"status": "error", "message": "Check your inputted credentials"}
         # Return the user object
         else:
-            return {"status": "success", "content": str(User(**user_data))}
+            return {
+                "status": "success", 
+                "content": User(**user_data).get_generic_info()
+            }
     
     @staticmethod
     def add_user(**kwargs):
@@ -81,3 +84,7 @@ class UserAccess(DataAccessBase):
         # Return false if the given information exists
         else:
             return {"status": "error", "message": "User has registered or is authorized"}
+    
+    @staticmethod
+    def add_permission(**kwargs):
+        pass

@@ -18,10 +18,10 @@ class User:
         
         # Save info
         self.info = kwargs
-        
-    def __repr__(self):
-        """Return a string representation of itself"""
-        return json.dumps(self.info, indent=4)
+    
+    def get_generic_info(self):
+        """Returns content that doesn't include any security concerns"""
+        return {k: v for k, v in self.info.items() if k not in config.privateInfo}
     
     def get_fullname(self, lastNameFirst):
         """Returns the user's full name"""
