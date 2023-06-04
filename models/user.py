@@ -18,10 +18,6 @@ class User:
         
         # Save info
         self.info = kwargs
-        
-    def get_all_info(self):
-        """Returns everything about the user"""
-        return self.info
     
     def get_generic_info(self):
         """Returns content that doesn't include any security concerns"""
@@ -32,13 +28,27 @@ class User:
         
         # Get the user's names
         first_name = self.info["first_name"]
-        last_name = self.info["last_names"]
+        last_name = self.info["last_name"]
         middle_initial = ""
         if "middle_initial" in list(self.info.keys()):
-            middle_initial = self.info["middle_initial"]
+            middle_initial = " " + self.info["middle_initial"]
         
         # Return different styles based on given options
         if lastNameFirst:
-            return (f"{last_name}, {first_name} {middle_initial}")
+            return (f"{last_name}, {first_name}{middle_initial}")
         else:
-            return(f"{first_name} {last_name} {middle_initial}")
+            return(f"{first_name}{middle_initial} {last_name}")
+    
+    def add_permission(self, permission):
+        "Add new permission to the user"
+        
+        # If the given permission is already in the permission list, return
+        # Return false if the given permission already exists
+        if permission in self.info["permissions"]:
+            return False
+            
+        # If not empty, concatenate the new permission with a sort
+        # Return true if the given permission didn't exist and has been added
+        else:
+            self.info["permissions"].append(permission)
+            return True

@@ -7,7 +7,7 @@ import uuid
 class UserAccess(DataAccessBase):
     """Class that handles user information"""
     
-    def get_user(secure=False, **kwargs):
+    def get_user(secure=False, obj=False, **kwargs):
         """Base method for get_user methods"""
         
         # Get the results from the query
@@ -19,14 +19,15 @@ class UserAccess(DataAccessBase):
         
         # Return the user object
         else:
-            # Get the content of the user 
-            content = User(**user_data).get_all_info() if not secure else \
+            # Get the content of the user based on wether 
+            # we want to get all or some data
+            content = User(**user_data).info if not secure else \
                 User(**user_data).get_generic_info()
             
-            # Return results
+            # Return results based on types of representation
             return {
                 "status": "success", 
-                "content": content
+                "content": content if not obj else User(**user_data)
             }
     
     @staticmethod
@@ -83,6 +84,7 @@ class UserAccess(DataAccessBase):
         DataAccessBase.REGISTER_COL.find_one({"email": kwargs["email"]}) == None:
             # Prep data to be inserted
             kwargs["_id"] = uuid.uuid4().hex
+            kwargs["permissions"] = []
             
             # Hash and save the given password
             kwargs["password"] = sha256(
@@ -123,4 +125,39 @@ class UserAccess(DataAccessBase):
     
     @staticmethod
     def add_permission(**kwargs):
-        pass
+        """Add permission values based on the given id"""
+        
+        # Check if kwargs has the minimum arguments
+        check = DataAccessBase.args_checker(kwargs, "add_permission")
+        if check:
+            return check
+
+        # Check if the permission value is a list 
+        if not isinstance(kwargs["permission"], list):
+            return {"status": "error", "message": "Permission value not in list format"}
+        
+        # Get user object
+        user = UserAccess.get_user(obj=True, _id=kwargs["_id"])["content"]
+        
+        # Add new permission(s) and track changes
+        results = {}
+        for permission in kwargs["permission"]:
+            # Attempt add permission
+            res = user.add_permission(permission)
+            
+            # Track changes
+            results[permission] = res
+        
+        # Update database
+        DataAccessBase.USER_COL.update_one(
+            {"_id": user.info["_id"]},
+            {"$set": {"permissions" : user.info["permissions"]}}
+        )
+        
+        # Return success message
+        return {
+            "status": "success", 
+            "message": 
+                f"Permission changes have been applied to {user.get_fullname(lastNameFirst=True)}. Refer to results for what has been applied",
+            "results": results
+        }

@@ -22,7 +22,8 @@
         "last_name"
       ],
       "add_permission": [
-        ""
+        "_id",
+        "permission"
       ]
     },
     "Users": {
@@ -40,5 +41,5 @@
     "port": "27018",
     "db": "Det025"
   },
-  "privateInfo": ["password", "_id"]
+  "privateInfo": ["password"]
 }
