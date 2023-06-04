@@ -75,7 +75,26 @@ def add_permission_endpoint():
         data = request.get_json()
 
         # Add permission to the user's data
-        response_data = UserAccess.add_permission(**data)
+        response_data = UserAccess.change_permission("add", **data)
+
+        # Return response data
+        return response_data, (200 if response_data["status"] == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@add_permission.route('/delete_permission/', methods=['POST'])
+def delete_permission_endpoint():
+    """Method to handle the adding of new permissions to the user"""
+    
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add permission to the user's data
+        response_data = UserAccess.change_permission("delete", **data)
 
         # Return response data
         return response_data, (200 if response_data["status"] == "success" else 400)

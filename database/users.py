@@ -100,41 +100,21 @@ class UserAccess(DataAccessBase):
             return {"status": "error", "message": "User has registered or is authorized"}
     
     @staticmethod
-    def get_user_by_id(**kwargs):
-        """Method that returns the user object based on the given id"""
-        
-        # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "get_user_by_id")
-        if check:
-            return check
-        
-        # Return user content
-        return UserAccess.get_user(**kwargs)
-    
-    @staticmethod
-    def get_user_by_lastname(**kwargs):
-        """Method that returns the user object based on the given id"""
-        
-        # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "get_user_by_lastname")
-        if check:
-            return check
-        
-        # Return user content
-        return UserAccess.get_user(**kwargs)
-    
-    @staticmethod
-    def add_permission(**kwargs):
+    def change_permission(operation, **kwargs):
         """Add permission values based on the given id"""
         
         # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "add_permission")
+        check = DataAccessBase.args_checker(kwargs, "change_permission")
         if check:
             return check
 
         # Check if the permission value is a list 
         if not isinstance(kwargs["permission"], list):
             return {"status": "error", "message": "Permission value not in list format"}
+        
+        # Check if the operation value is one of the accepted options
+        if operation not in ["add", "delete"]:
+            return {"status": "error", "message": "Operation value is not an accepted value"}
         
         # Get user object
         user = UserAccess.get_user(obj=True, _id=kwargs["_id"])["content"]
@@ -143,7 +123,8 @@ class UserAccess(DataAccessBase):
         results = {}
         for permission in kwargs["permission"]:
             # Attempt add permission
-            res = user.add_permission(permission)
+            res = user.add_permission(permission) if operation == "add" else \
+                user.delete_permission(permission)
             
             # Track changes
             results[permission] = res
@@ -155,9 +136,10 @@ class UserAccess(DataAccessBase):
         )
         
         # Return success message
+        operation_type = "addition" if operation == "add" else "deletion"
         return {
             "status": "success", 
             "message": 
-                f"Permission changes have been applied to {user.get_fullname(lastNameFirst=True)}. Refer to results for what has been applied",
+                f"Permission {operation_type} have been applied to {user.get_fullname(lastNameFirst=True)}. Refer to results for what has been applied",
             "results": results
         }

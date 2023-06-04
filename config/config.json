@@ -15,13 +15,7 @@
         "phone_number",
         "password"
       ],
-      "get_user_by_id": [
-        "_id"
-      ],
-      "get_user_by_lastname": [
-        "last_name"
-      ],
-      "add_permission": [
+      "change_permission": [
         "_id",
         "permission"
       ]
