@@ -28,4 +28,4 @@ def Config(config):
         return config
 
 # Export config
-config = Config(json.load(open("config.json")))
+config = Config(json.load(open("./config/config.json")))

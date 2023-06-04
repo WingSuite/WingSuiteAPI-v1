@@ -1,7 +1,7 @@
 # Import the test blueprint
+from database.users import UserAccess
 from flask import jsonify, request
-from database import DataAccess
-from models import User
+from models.user import User
 from . import *
 
 @login.route('/login/', methods=['POST'])
@@ -14,7 +14,7 @@ def login_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = DataAccess.get_user(**data)
+        response_data = UserAccess.get_user(**data)
 
         # If the response data results in an error, return 400 and error message
         if (response_data["status"] != "success"):
@@ -37,7 +37,7 @@ def register_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = DataAccess.register_user(**data)
+        response_data = UserAccess.register_user(**data)
 
         # Return response data
         return response_data, (200 if response_data["status"] == "success" else 400)
@@ -56,7 +56,7 @@ def authorize_user_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = DataAccess.add_user(**data)
+        response_data = UserAccess.add_user(**data)
 
         # Return response data
         return response_data, (200 if response_data["status"] == "success" else 400)
