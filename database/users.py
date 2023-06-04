@@ -1,6 +1,7 @@
 # Imports
 from .base import DataAccessBase
 from models.user import User
+from utils.hash import sha256
 import uuid
 
 class UserAccess(DataAccessBase):
@@ -50,6 +51,12 @@ class UserAccess(DataAccessBase):
         DataAccessBase.REGISTER_COL.find_one({"email": kwargs["email"]}) == None:
             # Prep data to be inserted
             kwargs["_id"] = uuid.uuid4().hex
+            
+            # Hash and save the given password
+            kwargs["password"] = sha256(
+                kwargs["password"], 
+                UserAccess.CONFIG.database.spicer
+            )
    
             # Insert user into the database and return success
             DataAccessBase.REGISTER_COL.insert_one(kwargs)
@@ -65,7 +72,17 @@ class UserAccess(DataAccessBase):
         # Check if kwargs has the minimum arguments
         for arg in DataAccessBase.REQ_ARGS.get_user:
             if arg not in kwargs:
-                return False
+                return {
+                    "status": "error", 
+                    "message": "Call needs the following arguments: " \
+                        + ", ".join(DataAccessBase.REQ_ARGS.get_user)
+                }
+
+        # Hash and save the given password to kwargs
+        kwargs["password"] = sha256(
+            kwargs["password"], 
+            UserAccess.CONFIG.database.spicer
+        )
         
         # Get the results from the query
         user_data = DataAccessBase.USER_COL.find_one(kwargs)

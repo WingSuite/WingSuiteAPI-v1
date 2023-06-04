@@ -12,7 +12,8 @@
         "password"
       ],
       "get_user": [
-        "email"
+        "email",
+        "password"
       ]
     },
     "Users": {
@@ -25,6 +26,7 @@
     }
   },
   "database": {
+    "spicer": "Bruh",
     "domain": "localhost",
     "port": "27018",
     "db": "Det025"
