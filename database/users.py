@@ -8,6 +8,31 @@ class UserAccess(DataAccessBase):
     """Class that handles user information"""
     
     @staticmethod
+    def get_user(**kwargs):
+        """Method that returns the user object based on the given information"""
+        
+        # Check if kwargs has the minimum arguments
+        check = DataAccessBase.args_checker(kwargs, "get_user")
+        if check:
+            return check
+        
+        # Hash and save the given password to kwargs
+        kwargs["password"] = sha256(
+            kwargs["password"], 
+            DataAccessBase.CONFIG.database.spicer
+        )
+        
+        # Get the results from the query
+        user_data = DataAccessBase.USER_COL.find_one(kwargs)
+
+        # Return if the given user is not in the database
+        if user_data == None:
+            return {"status": "error", "message": "Check your inputted credentials"}
+        # Return the user object
+        else:
+            return {"status": "success", "content": str(User(**user_data))}
+    
+    @staticmethod
     def add_user(**kwargs):
         """Method that handles adding a user to the system"""
   
@@ -56,28 +81,3 @@ class UserAccess(DataAccessBase):
         # Return false if the given information exists
         else:
             return {"status": "error", "message": "User has registered or is authorized"}
-
-    @staticmethod
-    def get_user(**kwargs):
-        """Method that returns the user object based on the given information"""
-        
-        # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "get_user")
-        if check:
-            return check
-        
-        # Hash and save the given password to kwargs
-        kwargs["password"] = sha256(
-            kwargs["password"], 
-            DataAccessBase.CONFIG.database.spicer
-        )
-        
-        # Get the results from the query
-        user_data = DataAccessBase.USER_COL.find_one(kwargs)
-
-        # Return if the given user is not in the database
-        if user_data == None:
-            return {"status": "error", "message": "Check your inputted credentials"}
-        # Return the user object
-        else:
-            return {"status": "success", "content": str(User(**user_data))}
