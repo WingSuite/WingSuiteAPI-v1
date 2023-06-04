@@ -1,7 +1,8 @@
 # Imports
+from config.config import permissions
 from .base import DataAccessBase
-from models.user import User
 from utils.hash import sha256
+from models.user import User
 import uuid
 
 class UserAccess(DataAccessBase):
@@ -122,12 +123,19 @@ class UserAccess(DataAccessBase):
         # Add new permission(s) and track changes
         results = {}
         for permission in kwargs["permission"]:
+            # If the given permission is not part of the approved list of permission
+            # track that is is not added with an exaplanation and continue
+            if permission not in permissions:
+                results[permission] = "Not Added (Invalid Permission)"
+                continue
+            
             # Attempt add permission
             res = user.add_permission(permission) if operation == "add" else \
                 user.delete_permission(permission)
             
             # Track changes
-            results[permission] = res
+            results[permission] = "Added" if res else "Not Added (Already " \
+                + ("Added)" if operation == "add" else "Deleted or is Missing)")
         
         # Update database
         DataAccessBase.USER_COL.update_one(

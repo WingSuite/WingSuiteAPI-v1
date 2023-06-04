@@ -1,0 +1,6 @@
+[
+    "*",
+    "user.add_permission",
+    "user.authorize_user",
+    "user.delete_permission"
+]
