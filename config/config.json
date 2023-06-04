@@ -1,12 +1,9 @@
 {
   "neededArguments": {
     "DataAccess": {
-      "get_user_by_userpass": [
+      "login": [
         "email",
         "password"
-      ],
-      "get_user_by_id": [
-        "_id"
       ],
       "add_user": [
         "email"
@@ -17,6 +14,12 @@
         "email",
         "phone_number",
         "password"
+      ],
+      "get_user_by_id": [
+        "_id"
+      ],
+      "get_user_by_lastname": [
+        "last_name"
       ],
       "add_permission": [
         ""

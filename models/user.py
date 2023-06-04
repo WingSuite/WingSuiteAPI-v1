@@ -18,6 +18,10 @@ class User:
         
         # Save info
         self.info = kwargs
+        
+    def get_all_info(self):
+        """Returns everything about the user"""
+        return self.info
     
     def get_generic_info(self):
         """Returns content that doesn't include any security concerns"""

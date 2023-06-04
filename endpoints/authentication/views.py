@@ -14,14 +14,14 @@ def login_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.get_user_by_userpass(**data)
+        response_data = UserAccess.login(**data)
 
         # If the response data results in an error, return 400 and error message
         if (response_data["status"] != "success"):
             return response_data, 400
         
         # Return response data except for the password
-        return {k: v for k, v in response_data.items() if k != "password"}, 200
+        return response_data, 200
 
     # Error handling
     except Exception as e:
