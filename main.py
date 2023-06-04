@@ -2,7 +2,7 @@
 from flask import Flask
 from endpoints.authentication import *
 from flask_cors import CORS
-
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, create_refresh_token, jwt_refresh_token_required
 
 # Make app name and initialize CORS
 app = Flask(__name__)
