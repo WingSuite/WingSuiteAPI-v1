@@ -1,12 +1,32 @@
 {
-    "neededArguments": {
-        "DataAccess": {
-            "add_user": ["email"],
-            "register_user": ["first_name", "last_name", "email", "phone_number", "password"],
-            "get_user": ["email"]
-        },
-        "Users": {
-            "init": ["first_name", "last_name", "email", "phone_number"]
-        }
+  "neededArguments": {
+    "DataAccess": {
+      "add_user": [
+        "email"
+      ],
+      "register_user": [
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number",
+        "password"
+      ],
+      "get_user": [
+        "email"
+      ]
+    },
+    "Users": {
+      "init": [
+        "first_name",
+        "last_name",
+        "email",
+        "phone_number"
+      ]
     }
+  },
+  "database": {
+    "domain": "localhost",
+    "port": "27018",
+    "db": "Det025"
+  }
 }
