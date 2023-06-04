@@ -12,13 +12,9 @@ class UserAccess(DataAccessBase):
         """Method that handles adding a user to the system"""
   
         # Check if kwargs has the minimum arguments
-        for arg in DataAccessBase.REQ_ARGS.add_user:
-            if arg not in kwargs:
-                return {
-                    "status": "error", 
-                    "message": "Call needs the following arguments: " \
-                        + ", ".join(DataAccessBase.REQ_ARGS.add_user)
-                }
+        check = DataAccessBase.args_checker(kwargs, "add_user")
+        if check:
+            return check
 
         # Add user to the list and return success if the given 
         # information is not the system
@@ -37,14 +33,10 @@ class UserAccess(DataAccessBase):
         """Method that handles registering a user to the system"""
   
         # Check if kwargs has the minimum arguments
-        for arg in DataAccessBase.REQ_ARGS.register_user:
-            if arg not in kwargs:
-                return {
-                    "status": "error", 
-                    "message": "Call needs the following arguments: " \
-                        + ", ".join(DataAccessBase.REQ_ARGS.register_user)
-                }
-
+        check = DataAccessBase.args_checker(kwargs, "register_user")
+        if check:
+            return check
+    
         # Add user to the list and return success if the given 
         # information is not the system
         if DataAccessBase.USER_COL.find_one({"email": kwargs["email"]}) == None and \
@@ -55,7 +47,7 @@ class UserAccess(DataAccessBase):
             # Hash and save the given password
             kwargs["password"] = sha256(
                 kwargs["password"], 
-                UserAccess.CONFIG.database.spicer
+                DataAccessBase.CONFIG.database.spicer
             )
    
             # Insert user into the database and return success
@@ -70,18 +62,14 @@ class UserAccess(DataAccessBase):
         """Method that returns the user object based on the given information"""
         
         # Check if kwargs has the minimum arguments
-        for arg in DataAccessBase.REQ_ARGS.get_user:
-            if arg not in kwargs:
-                return {
-                    "status": "error", 
-                    "message": "Call needs the following arguments: " \
-                        + ", ".join(DataAccessBase.REQ_ARGS.get_user)
-                }
-
+        check = DataAccessBase.args_checker(kwargs, "get_user")
+        if check:
+            return check
+        
         # Hash and save the given password to kwargs
         kwargs["password"] = sha256(
             kwargs["password"], 
-            UserAccess.CONFIG.database.spicer
+            DataAccessBase.CONFIG.database.spicer
         )
         
         # Get the results from the query
