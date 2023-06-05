@@ -17,7 +17,7 @@
       ],
       "change_permission": [
         "_id",
-        "permission"
+        "permissions"
       ]
     },
     "Users": {
@@ -35,5 +35,11 @@
     "port": "27018",
     "db": "Det025"
   },
-  "privateInfo": ["password"]
+  "JWT": {
+    "secret": "C4nW3G3tMuchH1gh3rS0H1gh",
+    "accessExpiry": 8,
+    "refreshExpiry": 720
+  },
+  "privateInfo": ["password"],
+  "rootPermissionString": "*"
 }

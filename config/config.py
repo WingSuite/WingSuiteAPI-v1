@@ -27,5 +27,6 @@ def Config(config):
     else:
         return config
 
-# Export config
+# Export configs
+permissions = set(json.load(open("./config/permissions.json")))
 config = Config(json.load(open("./config/config.json")))
