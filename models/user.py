@@ -40,13 +40,13 @@ class User:
             return(f"{first_name}{middle_initial} {last_name}")
     
     def add_permission(self, permission):
-        "Add new permission to the user"
+        "Add new permissions to the user"
         
-        # If the given permission is already in the permission list, return false
+        # If the given permission is already in the permissions list, return false
         if permission in self.info["permissions"]:
             return False
             
-        # If not existent, append the new permission to the list and return true
+        # If not existent, append the new permissions to the list and return true
         else:
             self.info["permissions"].append(permission)
             return True
@@ -54,7 +54,7 @@ class User:
     def delete_permission(self, permission):
         "Remove permission to the user"
         
-        # If the given permission is already in the permission list, remove and return true
+        # If the given permission is already in the permissions list, remove and return true
         if permission in self.info["permissions"]:
             self.info["permissions"].remove(permission)
             return True

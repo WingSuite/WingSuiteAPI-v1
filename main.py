@@ -50,8 +50,8 @@ app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 
 # User routes
-app.register_blueprint(add_permission, url_prefix="/user/")
-app.register_blueprint(delete_permission, url_prefix="/user/")
+app.register_blueprint(add_permissions, url_prefix="/user/")
+app.register_blueprint(delete_permissions, url_prefix="/user/")
 
 """
 APP RUNTIME HANDLING

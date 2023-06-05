@@ -103,17 +103,17 @@ class UserAccess(DataAccessBase):
             return {"status": "error", "message": "User has registered or is authorized"}
     
     @staticmethod
-    def change_permission(operation, **kwargs):
-        """Add permission values based on the given id"""
+    def change_permissions(operation, **kwargs):
+        """Add permissions values based on the given id"""
         
         # Check if kwargs has the minimum arguments
-        check = DataAccessBase.args_checker(kwargs, "change_permission")
+        check = DataAccessBase.args_checker(kwargs, "change_permissions")
         if check:
             return check
 
-        # Check if the permission value is a list 
+        # Check if the permissions value is a list 
         if not isinstance(kwargs["permissions"], list):
-            return {"status": "error", "message": "Permission value not in list format"}
+            return {"status": "error", "message": "Permissions value not in list format"}
         
         # Check if the operation value is one of the accepted options
         if operation not in ["add", "delete"]:

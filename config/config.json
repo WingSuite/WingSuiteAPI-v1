@@ -15,7 +15,7 @@
         "phone_number",
         "password"
       ],
-      "change_permission": [
+      "change_permissions": [
         "_id",
         "permissions"
       ],
