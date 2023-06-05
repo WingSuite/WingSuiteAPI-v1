@@ -64,6 +64,7 @@ def who_am_i():
         # Get the user based on the ID
         result = UserAccess.get_user(secure=True, _id=id)
         
+        # Return the results of the database query
         return result, (200 if result["status"] == "success" else 400)
 
     # Error handling

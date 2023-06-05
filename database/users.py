@@ -25,7 +25,10 @@ class UserAccess(DataAccessBase):
             # Get the content of the user based on wether 
             # we want to get all or some data
             content = User(**user_data).info if not secure else \
-                User(**user_data).get_generic_info()
+                User(**user_data).get_generic_info(
+                    includeFullName=True, 
+                    lastNameFirst=True
+                )
             
             # Return results based on types of representation
             return {

@@ -19,9 +19,18 @@ class User:
         # Save info
         self.info = kwargs
     
-    def get_generic_info(self):
+    def get_generic_info(self, includeFullName=True, lastNameFirst=True):
         """Returns content that doesn't include any security concerns"""
-        return {k: v for k, v in self.info.items() if k not in config.privateInfo}
+        
+        # FIlter out any secure data
+        data = {k: v for k, v in self.info.items() if k not in config.privateInfo}
+        
+        # Append full name information to the data based on the given parameters 
+        if includeFullName:
+            data["full_name"] = self.get_fullname(lastNameFirst)
+        
+        # Return the data
+        return data
     
     def get_fullname(self, lastNameFirst):
         """Returns the user's full name"""
