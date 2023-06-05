@@ -10,8 +10,11 @@ class DataAccessBase:
         f"mongodb://{config.database.domain}:{config.database.port}/"
     )
     DB = CLIENT[config.database.db]
+    
+    # Collection constant definition
     USER_COL = DB["users"]
     REGISTER_COL = DB["registerList"]
+    BLACKLIST_COL = DB["jwt_blacklist"]
     
     # Set config constants    
     REQ_ARGS = config.neededArguments.DataAccess
@@ -21,7 +24,7 @@ class DataAccessBase:
     def args_checker(args, key):
         """Check if the given args is sufficient"""
 
-        # Check if the given arumgents has the minimum arguments
+        # Check if the given arguments has the minimum arguments
         for arg in DataAccessBase.REQ_ARGS[key]:
             if arg not in args:
                 return {

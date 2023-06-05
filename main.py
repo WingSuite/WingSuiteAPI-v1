@@ -3,6 +3,9 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask import Flask
 
+# Data Import
+from database.base import DataAccessBase
+
 # Endpoint Imports
 from endpoints.authentication import *
 from endpoints.users import *
@@ -10,6 +13,8 @@ from endpoints.users import *
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
+
+import json
 
 """
 FLASK APP CONFIGURATION
@@ -26,6 +31,13 @@ app.config["JWT_SECRET_KEY"] = config.JWT.secret
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=config.JWT.accessExpiry)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=config.JWT.refreshExpiry)
 jwt = JWTManager(app)
+
+# Define the blacklist checker for JWT
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    jti = jwt_payload['jti']
+    query = DataAccessBase.BLACKLIST_COL.find_one({"access_jti": jti})
+    return query is not None
 
 """
 ROUTE HANDLING

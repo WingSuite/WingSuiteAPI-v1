@@ -1,4 +1,5 @@
 # Imports
+from flask_jwt_extended import decode_token
 from config.config import permissions
 from .base import DataAccessBase
 from utils.hash import sha256
@@ -125,7 +126,7 @@ class UserAccess(DataAccessBase):
         results = {}
         for permission in kwargs["permissions"]:
             # If the given permission is not part of the approved list of permission
-            # track that is is not added with an exaplanation and continue
+            # track that is is not added with an explanation and continue
             if permission not in permissions:
                 results[permission] = "Not Added (Invalid Permission)"
                 continue
@@ -152,4 +153,31 @@ class UserAccess(DataAccessBase):
             "message": 
                 f"Permission {operation_type} have been applied to {user.get_fullname(lastNameFirst=True)}. Refer to results for what has been applied",
             "results": results
+        }
+    
+    @staticmethod
+    def handle_jwt_blacklisting(**kwargs):
+        """Handles the blacklisting of JWT tokens"""
+        
+        # Check if kwargs has the minimum arguments
+        check = DataAccessBase.args_checker(kwargs, "handle_jwt_blacklisting")
+        if check:
+            return check
+        
+        # Get the JTI from the tokens
+        refresh_jti = decode_token(kwargs["refresh"])["jti"]
+        access_jti = decode_token(kwargs["access"])["jti"]
+    
+        # Place tokens to blacklist collection
+        DataAccessBase.BLACKLIST_COL.insert_one({
+            "refresh": kwargs["refresh"],
+            "access": kwargs["access"],
+            "refresh_jti": refresh_jti,
+            "access_jti": access_jti
+        })
+        
+        # Return message
+        return {
+            "status": "success",
+            "message": "Signed Out"
         }

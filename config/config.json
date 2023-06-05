@@ -18,6 +18,10 @@
       "change_permission": [
         "_id",
         "permissions"
+      ],
+      "handle_jwt_blacklisting": [
+        "access",
+        "refresh"
       ]
     },
     "Users": {

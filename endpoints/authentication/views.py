@@ -1,9 +1,12 @@
 # Import the test blueprint
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import (
+    create_access_token, 
+    create_refresh_token,
+    jwt_required
+)
 from endpoints.base import permissions_required
 from database.users import UserAccess
 from flask import jsonify, request
-from models.user import User
 from . import *
 
 @login.route("/login/", methods=["POST"])
@@ -16,16 +19,16 @@ def login_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.login(**data)
+        result = UserAccess.login(**data)
 
         # If the response data results in an error, return 400 and error message
-        if (response_data["status"] != "success"):
-            return response_data, 400
+        if (result["status"] != "success"):
+            return result, 400
 
         # Create refresh and access token
         identity = {
-            "email": response_data["content"]["email"],
-            "_id": response_data["content"]["_id"]
+            "email": result["content"]["email"],
+            "_id": result["content"]["_id"]
         }
         access_token = create_access_token(identity=identity)
         refresh_token = create_refresh_token(identity=identity)
@@ -47,17 +50,17 @@ def register_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.register_user(**data)
+        result = UserAccess.register_user(**data)
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result["status"] == "success" else 400)
 
     # Error handling
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @authorize.route("/authorize_user/", methods=["POST"])
-@permissions_required(["auth.authrize_user"])
+@permissions_required(["auth.authorize_user"])
 def authorize_user_endpoint():
     """Log In Handling"""
     
@@ -67,15 +70,31 @@ def authorize_user_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.add_user(**data)
+        result = UserAccess.add_user(**data)
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result["status"] == "success" else 400)
 
     # Error handling
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@signout.route("/signout/")
+@signout.route("/signout/", methods=["POST"])
+@jwt_required()
 def signout_endpoint():
-    return "Signout"
+    """Sign Out Handling"""
+    
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+        
+        # Get the user's instance based on the given information
+        result = UserAccess.handle_jwt_blacklisting(**data)
+
+        # Return response data
+        return result, (200 if result["status"] == "success" else 400)
+        
+    # Error handling
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
