@@ -135,8 +135,9 @@ class UserAccess(DataAccessBase):
                 user.delete_permission(permission)
             
             # Track changes
-            results[permission] = "Added" if res else "Not Added (Already " \
-                + ("Added)" if operation == "add" else "Deleted or is Missing)")
+            results[permission] = ("Added" if operation == "add" else "Deleted") \
+                if res else "Not Added (Already " + ("Added)" if operation == "add" \
+                else "Deleted or is Missing)")
         
         # Update database
         DataAccessBase.USER_COL.update_one(
