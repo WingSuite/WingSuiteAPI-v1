@@ -57,7 +57,7 @@ def register_endpoint():
         return jsonify({"error": str(e)}), 500
 
 @authorize.route("/authorize_user/", methods=["POST"])
-@permissions_required(["user.authrize_user"])
+@permissions_required(["auth.authrize_user"])
 def authorize_user_endpoint():
     """Log In Handling"""
     
