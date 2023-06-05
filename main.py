@@ -52,6 +52,7 @@ app.register_blueprint(signout, url_prefix="/auth/")
 # User routes
 app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
+app.register_blueprint(who_am_i, url_prefix="/user/")
 
 """
 APP RUNTIME HANDLING

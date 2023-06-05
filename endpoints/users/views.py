@@ -1,10 +1,11 @@
 # Import the test blueprint
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import jwt_required, decode_token
 from endpoints.base import permissions_required
 from database.users import UserAccess
 from flask import jsonify, request
 from models.user import User
 from . import *
+import json
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
@@ -18,10 +19,10 @@ def add_permissions_endpoint():
         data = request.get_json()
 
         # Add permission to the user's data
-        response_data = UserAccess.change_permissions("add", **data)
+        result = UserAccess.change_permissions("add", **data)
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result["status"] == "success" else 400)
 
     # Error handling
     except Exception as e:
@@ -38,10 +39,32 @@ def delete_permissions_endpoint():
         data = request.get_json()
 
         # Add permission to the user's data
-        response_data = UserAccess.change_permissions("delete", **data)
+        result = UserAccess.change_permissions("delete", **data)
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result["status"] == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@who_am_i.route("/who_am_i/", methods=["GET"])
+@jwt_required()
+def who_am_i():
+    """Method to return the user's information"""
+    
+    # Try to parse information
+    try:
+        # Get the access token
+        token = request.headers.get('Authorization', None).split()[1]
+        
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+        
+        # Get the user based on the ID
+        result = UserAccess.get_user(secure=True, _id=id)
+        
+        return result, (200 if result["status"] == "success" else 400)
 
     # Error handling
     except Exception as e:
