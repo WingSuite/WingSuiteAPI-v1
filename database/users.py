@@ -8,6 +8,7 @@ import uuid
 class UserAccess(DataAccessBase):
     """Class that handles user information"""
     
+    @staticmethod
     def get_user(secure=False, obj=False, **kwargs):
         """Base method for get_user methods"""
         
@@ -68,7 +69,7 @@ class UserAccess(DataAccessBase):
             return {"status": "success", "message": "User added to the system"}
         # Return false if the given information exists
         else:
-            return {"status": "error", "message": "User didn't register"}
+            return {"status": "error", "message": "User did not register"}
         
     @staticmethod
     def register_user(**kwargs):
@@ -110,7 +111,7 @@ class UserAccess(DataAccessBase):
             return check
 
         # Check if the permission value is a list 
-        if not isinstance(kwargs["permission"], list):
+        if not isinstance(kwargs["permissions"], list):
             return {"status": "error", "message": "Permission value not in list format"}
         
         # Check if the operation value is one of the accepted options
@@ -122,7 +123,7 @@ class UserAccess(DataAccessBase):
         
         # Add new permission(s) and track changes
         results = {}
-        for permission in kwargs["permission"]:
+        for permission in kwargs["permissions"]:
             # If the given permission is not part of the approved list of permission
             # track that is is not added with an exaplanation and continue
             if permission not in permissions:

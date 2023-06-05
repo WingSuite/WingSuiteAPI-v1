@@ -17,7 +17,7 @@
       ],
       "change_permission": [
         "_id",
-        "permission"
+        "permissions"
       ]
     },
     "Users": {
@@ -40,5 +40,6 @@
     "accessExpiry": 8,
     "refreshExpiry": 720
   },
-  "privateInfo": ["password"]
+  "privateInfo": ["password"],
+  "rootPermissionString": "*"
 }

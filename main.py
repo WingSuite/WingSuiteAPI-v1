@@ -20,12 +20,12 @@ from datetime import timedelta
 app = Flask(__name__)
 
 # Set CORS for the application
-CORS(app, methods=['POST', 'GET'])
+CORS(app, methods=["POST", "GET"])
 
 # Initialize JWT functionalities
-app.config['JWT_SECRET_KEY'] = config.JWT.secret 
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=config.JWT.accessExpiry)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(hours=config.JWT.refreshExpiry)
+app.config["JWT_SECRET_KEY"] = config.JWT.secret 
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=config.JWT.accessExpiry)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(hours=config.JWT.refreshExpiry)
 jwt = JWTManager(app)
 
 # Register all blueprints
@@ -39,5 +39,5 @@ app.register_blueprint(dashboard, url_prefix="/user/")
 app.register_blueprint(signout, url_prefix="/user/")
 
 # Main run thread
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
