@@ -20,21 +20,32 @@ class UserAccess(DataAccessBase):
         if user_data == None:
             return {"status": "error", "message": "Check your inputted credentials"}
         
-        # Return the user object
-        else:
-            # Get the content of the user based on wether 
-            # we want to get all or some data
-            content = User(**user_data).info if not secure else \
-                User(**user_data).get_generic_info(
-                    includeFullName=True, 
-                    lastNameFirst=True
-                )
-            
-            # Return results based on types of representation
-            return {
-                "status": "success", 
-                "content": content if not obj else User(**user_data)
-            }
+        # Get the content of the user based on wether 
+        # we want to get all or some data
+        content = User(**user_data).info if not secure else \
+            User(**user_data).get_generic_info(
+                includeFullName=True, 
+                lastNameFirst=True
+            )
+        
+        # Return results based on types of representation
+        return {
+            "status": "success", 
+            "content": content if not obj else User(**user_data)
+        }
+    
+    @staticmethod
+    def set_user(**kwargs):
+        
+        # Check if kwargs has the minimum arguments
+        check = DataAccessBase.args_checker(kwargs, "set_user")
+        if check:
+            return check
+        
+        DataAccessBase.USER_COL.update_one(
+            {"_id": kwargs["_id"]},
+            {"$set": kwargs["value"]}
+        )
     
     @staticmethod
     def login(**kwargs):

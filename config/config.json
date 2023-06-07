@@ -5,6 +5,10 @@
         "email",
         "password"
       ],
+      "set_user": [
+        "_id",
+        "value"
+      ],
       "add_user": [
         "email"
       ],
@@ -22,6 +26,17 @@
       "handle_jwt_blacklisting": [
         "access",
         "refresh"
+      ]
+    },
+    "Unit": {
+      "init": [
+        "id",
+        "name",
+        "type",
+        "parent",
+        "children",
+        "officers",
+        "members"
       ]
     },
     "Users": {
