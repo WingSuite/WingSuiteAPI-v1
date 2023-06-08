@@ -62,7 +62,7 @@ def register_endpoint():
 
         # Get the user's instance based on the given information
         result = UserAccess.register_user(**data)
-        
+
         # Return response data
         return result, (200 if result.status == "success" else 400)
 

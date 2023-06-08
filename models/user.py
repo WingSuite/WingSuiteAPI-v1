@@ -28,7 +28,7 @@ class User:
             k: v for k, v in self.info.items() if k not in config.privateInfo
         }
 
-        # Append full name information to the data based on the 
+        # Append full name information to the data based on the
         # given parameters
         if includeFullName:
             data["full_name"] = self.get_fullname(lastNameFirst)

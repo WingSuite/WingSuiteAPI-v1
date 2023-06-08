@@ -158,7 +158,7 @@ class UserAccess(DataAccessBase):
 
         # Get the content from the user fetch
         user = user.content
-        
+
         # Add new permission(s) and track changes
         results = {}
         for permission in kwargs["permissions"]:
