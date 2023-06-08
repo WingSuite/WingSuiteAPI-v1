@@ -11,7 +11,7 @@ class UserAccess(DataAccessBase):
     """Class that handles user information"""
 
     # Store the required arguments for this class
-    ARGS = DataAccessBase.REQ_ARGS.users
+    ARGS = DataAccessBase.REQ_ARGS.user
 
     @staticmethod
     @DataAccessBase.dict_wrap

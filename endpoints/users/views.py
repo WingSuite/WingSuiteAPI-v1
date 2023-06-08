@@ -2,7 +2,7 @@
 from . import add_permissions, delete_permissions, who_am_i
 from flask_jwt_extended import jwt_required, decode_token
 from endpoints.base import permissions_required
-from database.users import UserAccess
+from database.user import UserAccess
 from flask import jsonify, request
 
 

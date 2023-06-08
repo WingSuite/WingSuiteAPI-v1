@@ -17,11 +17,33 @@ class DataAccessBase:
     # Collection constant definition
     USER_COL = DB["users"]
     REGISTER_COL = DB["registerList"]
+    UNIT_COL = DB["units"]
     BLACKLIST_COL = DB["jwt_blacklist"]
 
     # Set config constants
     REQ_ARGS = arguments.dataAccess
     CONFIG = config
+
+    def sendError(message):
+        """Error message format method"""
+        return {"status": "error", "message": message}
+
+    def sendSuccess(message):
+        """Success message format method"""
+        return {"status": "success", "message": message}
+
+    def checkDataType(data, schema):
+        """Method that checks if the given data follows the datatype schema"""
+
+        # Iterate through every key, value pair in the data dictionary
+        for key, value in data.items():
+            # Check if the datatype of the iterated value is the same
+            # as the corresponding schema value. If not, return false
+            if type(value) is not schema[key]:
+                return False
+
+        # Return true
+        return True
 
     def param_check(required_params):
         """Method that checks for minimum parameters"""

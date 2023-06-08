@@ -11,7 +11,7 @@ from . import (
     signout
 )
 from endpoints.base import permissions_required
-from database.users import UserAccess
+from database.user import UserAccess
 from flask import jsonify, request
 
 

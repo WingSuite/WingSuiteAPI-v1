@@ -1,6 +1,6 @@
 # Imports
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from database.users import UserAccess
+from database.user import UserAccess
 from config.config import config
 from functools import wraps
 from flask import jsonify
