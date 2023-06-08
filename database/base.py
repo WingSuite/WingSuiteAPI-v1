@@ -33,9 +33,9 @@ class DataAccessBase:
             def wrapper(*args, **kwargs):
                 """Wrapping definition"""
 
-                # Check if  the given arguments has the minimum arguments
+                # Check if the given arguments has the minimum arguments
                 for arg in required_params:
-                    if arg not in args:
+                    if arg not in kwargs:
                         return {
                             "status": "error",
                             "message": "Call needs the following arguments: "

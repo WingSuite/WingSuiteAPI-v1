@@ -3,7 +3,7 @@
     "users": {
       "login": ["email", "password"],
       "set_user": ["_id", "value"],
-      "add_user": ["email"],
+      "add_user": ["_id"],
       "register_user": ["first_name", "last_name", "email", "phone_number", 
         "password"],
       "change_permissions": ["_id", "permissions"],

@@ -14,6 +14,7 @@ class UserAccess(DataAccessBase):
     ARGS = DataAccessBase.REQ_ARGS.users
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     def get_user(secure=False, obj=False, **kwargs):
         """Base method for get_user methods"""
 
@@ -44,17 +45,18 @@ class UserAccess(DataAccessBase):
         }
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.set_user)
-    @DataAccessBase.dict_wrap()
     def set_user(**kwargs):
-        # Updated the specified user's information
+        """Update the specified user's information"""
         DataAccessBase.USER_COL.update_one(
             {"_id": kwargs["_id"]}, {"$set": kwargs["value"]}
         )
+        return {}
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.login)
-    @DataAccessBase.dict_wrap()
     def login(**kwargs):
         """
         Method that returns the user object based
@@ -70,27 +72,27 @@ class UserAccess(DataAccessBase):
         return UserAccess.get_user(secure=True, **kwargs)
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.add_user)
-    @DataAccessBase.dict_wrap()
     def add_user(**kwargs):
         """Method that handles adding a user to the system"""
 
         # Add user to the list and return success if the given
         # information is not the system
-        user = DataAccessBase.REGISTER_COL.find_one({"email": kwargs["email"]})
+        user = DataAccessBase.REGISTER_COL.find_one({"_id": kwargs["_id"]})
         if user is not None:
             # Insert user into the database, remove from REGISTER_COL and
             # return success
             DataAccessBase.USER_COL.insert_one(user)
-            DataAccessBase.REGISTER_COL.delete_one({"email": kwargs["email"]})
+            DataAccessBase.REGISTER_COL.delete_one({"_id": kwargs["_id"]})
             return {"status": "success", "message": "User added to the system"}
         # Return false if the given information exists
         else:
             return {"status": "error", "message": "User did not register"}
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.register_user)
-    @DataAccessBase.dict_wrap()
     def register_user(**kwargs):
         """Method that handles registering a user to the system"""
 
@@ -127,8 +129,8 @@ class UserAccess(DataAccessBase):
             }
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.change_permissions)
-    @DataAccessBase.dict_wrap()
     def change_permissions(operation, **kwargs):
         """Add permissions values based on the given id"""
 
@@ -147,8 +149,16 @@ class UserAccess(DataAccessBase):
             }
 
         # Get user object
-        user = UserAccess.get_user(obj=True, _id=kwargs["_id"])["content"]
+        user = UserAccess.get_user(obj=True, _id=kwargs["_id"])
 
+        # If content is not in result of getting the user, return the
+        # error message
+        if "content" not in user:
+            return user
+
+        # Get the content from the user fetch
+        user = user.content
+        
         # Add new permission(s) and track changes
         results = {}
         for permission in kwargs["permissions"]:
@@ -195,8 +205,8 @@ class UserAccess(DataAccessBase):
         }
 
     @staticmethod
+    @DataAccessBase.dict_wrap
     @DataAccessBase.param_check(ARGS.handle_jwt_blacklisting)
-    @DataAccessBase.dict_wrap()
     def handle_jwt_blacklisting(**kwargs):
         """Handles the blacklisting of JWT tokens"""
 
