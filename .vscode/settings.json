@@ -3,5 +3,16 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.formatting.provider": "none"
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.pycodestyleEnabled": true,
+    "editor.rulers": [
+        79
+    ],
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "79"
+    ],
+    "editor.formatOnSave": true
 }

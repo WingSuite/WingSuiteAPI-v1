@@ -4,4 +4,5 @@ import json
 
 # Export configs
 permissions = set(json.load(open("./config/permissions.json")))
+arguments = DictParse(json.load(open("./config/arguments.json")))
 config = DictParse(json.load(open("./config/config.json")))
