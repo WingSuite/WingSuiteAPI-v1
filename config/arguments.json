@@ -10,13 +10,13 @@
       "handle_jwt_blacklisting": ["access", "refresh"]
     },
     "unit": {
-      "create_unit": {"id": "", "name": "", "type": "", "parent": "",
+      "create_unit": {"name": "", "type": "", "parent": "",
         "children": [], "officers": [], "members": []}
     }
   },
   "models": {
     "unit": {
-      "init": ["id", "name", "type", "parent", "children", "officers",
+      "init": ["name", "type", "parent", "children", "officers",
         "members"]
     },
     "user": {

@@ -1,6 +1,7 @@
 # Imports
 from config.config import config
 from .base import DataAccessBase
+from models.unit import Unit
 import pprint
 import uuid
 
@@ -39,6 +40,42 @@ class UnitAccess(DataAccessBase):
 
         # Insert into the collection and send a success message
         DataAccessBase.UNIT_COL.insert_one(kwargs)
-        return DataAccessBase.sendSuccess(
-            f"{kwargs['name']} added to units list"
-        )
+        return DataAccessBase.sendSuccess("Unit added")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_unit(id):
+        """Method to delete a unit"""
+
+        # Check if the unit based on its id does not exist
+        if (DataAccessBase.UNIT_COL.find_one({"_id": id}) is None):
+            return DataAccessBase.sendError("Unit does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.UNIT_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("Unit deleted")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def update_unit(id, **kwargs):
+        """Method to delete a unit"""
+
+        # Delete the id in the kwargs
+        del kwargs["_id"]
+
+        # Check if the unit based on its id does exist
+        if (DataAccessBase.UNIT_COL.find_one({"_id": id}) is None):
+            return DataAccessBase.sendError("Unit does not exist")
+
+        # Update the document and return a success message
+        DataAccessBase.UNIT_COL.update_one({"_id": id}, {"$set": kwargs})
+        return DataAccessBase.sendSuccess("Unit updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_unit(id):
+        """Method to get a unit by ID"""
+
+        # Delete the document and return a success message
+        unit = Unit(**DataAccessBase.UNIT_COL.find_one({"_id": id}))
+        return DataAccessBase.sendSuccess("Unit updated")

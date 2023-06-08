@@ -39,7 +39,7 @@ class DataAccessBase:
         for key, value in data.items():
             # Check if the datatype of the iterated value is the same
             # as the corresponding schema value. If not, return false
-            if type(value) is not schema[key]:
+            if key in schema.keys() and type(value) is not schema[key]:
                 return False
 
         # Return true
