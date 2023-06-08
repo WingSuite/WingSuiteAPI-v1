@@ -15,7 +15,7 @@
       "init": ["id", "name", "type", "parent", "children", "officers", 
         "members"]
     },
-    "users": {
+    "user": {
       "init": ["first_name", "last_name", "email", "phone_number"]
     }
   }

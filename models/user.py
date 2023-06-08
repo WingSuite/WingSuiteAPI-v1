@@ -1,13 +1,13 @@
 # Imports
+from config.config import config, arguments
 from utils.dict_parse import DictParse
-from config.config import config
 
 
 class User:
     """User class model"""
 
     # Static variable declaration
-    REQ_ARGS = config.neededArguments.Users
+    REQ_ARGS = arguments.models.user
 
     def __init__(self, **kwargs):
         """Constructor for the User class"""
@@ -90,3 +90,6 @@ class User:
         # If not, append to the end of the list
         else:
             self.info.units.append(id)
+
+        # Return true
+        return True
