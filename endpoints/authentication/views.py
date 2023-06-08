@@ -34,8 +34,8 @@ def login_endpoint():
 
         # Create refresh and access token
         identity = {
-            "email": result.content.email,
-            "_id": result.content._id,
+            "email": result.message.info.email,
+            "_id": result.message.info._id,
         }
         access_token = create_access_token(identity=identity)
         refresh_token = create_refresh_token(identity=identity)
@@ -100,10 +100,11 @@ def signout_endpoint():
     # Try to parse information
     try:
         # Parse information from the call's body
-        data = request.get_json()
+        access = request.get_json()["access"]
+        refresh = request.get_json()["refresh"]
 
         # Get the user's instance based on the given information
-        result = UserAccess.handle_jwt_blacklisting(**data)
+        result = UserAccess.handle_jwt_blacklisting(access, refresh)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

@@ -3,6 +3,7 @@ from config.config import config, arguments
 from utils.dict_parse import DictParse
 from functools import wraps
 import pymongo
+import pprint
 
 
 class DataAccessBase:
@@ -56,13 +57,21 @@ class DataAccessBase:
                 """Wrapping definition"""
 
                 # Check if the given arguments has the minimum arguments
-                for arg in required_params:
+                for arg in required_params.keys():
                     if arg not in kwargs:
-                        return {
-                            "status": "error",
-                            "message": "Call needs the following arguments: "
-                            + ", ".join(required_params),
-                        }
+                        return DataAccessBase.sendError(
+                            "Call needs the following arguments: "
+                            + ", ".join(required_params.keys())
+                        )
+
+                # Check if the given data is in the correct data types
+                schema = {key: type(value) for key, value
+                          in required_params.items()}
+                if not (DataAccessBase.checkDataType(kwargs, schema)):
+                    return DataAccessBase.sendError(
+                        "Inputs should be in the following structure:\n"
+                        + pprint.pformat(schema)
+                    )
 
                 # Return normally if all else is good
                 return func(*args, **kwargs)

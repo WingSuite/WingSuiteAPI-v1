@@ -2,6 +2,7 @@
 from . import add_permissions, delete_permissions, who_am_i
 from flask_jwt_extended import jwt_required, decode_token
 from endpoints.base import permissions_required
+from config.config import permissions
 from database.user import UserAccess
 from flask import jsonify, request
 
@@ -16,11 +17,46 @@ def add_permissions_endpoint():
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add permission to the user's data
-        result = UserAccess.change_permissions("add", **data)
+        # Get the target user's object
+        user = UserAccess.get_user(data["id"])
+
+        # If content is not in result of getting the user, return the
+        # error message
+        if user.status == "error":
+            return user
+
+        # Get the content from the user fetch
+        user = user.message
+
+        # Add new permission(s) and track changes
+        results = {}
+        for permission in data["permissions"]:
+            # If the iterated item is not part of the approved list of
+            # permission, track that it's not added and continue
+            if permission not in permissions:
+                results[permission] = "Not Added (Invalid Permission)"
+                continue
+
+            # Attempt add permission and track change
+            res = user.add_permission(permission)
+            results[permission] = (
+                "Added" if res else "Not Added (Already Added)"
+            )
+
+        # Push changes to collection
+        UserAccess.update_user(id=data["id"], **user.info)
+
+        # Make response dictionary
+        message = {
+            "status": "success",
+            "message": "Permission addition have been applied to"
+            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results"
+            + "for what has been applied",
+            "results": results,
+        }
 
         # Return response data
-        return result, (200 if result.status == "success" else 400)
+        return message, 200
 
     # Error handling
     except Exception as e:
@@ -37,11 +73,46 @@ def delete_permissions_endpoint():
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add permission to the user's data
-        result = UserAccess.change_permissions("delete", **data)
+        # Get the target user's object
+        user = UserAccess.get_user(data["id"])
+
+        # If content is not in result of getting the user, return the
+        # error message
+        if user.status == "error":
+            return user
+
+        # Get the content from the user fetch
+        user = user.message
+
+        # Add new permission(s) and track changes
+        results = {}
+        for permission in data["permissions"]:
+            # If the iterated item is not part of the approved list of
+            # permission, track that it's not added and continue
+            if permission not in permissions:
+                results[permission] = "Not Added (Invalid Permission)"
+                continue
+
+            # Attempt add permission and track change
+            res = user.delete_permission(permission)
+            results[permission] = (
+                "Deleted" if res else "Not Deleted (Permission Missing)"
+            )
+
+        # Push changes to collection
+        UserAccess.update_user(data["id"], **user.info)
+
+        # Make response dictionary
+        message = {
+            "status": "success",
+            "message": "Permission deletion have been applied to"
+            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results"
+            + "for what has been applied",
+            "results": results,
+        }
 
         # Return response data
-        return result, (200 if result.status == "success" else 400)
+        return message, 200
 
     # Error handling
     except Exception as e:
@@ -62,10 +133,11 @@ def who_am_i():
         id = decode_token(token)["sub"]["_id"]
 
         # Get the user based on the ID
-        result = UserAccess.get_user(secure=True, _id=id)
+        result = UserAccess.get_user(id)
+        content = result.message.get_generic_info()
 
         # Return the results of the database query
-        return result, (200 if result.status == "success" else 400)
+        return content, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:

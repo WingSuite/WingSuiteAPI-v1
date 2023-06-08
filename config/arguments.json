@@ -1,14 +1,5 @@
 {
   "dataAccess": {
-    "user": {
-      "login": ["email", "password"],
-      "set_user": ["_id", "value"],
-      "add_user": ["_id"],
-      "register_user": ["first_name", "last_name", "email", "phone_number",
-        "password"],
-      "change_permissions": ["_id", "permissions"],
-      "handle_jwt_blacklisting": ["access", "refresh"]
-    },
     "unit": {
       "create_unit": {"name": "", "type": "", "parent": "",
         "children": [], "officers": [], "members": []}
@@ -16,7 +7,7 @@
   },
   "models": {
     "unit": {
-      "init": ["name", "type", "parent", "children", "officers",
+      "init": ["_id", "name", "unit_type", "parent", "children", "officers",
         "members"]
     },
     "user": {

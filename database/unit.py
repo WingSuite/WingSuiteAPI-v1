@@ -1,50 +1,49 @@
 # Imports
+from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
+from typing import Union, Any
 from models.unit import Unit
-import pprint
 import uuid
 
 
 class UnitAccess(DataAccessBase):
     """Class that handles unit information"""
 
-    # Store the required arguments for this class
-    ARGS = DataAccessBase.REQ_ARGS.unit
-
     @staticmethod
     @DataAccessBase.dict_wrap
-    @DataAccessBase.param_check(ARGS.create_unit.keys())
-    def create_unit(**kwargs):
+    def create_unit(
+        name: str,
+        unit_type: str,
+        parent: str,
+        children: list,
+        officers: list,
+        members: list,
+        **kwargs: Any
+    ) -> DictParse:
         """Method to create a new unit"""
-
-        # Check if the given data is in the correct data types
-        schema = {key: type(value) for key, value in
-                  UnitAccess.ARGS.create_unit.items()}
-        if not (DataAccessBase.checkDataType(kwargs, schema)):
-            return DataAccessBase.sendError(
-                "Inputs should be in the following structure:\n"
-                + pprint.pformat(schema)
-            )
 
         # If the inputted type is an approved type, return with an
         # error message
-        if kwargs["type"] not in config.unitTypes:
+        if unit_type not in config.unitTypes:
             return DataAccessBase.sendError(
                 "Unit type not a valid type. Selected from: "
                 + ", ".join(config.unitTypes)
             )
 
-        # Prep the incoming data for insertion into the collection
-        kwargs["_id"] = uuid.uuid4().hex
+        # Prep data to be inserted
+        data = {k: v for k, v in locals().items()
+                if k not in ["kwargs", "args"]}
+        data.update(locals()["kwargs"])
+        data["_id"] = uuid.uuid4().hex
 
         # Insert into the collection and send a success message
-        DataAccessBase.UNIT_COL.insert_one(kwargs)
+        DataAccessBase.UNIT_COL.insert_one(data)
         return DataAccessBase.sendSuccess("Unit added")
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def delete_unit(id):
+    def delete_unit(id: str) -> DictParse:
         """Method to delete a unit"""
 
         # Check if the unit based on its id does not exist
@@ -57,7 +56,7 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def update_unit(id, **kwargs):
+    def update_unit(id: str, **kwargs) -> DictParse:
         """Method to delete a unit"""
 
         # Delete the id in the kwargs
@@ -73,9 +72,18 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_unit(id):
+    def get_unit(id: str) -> Union[Unit, DictParse]:
         """Method to get a unit by ID"""
 
-        # Delete the document and return a success message
-        unit = Unit(**DataAccessBase.UNIT_COL.find_one({"_id": id}))
-        return DataAccessBase.sendSuccess("Unit updated")
+        # Search the collection based on id
+        unit = DataAccessBase.UNIT_COL.find_one({"_id": id})
+
+        # Return if the given unit is not in the database
+        if unit is None:
+            return {
+                "status": "error",
+                "message": "Unit not found",
+            }
+
+        # Return with a User object
+        return DataAccessBase.sendSuccess(Unit(**unit))
