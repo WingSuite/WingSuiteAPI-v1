@@ -1,0 +1,28 @@
+{
+  "endpoints": {
+    "unit": {
+
+    },
+    "authentication": {
+      "login": ["email", "password"],
+      "register": ["first_name", "last_name", "email", "phone_number",
+        "password"],
+      "authorize_user": ["id"],
+      "signout": ["access", "refresh"]
+    },
+    "user": {
+      "add_permissions": ["id", "permissions"],
+      "delete_permissions": ["id", "permissions"],
+      "who_am_i": []
+    }
+  },
+  "models": {
+    "unit": {
+      "init": ["_id", "name", "unit_type", "parent", "children", "officers",
+        "members"]
+    },
+    "user": {
+      "init": ["_id", "first_name", "last_name", "email", "phone_number"]
+    }
+  }
+}

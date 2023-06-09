@@ -1,34 +1,4 @@
 {
-  "neededArguments": {
-    "DataAccess": {
-      "login": [
-        "email",
-        "password"
-      ],
-      "add_user": [
-        "email"
-      ],
-      "register_user": [
-        "first_name",
-        "last_name",
-        "email",
-        "phone_number",
-        "password"
-      ],
-      "change_permission": [
-        "_id",
-        "permissions"
-      ]
-    },
-    "Users": {
-      "init": [
-        "first_name",
-        "last_name",
-        "email",
-        "phone_number"
-      ]
-    }
-  },
   "database": {
     "spicer": "Bruh",
     "domain": "localhost",
@@ -41,5 +11,6 @@
     "refreshExpiry": 720
   },
   "privateInfo": ["password"],
-  "rootPermissionString": "*"
+  "rootPermissionString": "*",
+  "unitTypes": ["wingmen", "team", "flight", "squadron", "group", "wing"]
 }

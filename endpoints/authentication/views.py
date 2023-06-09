@@ -1,81 +1,123 @@
 # Import the test blueprint
-from flask_jwt_extended import create_access_token, create_refresh_token
-from endpoints.base import permissions_required
-from database.users import UserAccess
-from flask import jsonify, request
-from models.user import User
-from . import *
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+)
+from . import (
+    login,
+    register,
+    authorize,
+    signout,
+)
+from endpoints.base import (
+    permissions_required,
+    param_check,
+    serverErrorResponse,
+    ARGS
+)
+from database.user import UserAccess
+from flask import request
 
-@login.route("/login/", methods=["POST"])
+
+@login.route("/login/", methods=["GET"])
+@param_check(ARGS.authentication.login)
 def login_endpoint():
     """Log In Handling"""
-    
+
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.login(**data)
+        result = UserAccess.login(**data)
 
-        # If the response data results in an error, return 400 and error message
-        if (response_data["status"] != "success"):
-            return response_data, 400
+        # If the response data results in an error, return 400
+        # and error message
+        if result.status != "success":
+            return result, 400
 
         # Create refresh and access token
         identity = {
-            "email": response_data["content"]["email"],
-            "_id": response_data["content"]["_id"]
+            "email": result.message.info.email,
+            "_id": result.message.info._id,
         }
         access_token = create_access_token(identity=identity)
         refresh_token = create_refresh_token(identity=identity)
-        
+
         # Return response data except for the password
-        return {"access_token": access_token, "refresh_token": refresh_token}, 200
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+        }, 200
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
+
 
 @register.route("/register/", methods=["POST"])
+@param_check(ARGS.authentication.register)
 def register_endpoint():
     """Log In Handling"""
-    
+
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.register_user(**data)
+        result = UserAccess.register_user(**data)
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
+
 
 @authorize.route("/authorize_user/", methods=["POST"])
-@permissions_required(["auth.authrize_user"])
+@permissions_required(["auth.authorize_user"])
+@param_check(ARGS.authentication.authorize_user)
 def authorize_user_endpoint():
     """Log In Handling"""
-    
+
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        response_data = UserAccess.add_user(**data)
+        result = UserAccess.add_user(data["id"])
 
         # Return response data
-        return response_data, (200 if response_data["status"] == "success" else 400)
+        return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
-@signout.route("/signout/")
+
+@signout.route("/signout/", methods=["POST"])
+@param_check(ARGS.authentication.signout)
+@jwt_required()
 def signout_endpoint():
-    return "Signout"
+    """Sign Out Handling"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        access = request.get_json()["access"]
+        refresh = request.get_json()["refresh"]
+
+        # Get the user's instance based on the given information
+        result = UserAccess.handle_jwt_blacklisting(access, refresh)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
