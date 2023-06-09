@@ -1,9 +1,8 @@
 # Imports
-from config.config import config, arguments
 from utils.dict_parse import DictParse
+from config.config import config
 from functools import wraps
 import pymongo
-import pprint
 
 
 class DataAccessBase:
@@ -22,7 +21,6 @@ class DataAccessBase:
     BLACKLIST_COL = DB["jwt_blacklist"]
 
     # Set config constants
-    REQ_ARGS = arguments.dataAccess
     CONFIG = config
 
     def sendError(message):
@@ -32,55 +30,6 @@ class DataAccessBase:
     def sendSuccess(message):
         """Success message format method"""
         return {"status": "success", "message": message}
-
-    def checkDataType(data, schema):
-        """Method that checks if the given data follows the datatype schema"""
-
-        # Iterate through every key, value pair in the data dictionary
-        for key, value in data.items():
-            # Check if the datatype of the iterated value is the same
-            # as the corresponding schema value. If not, return false
-            if key in schema.keys() and type(value) is not schema[key]:
-                return False
-
-        # Return true
-        return True
-
-    def param_check(required_params):
-        """Method that checks for minimum parameters"""
-
-        def decorator(func):
-            """Decorator definition"""
-
-            @wraps(func)
-            def wrapper(*args, **kwargs):
-                """Wrapping definition"""
-
-                # Check if the given arguments has the minimum arguments
-                for arg in required_params.keys():
-                    if arg not in kwargs:
-                        return DataAccessBase.sendError(
-                            "Call needs the following arguments: "
-                            + ", ".join(required_params.keys())
-                        )
-
-                # Check if the given data is in the correct data types
-                schema = {key: type(value) for key, value
-                          in required_params.items()}
-                if not (DataAccessBase.checkDataType(kwargs, schema)):
-                    return DataAccessBase.sendError(
-                        "Inputs should be in the following structure:\n"
-                        + pprint.pformat(schema)
-                    )
-
-                # Return normally if all else is good
-                return func(*args, **kwargs)
-
-            # End of wrapper definition
-            return wrapper
-
-        # End of decorator definition
-        return decorator
 
     def dict_wrap(func):
         """Dictionary to object wrapper"""

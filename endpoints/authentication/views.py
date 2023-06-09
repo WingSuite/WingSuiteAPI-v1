@@ -8,14 +8,20 @@ from . import (
     login,
     register,
     authorize,
-    signout
+    signout,
 )
-from endpoints.base import permissions_required
+from endpoints.base import (
+    permissions_required,
+    param_check,
+    serverErrorResponse,
+    ARGS
+)
 from database.user import UserAccess
-from flask import jsonify, request
+from flask import request
 
 
 @login.route("/login/", methods=["GET"])
+@param_check(ARGS.authentication.login)
 def login_endpoint():
     """Log In Handling"""
 
@@ -48,10 +54,11 @@ def login_endpoint():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
 
 @register.route("/register/", methods=["POST"])
+@param_check(ARGS.authentication.register)
 def register_endpoint():
     """Log In Handling"""
 
@@ -68,11 +75,12 @@ def register_endpoint():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
 
 @authorize.route("/authorize_user/", methods=["POST"])
 @permissions_required(["auth.authorize_user"])
+@param_check(ARGS.authentication.authorize_user)
 def authorize_user_endpoint():
     """Log In Handling"""
 
@@ -82,17 +90,18 @@ def authorize_user_endpoint():
         data = request.get_json()
 
         # Get the user's instance based on the given information
-        result = UserAccess.add_user(**data)
+        result = UserAccess.add_user(data["id"])
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
 
 @signout.route("/signout/", methods=["POST"])
+@param_check(ARGS.authentication.signout)
 @jwt_required()
 def signout_endpoint():
     """Sign Out Handling"""
@@ -111,4 +120,4 @@ def signout_endpoint():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))

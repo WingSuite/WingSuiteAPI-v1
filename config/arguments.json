@@ -1,8 +1,19 @@
 {
-  "dataAccess": {
+  "endpoints": {
     "unit": {
-      "create_unit": {"name": "", "type": "", "parent": "",
-        "children": [], "officers": [], "members": []}
+
+    },
+    "authentication": {
+      "login": ["email", "password"],
+      "register": ["first_name", "last_name", "email", "phone_number",
+        "password"],
+      "authorize_user": ["id"],
+      "signout": ["access", "refresh"]
+    },
+    "user": {
+      "add_permissions": ["id", "permissions"],
+      "delete_permissions": ["id", "permissions"],
+      "who_am_i": []
     }
   },
   "models": {
@@ -11,7 +22,7 @@
         "members"]
     },
     "user": {
-      "init": ["first_name", "last_name", "email", "phone_number"]
+      "init": ["_id", "first_name", "last_name", "email", "phone_number"]
     }
   }
 }

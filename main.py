@@ -13,7 +13,7 @@ from endpoints.authentication import (
     authorize,
     signout
 )
-from endpoints.users import (
+from endpoints.user import (
     add_permissions,
     delete_permissions,
     who_am_i

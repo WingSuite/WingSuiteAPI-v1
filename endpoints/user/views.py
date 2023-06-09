@@ -1,14 +1,20 @@
 # Import the test blueprint
+from endpoints.base import (
+    permissions_required,
+    param_check,
+    serverErrorResponse,
+    ARGS
+)
 from . import add_permissions, delete_permissions, who_am_i
 from flask_jwt_extended import jwt_required, decode_token
-from endpoints.base import permissions_required
 from config.config import permissions
 from database.user import UserAccess
-from flask import jsonify, request
+from flask import request
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
 @permissions_required(["user.add_permissions"])
+@param_check(ARGS.user.add_permissions)
 def add_permissions_endpoint():
     """Method to handle the adding of new permissions to the user"""
 
@@ -44,7 +50,7 @@ def add_permissions_endpoint():
             )
 
         # Push changes to collection
-        UserAccess.update_user(id=data["id"], **user.info)
+        UserAccess.update_user(data["id"], **user.info)
 
         # Make response dictionary
         message = {
@@ -60,11 +66,12 @@ def add_permissions_endpoint():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
 
 @delete_permissions.route("/delete_permissions/", methods=["POST"])
 @permissions_required(["user.delete_permissions"])
+@param_check(ARGS.user.delete_permissions)
 def delete_permissions_endpoint():
     """Method to handle the adding of new permissions to the user"""
 
@@ -116,7 +123,7 @@ def delete_permissions_endpoint():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
 
 
 @who_am_i.route("/who_am_i/", methods=["GET"])
@@ -141,4 +148,4 @@ def who_am_i():
 
     # Error handling
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return serverErrorResponse(str(e))
