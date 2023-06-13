@@ -21,7 +21,7 @@ from flask import request
 @permissions_required(["user.create_unit"])
 @param_check(ARGS.unit.create_unit)
 def create_unit_endpoint():
-    """Method to handle the creation of new units"""
+    """Method to handle the creation of a new unit"""
 
     # Try to parse information
     try:
@@ -30,6 +30,28 @@ def create_unit_endpoint():
 
         # Add the unit to the database
         result = UnitAccess.create_unit(**data)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@delete_unit.route("/delete_unit/", methods=["POST"])
+@permissions_required(["user.delete_unit"])
+@param_check(ARGS.unit.delete_unit)
+def delete_unit_endpoint():
+    """Method to handle the deletion of a new unit"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add the unit to the database
+        result = UnitAccess.delete_unit(**data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
