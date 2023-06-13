@@ -18,6 +18,11 @@ from endpoints.user import (
     delete_permissions,
     who_am_i
 )
+from endpoints.metadata import (
+    get_metadata,
+    delete_metadata,
+    update_metadata
+)
 
 # Miscellaneous Imports
 from config.config import config
@@ -66,6 +71,11 @@ app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
+
+# Cadet MetaData Routes
+app.register_blueprint(get_metadata, url_prefix="/meta/")
+app.register_blueprint(delete_metadata, url_prefix="/meta/")
+app.register_blueprint(update_metadata, url_prefix="/meta/")
 
 """
 APP RUNTIME HANDLING
