@@ -52,3 +52,23 @@ class Unit:
 
         # Return true
         return True
+
+    def add_child(self, id):
+        """Method to add a child"""
+
+        # Add child to the children's list if it doesn't exist
+        if id not in self.info.children:
+            self.info.children.append(id)
+
+        # Return true
+        return True
+
+    def delete_child(self, id):
+        """Method to delete a child"""
+
+        # Add child to the children's list if it doesn't exist
+        if id in self.info.children:
+            self.info.children.remove(id)
+
+        # Return true
+        return True

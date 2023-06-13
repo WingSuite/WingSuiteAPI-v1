@@ -3,7 +3,9 @@ from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
 from typing import Union, Any
+from database.user import UserAccess
 from models.unit import Unit
+from models.user import User
 import uuid
 
 
@@ -27,18 +29,62 @@ class UnitAccess(DataAccessBase):
         # error message
         if unit_type not in config.unitTypes:
             return DataAccessBase.sendError(
-                "Unit type not a valid type. Selected from: "
+                "Unit type is not a valid type. \nSelect from: "
                 + ", ".join(config.unitTypes)
             )
 
         # Prep data to be inserted
-        data = {k: v for k, v in locals().items()
-                if k not in ["kwargs", "args"]}
+        data = {
+            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
+        }
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
 
-        # Insert into the collection and send a success message
+        # Insert into the collection
         DataAccessBase.UNIT_COL.insert_one(data)
+
+        # Add the inputted officers and members into the unit
+        for item in officers + members:
+            # Get the user object based on iterated item
+            user = UserAccess.get_user(item).message
+
+            # Continue if the iterated user is not a User
+            if type(user) != User:
+                continue
+
+            # Add the officer to the unit
+            user.add_unit(data["_id"])
+
+            # Update officer
+            UserAccess.update_user(item, **user.info)
+
+        # Iterate through the children's list and update pointers
+        for item in children:
+            # Get the unit object based on the iterated item
+            unit = UnitAccess.get_unit(item).message
+
+            # Continue if the iterated unit is not a Unit
+            if type(user) != Unit:
+                continue
+
+            # Update their parent pointer
+            unit.info.parent = data["_id"]
+
+            # Update child unit
+            UnitAccess.update_unit(item, **unit.info)
+
+        # Update the unit's parent node if one is provided
+        if parent != "":
+            # Get the unit object based on the iterated item
+            unit = UnitAccess.get_unit(parent).message
+
+            # Update children info
+            unit.add_child(data["_id"])
+
+            # Update child unit
+            UnitAccess.update_unit(unit.info._id, **unit.info)
+
+        # Send success message after successful operation
         return DataAccessBase.sendSuccess("Unit added")
 
     @staticmethod
@@ -47,7 +93,7 @@ class UnitAccess(DataAccessBase):
         """Method to delete a unit"""
 
         # Check if the unit based on its id does not exist
-        if (DataAccessBase.UNIT_COL.find_one({"_id": id}) is None):
+        if DataAccessBase.UNIT_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Unit does not exist")
 
         # Delete the document and return a success message
@@ -63,7 +109,7 @@ class UnitAccess(DataAccessBase):
         del kwargs["_id"]
 
         # Check if the unit based on its id does exist
-        if (DataAccessBase.UNIT_COL.find_one({"_id": id}) is None):
+        if DataAccessBase.UNIT_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Unit does not exist")
 
         # Update the document and return a success message

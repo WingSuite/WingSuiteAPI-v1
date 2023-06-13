@@ -18,6 +18,14 @@ from endpoints.user import (
     delete_permissions,
     who_am_i
 )
+from endpoints.unit import (
+    create_unit,
+    update_unit,
+    get_unit_info,
+    delete_unit,
+    add_members,
+    delete_members
+)
 from endpoints.metadata import (
     get_metadata,
     delete_metadata,
@@ -72,7 +80,10 @@ app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
 
-# Cadet MetaData Routes
+# Unit routes
+app.register_blueprint(create_unit, url_prefix="/unit/")
+
+# Cadet metadata routes
 app.register_blueprint(get_metadata, url_prefix="/meta/")
 app.register_blueprint(delete_metadata, url_prefix="/meta/")
 app.register_blueprint(update_metadata, url_prefix="/meta/")
