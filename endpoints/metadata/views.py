@@ -35,4 +35,3 @@ def update_endpoint():
 @param_check(ARGS.authentication.login)
 def delete_endpoint():
     return "sucess"
-
