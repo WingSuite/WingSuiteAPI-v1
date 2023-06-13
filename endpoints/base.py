@@ -73,8 +73,8 @@ def param_check(required_params):
                 return clientErrorResponse("JSON body is empty")
 
             # Check if the given arguments has the minimum arguments
-            for arg in data.keys():
-                if arg not in required_params:
+            for arg in required_params:
+                if arg not in data.keys():
                     return clientErrorResponse(
                         "Call needs the following arguments: "
                         + ", ".join(required_params)

@@ -3,7 +3,7 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
-    ARGS
+    ARGS,
 )
 from . import (
     create_unit,
@@ -11,7 +11,7 @@ from . import (
     get_unit_info,
     delete_unit,
     add_members,
-    delete_members
+    delete_members,
 )
 from database.unit import UnitAccess
 from flask import request
@@ -39,11 +39,36 @@ def create_unit_endpoint():
         return serverErrorResponse(str(e))
 
 
+@update_unit.route("/update_unit/", methods=["POST"])
+@permissions_required(["user.update_unit"])
+@param_check(ARGS.unit.update_unit)
+def update_unit_endpoint():
+    """Method to handle the update of a unit"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the id of the target unit
+        id = data.pop("id")
+
+        # Add the unit to the database
+        result = UnitAccess.update_unit(id, **data)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
 @delete_unit.route("/delete_unit/", methods=["POST"])
 @permissions_required(["user.delete_unit"])
 @param_check(ARGS.unit.delete_unit)
 def delete_unit_endpoint():
-    """Method to handle the deletion of a new unit"""
+    """Method to handle the deletion of a unit"""
 
     # Try to parse information
     try:

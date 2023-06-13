@@ -150,12 +150,20 @@ class UnitAccess(DataAccessBase):
     def update_unit(id: str, **kwargs) -> DictParse:
         """Method to delete a unit"""
 
-        # Delete the id in the kwargs
-        del kwargs["_id"]
-
         # Check if the unit based on its id does exist
         if DataAccessBase.UNIT_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Unit does not exist")
+
+        # If the kwargs include the changing of a unit type, check for its
+        # validity
+        if (
+            "unit_type" in kwargs and
+            kwargs["unit_type"] not in config.unitTypes
+        ):
+            return DataAccessBase.sendError(
+                "Unit type is not a valid type. \nSelect from: "
+                + ", ".join(config.unitTypes)
+            )
 
         # Update the document and return a success message
         DataAccessBase.UNIT_COL.update_one({"_id": id}, {"$set": kwargs})
