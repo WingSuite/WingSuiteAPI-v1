@@ -10,5 +10,9 @@
     "unit.add_members",
     "unit.delete_members",
     "unit.add_officers",
-    "unit.delete_officers"
+    "unit.delete_officers",
+    "event.create_event",
+    "event.update_event",
+    "event.get_event_info",
+    "event.delete_event"
 ]

@@ -1,5 +1,11 @@
 {
   "endpoints": {
+    "event": {
+      "create_event": ["name", "unit", "location", "datetime", "description"],
+      "update_event": ["id"],
+      "get_event_info": ["id"],
+      "delete_event": ["id"]
+    },
     "unit": {
       "create_unit": ["name", "unit_type", "parent", "children", "officers",
         "members"],
@@ -25,6 +31,9 @@
     }
   },
   "models": {
+    "event": {
+      "init": ["_id", "name", "unit", "location", "datetime", "description"]
+    },
     "unit": {
       "init": ["_id", "name", "unit_type", "parent", "children", "officers",
         "members"]

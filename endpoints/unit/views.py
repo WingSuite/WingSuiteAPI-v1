@@ -1,4 +1,4 @@
-# Import the test blueprint
+# Imports
 from endpoints.base import (
     permissions_required,
     param_check,
