@@ -28,11 +28,12 @@ def get_endpoint():
 @update_metadata.route("/update/", methods=["GET"])
 @param_check(ARGS.authentication.login)
 def update_endpoint():
-    return "sucess"
+    try:
+        data = request.get_json()
+        return "sucess"
 
 
 @delete_metadata.route("/delete/", methods=["GET"])
 @param_check(ARGS.authentication.login)
 def delete_endpoint():
     return "sucess"
-
