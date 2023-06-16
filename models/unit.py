@@ -1,6 +1,7 @@
 # Imports
-from config.config import arguments
 from utils.dict_parse import DictParse
+from config.config import arguments
+from typing import Any
 
 
 class Unit:
@@ -9,7 +10,7 @@ class Unit:
     # Static variable declaration
     REQ_ARGS = arguments.models.unit
 
-    def __init__(self, **kwargs):
+    def __init__(self: "Unit", **kwargs: Any) -> None:
         """Constructor for base unit"""
 
         # Check if kwargs has the minimum arguments
@@ -20,7 +21,7 @@ class Unit:
         # Save info
         self.info = DictParse(kwargs)
 
-    def add_member(self, id):
+    def add_member(self: "Unit", id: str) -> bool:
         """
         Add a new member to the members list
 
@@ -33,7 +34,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_member(self, id):
+    def delete_member(self: "Unit", id: str) -> bool:
         """
         Remove a member to the members list
 
@@ -53,7 +54,7 @@ class Unit:
         # Return true
         return True
 
-    def add_officer(self, id):
+    def add_officer(self: "Unit", id: str) -> bool:
         """
         Add a new officer to the officers list
 
@@ -66,7 +67,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_officer(self, id):
+    def delete_officer(self: "Unit", id: str) -> bool:
         """
         Remove a officer to the officers list
 
@@ -86,7 +87,7 @@ class Unit:
         # Return true
         return True
 
-    def add_child(self, id):
+    def add_child(self: "Unit", id: str) -> bool:
         """Method to add a child"""
 
         # Add child to the children's list if it doesn't exist
@@ -96,7 +97,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_child(self, id):
+    def delete_child(self: "Unit", id: str) -> bool:
         """Method to delete a child"""
 
         # Add child to the children's list if it doesn't exist

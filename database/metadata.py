@@ -1,5 +1,5 @@
 # Imports
-from flask_jwt_extended import decode_token
+# from flask_jwt_extended import decode_token
 from utils.dict_parse import DictParse
 from .base import DataAccessBase
 from typing import Union, Any
@@ -18,7 +18,7 @@ class UserAccess(DataAccessBase):
         # information is not the system
         stat = DataAccessBase.META_COL.find_one({"_id": id})
         if stat is not None:
-            # Insert metadata into the database and return sucess
+            # Insert metadata into the database and return success
             DataAccessBase.META_COL.insert_one(stat)
             return DataAccessBase.sendSuccess("Metadata added to system")
         # Return false if the given information exists

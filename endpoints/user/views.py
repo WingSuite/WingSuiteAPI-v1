@@ -3,6 +3,7 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
+    successResponse,
     ARGS
 )
 from . import add_permissions, delete_permissions, who_am_i
@@ -62,7 +63,7 @@ def add_permissions_endpoint():
         }
 
         # Return response data
-        return message, 200
+        return successResponse(message)
 
     # Error handling
     except Exception as e:
@@ -119,7 +120,7 @@ def delete_permissions_endpoint():
         }
 
         # Return response data
-        return message, 200
+        return successResponse(message)
 
     # Error handling
     except Exception as e:

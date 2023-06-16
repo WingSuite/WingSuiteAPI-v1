@@ -90,7 +90,7 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_user(id: str) -> Union[User, DictParse]:
+    def get_user(id: str) -> DictParse:
         """Base method for get_user methods"""
 
         # Get the results from the query
