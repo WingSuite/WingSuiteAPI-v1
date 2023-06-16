@@ -7,6 +7,8 @@
     "unit.update_unit",
     "unit.get_unit_info",
     "unit.delete_unit",
-    "unit.add_member",
-    "unit.delete_member"
+    "unit.add_members",
+    "unit.delete_members",
+    "unit.add_officers",
+    "unit.delete_officers"
 ]

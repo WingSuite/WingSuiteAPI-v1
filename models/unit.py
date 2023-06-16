@@ -33,7 +33,7 @@ class Unit:
         # Return true
         return True
 
-    def removed_member(self, id):
+    def delete_member(self, id):
         """
         Remove a member to the members list
 
@@ -44,6 +44,39 @@ class Unit:
         try:
             # Append the user to the list
             self.info.members.remove(id)
+
+        # Catch error
+        except Exception:
+            # Return false
+            return False
+
+        # Return true
+        return True
+
+    def add_officer(self, id):
+        """
+        Add a new officer to the officers list
+
+        NOTE: Remember to add the unit to the user's side as well.
+        """
+
+        # Append the user to the list
+        self.info.officers.append(id)
+
+        # Return true
+        return True
+
+    def delete_officer(self, id):
+        """
+        Remove a officer to the officers list
+
+        NOTE: Remember to add the unit to the user's side as well.
+        """
+
+        # Try to remove
+        try:
+            # Append the user to the list
+            self.info.officers.remove(id)
 
         # Catch error
         except Exception:

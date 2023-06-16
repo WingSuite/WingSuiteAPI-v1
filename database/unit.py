@@ -2,7 +2,7 @@
 from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
-from typing import Union, Any
+from typing import Union, List, Any
 from database.user import UserAccess
 from models.unit import Unit
 from models.user import User
@@ -157,8 +157,8 @@ class UnitAccess(DataAccessBase):
         # If the kwargs include the changing of a unit type, check for its
         # validity
         if (
-            "unit_type" in kwargs and
-            kwargs["unit_type"] not in config.unitTypes
+            "unit_type" in kwargs
+            and kwargs["unit_type"] not in config.unitTypes
         ):
             return DataAccessBase.sendError(
                 "Unit type is not a valid type. \nSelect from: "

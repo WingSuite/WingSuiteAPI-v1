@@ -88,6 +88,10 @@ class User:
         if id not in self.info.units:
             self.info.units.append(id)
 
+        # If not, return false
+        else:
+            return False
+
         # Return true
         return True
 
@@ -98,6 +102,10 @@ class User:
         # in the units list
         if id in self.info.units:
             self.info.units.remove(id)
+
+        # If not, return false
+        else:
+            return False
 
         # Return true
         return True

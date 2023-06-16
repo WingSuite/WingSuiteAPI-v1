@@ -55,8 +55,8 @@ def add_permissions_endpoint():
         # Make response dictionary
         message = {
             "status": "success",
-            "message": "Permission addition have been applied to"
-            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results"
+            "message": "Permission addition have been applied to "
+            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results "
             + "for what has been applied",
             "results": results,
         }
@@ -112,8 +112,8 @@ def delete_permissions_endpoint():
         # Make response dictionary
         message = {
             "status": "success",
-            "message": "Permission deletion have been applied to"
-            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results"
+            "message": "Permission deletion have been applied to "
+            + f"{user.get_fullname(lastNameFirst=True)}. Refer to results "
             + "for what has been applied",
             "results": results,
         }

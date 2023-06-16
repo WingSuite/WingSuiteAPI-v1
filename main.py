@@ -82,8 +82,11 @@ app.register_blueprint(who_am_i, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")
-app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
+app.register_blueprint(get_unit_info, url_prefix="/unit/")
+app.register_blueprint(delete_unit, url_prefix="/unit/")
+app.register_blueprint(add_members, url_prefix="/unit/")
+app.register_blueprint(delete_members, url_prefix="/unit/")
 
 # Cadet metadata routes
 app.register_blueprint(get_metadata, url_prefix="/meta/")
