@@ -83,13 +83,29 @@ class User:
     def add_unit(self, id):
         """Unit adder method"""
 
-        # If "units" is not in the instance's metadata, add it for the user
-        if "units" not in self.info:
-            self.info.units = [id]
-
-        # If not, append to the end of the list
-        else:
+        # Add the ID of the unit to the user's information if the ID is not
+        # in the units list
+        if id not in self.info.units:
             self.info.units.append(id)
+
+        # If not, return false
+        else:
+            return False
+
+        # Return true
+        return True
+
+    def delete_unit(self, id):
+        """Unit remover method"""
+
+        # Remove the ID of the unit to the user's information if the ID is not
+        # in the units list
+        if id in self.info.units:
+            self.info.units.remove(id)
+
+        # If not, return false
+        else:
+            return False
 
         # Return true
         return True

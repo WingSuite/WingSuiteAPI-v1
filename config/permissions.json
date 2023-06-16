@@ -2,5 +2,13 @@
     "*",
     "auth.authorize_user",
     "user.add_permissions",
-    "user.delete_permissions"
+    "user.delete_permissions",
+    "unit.create_unit",
+    "unit.update_unit",
+    "unit.get_unit_info",
+    "unit.delete_unit",
+    "unit.add_members",
+    "unit.delete_members",
+    "unit.add_officers",
+    "unit.delete_officers"
 ]
