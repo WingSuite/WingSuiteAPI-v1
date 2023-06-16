@@ -12,17 +12,20 @@ from . import (
     delete_unit,
     add_members,
     delete_members,
+    add_officers,
+    delete_officers,
 )
 from database.unit import UnitAccess
 from database.user import UserAccess
 from flask import request
 
 
-def _update_personnel_helper(id, users, operation):
+def _update_personnel_helper(id, users, operation, participation):
     """Helper function to update personnel for a unit"""
 
-    # Get the past tense based on the operation
+    # Get the vocab based on the operation
     past_tense = "added" if operation == "add" else "deleted"
+    ion_word = "addition" if operation == "add" else "deletion"
 
     # Get the unit object
     unit = UnitAccess.get_unit(id)
@@ -53,20 +56,29 @@ def _update_personnel_helper(id, users, operation):
         if operation == "add":
             res = user_obj.add_unit(id)
             if res:
-                unit.add_member(user)
+                if participation == "member":
+                    unit.add_member(user)
+                elif participation == "officer":
+                    unit.add_officer(user)
 
         # Do a delete operation if operation is "delete"
-        if operation == "delete":
-            res = user_obj.delete_unit(id)
+        elif operation == "delete":
+            res = None
+            if participation == "member":
+                res = unit.delete_member(user)
+            elif participation == "officer":
+                res = unit.delete_officer(user)
             if res:
-                unit.delete_member(user)
+                user_obj.delete_unit(id)
 
         # Update user
         UserAccess.update_user(user_obj.info._id, **user_obj.info)
 
         # Track result
         results[user] = (
-            f"User {past_tense}" if res else f"User already {past_tense}"
+            f"User {past_tense}"
+            if res
+            else f"User already {past_tense} as a {participation}"
         )
 
     # Push unit changes
@@ -75,8 +87,8 @@ def _update_personnel_helper(id, users, operation):
     # Make the message
     message = {
         "status": "success",
-        "message": "Member addition have been applied to "
-        + f"{unit.info.name}. Refer to results for what has been "
+        "message": f"{participation.capitalize()} {ion_word} have been applied"
+        + f" to {unit.info.name}. Refer to results for what has been "
         + "applied",
         "results": results,
     }
@@ -192,7 +204,9 @@ def add_members_endpoint():
         data = request.get_json()
 
         # Return response data
-        return _update_personnel_helper(**data, operation="add")
+        return _update_personnel_helper(
+            **data, operation="add", participation="member"
+        )
 
     # Error handling
     except Exception as e:
@@ -211,7 +225,51 @@ def delete_members_endpoint():
         data = request.get_json()
 
         # Return response data
-        return _update_personnel_helper(**data, operation="delete")
+        return _update_personnel_helper(
+            **data, operation="delete", participation="member"
+        )
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@add_officers.route("/add_officers/", methods=["POST"])
+@permissions_required(["user.add_officers"])
+@param_check(ARGS.unit.add_officers)
+def add_officers_endpoint():
+    """Method to add a new officers to the unit"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Return response data
+        return _update_personnel_helper(
+            **data, operation="add", participation="officer"
+        )
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@delete_officers.route("/delete_officers/", methods=["POST"])
+@permissions_required(["user.delete_officers"])
+@param_check(ARGS.unit.delete_officers)
+def delete_officers_endpoint():
+    """Method to delete officers to the unit"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Return response data
+        return _update_personnel_helper(
+            **data, operation="delete", participation="officer"
+        )
 
     # Error handling
     except Exception as e:

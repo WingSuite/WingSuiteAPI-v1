@@ -2,7 +2,7 @@
 from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
-from typing import Union, List, Any
+from typing import Union, Any
 from database.user import UserAccess
 from models.unit import Unit
 from models.user import User
