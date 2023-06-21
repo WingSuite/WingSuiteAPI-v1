@@ -25,13 +25,25 @@ class DataAccessBase:
     # Set config constants
     CONFIG = config
 
-    def sendError(message: str) -> dict:
+    def sendError(message: str, **kwargs: Any) -> dict:
         """Error message format method"""
-        return {"status": "error", "message": message}
 
-    def sendSuccess(message: str) -> dict:
+        # Prep the message
+        message = {"status": "success", "message": message}
+        message.update(kwargs)
+
+        # Return the success message
+        return message
+
+    def sendSuccess(message: str, **kwargs: Any) -> dict:
         """Success message format method"""
-        return {"status": "success", "message": message}
+
+        # Prep the message
+        message = {"status": "success", "message": message}
+        message.update(kwargs)
+
+        # Return the success message
+        return message
 
     def dict_wrap(func: object) -> object:
         """Dictionary to object wrapper"""

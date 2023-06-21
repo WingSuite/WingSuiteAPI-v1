@@ -7,7 +7,7 @@ from endpoints.base import (
     ARGS,
 )
 from . import create_event, update_event, get_event_info, delete_event
-# from database.unit import UnitAccess
+from database.unit import UnitAccess
 from database.event import EventAccess
 from flask import request
 
@@ -23,8 +23,24 @@ def create_event_endpoint():
         # Parse information from the call's body
         data = request.get_json()
 
+        # Get the unit object of the target unit
+        unit = UnitAccess.get_unit(data["unit"])
+
+        # Check if the unit exists
+        if unit.status == "error":
+            return unit
+
+        # Update unit so that its easier to use
+        unit = unit.message
+
         # Add the event to the database
         result = EventAccess.create_event(**data)
+
+        # Add event to the unit
+        unit.add_event(result.id, data["datetime"])
+
+        # Update the unit
+        UnitAccess.update_unit(id=data["unit"], **unit.info)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -96,8 +112,34 @@ def delete_event_endpoint():
         # Parse information from the call's body
         data = request.get_json()
 
+        # Get the event
+        event = EventAccess.get_event_by_id(**data)
+
+        # Check if the unit exists
+        if event.status == "error":
+            return event
+
+        # Get event object
+        event = event.message
+
+        # Get the unit object of the target unit
+        unit = UnitAccess.get_unit(event.info.unit)
+
+        # Check if the unit exists
+        if unit.status == "error":
+            return unit
+
+        # Update unit so that its easier to use
+        unit = unit.message
+
         # Add the event to the database
         result = EventAccess.delete_event(**data)
+
+        # Add event to the unit
+        unit.delete_event(result.id)
+
+        # Update the unit
+        UnitAccess.update_unit(id=unit.info._id, **unit.info)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

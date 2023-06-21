@@ -21,6 +21,38 @@ class Unit:
         # Save info
         self.info = DictParse(kwargs)
 
+    def add_event(self: "Unit", id: str, datetime: int) -> bool:
+        """
+        Adds new event to the unit
+
+        NOTE: Remember to create the event as well
+        """
+
+        # Append to the end of the list
+        self.info.events.append({"event_id": id, "datetime": datetime})
+
+        # Sort the list
+        self.info.events = sorted(
+            self.info.events, key=lambda x: x["datetime"], reverse=True
+        )
+
+    def delete_event(self: "Unit", id: str) -> bool:
+        """
+        Deletes a specific event to the unit
+
+        NOTE: Remember to delete the event as well
+        """
+
+        # Append to the end of the list
+        self.info.events = [
+            item for item in self.info.events if item["event_id"] != id
+        ]
+
+        # Sort the list
+        self.info.events = sorted(
+            self.info.events, key=lambda x: x["datetime"], reverse=True
+        )
+
     def add_member(self: "Unit", id: str) -> bool:
         """
         Add a new member to the members list

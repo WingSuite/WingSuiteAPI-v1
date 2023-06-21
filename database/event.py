@@ -31,6 +31,9 @@ class EventAccess(DataAccessBase):
         # Insert into the collection
         DataAccessBase.EVENT_COL.insert_one(data)
 
+        # Return a statement
+        return DataAccessBase.sendSuccess("Event created", id=data["_id"])
+
     @staticmethod
     @DataAccessBase.dict_wrap
     def delete_event(id: str) -> DictParse:
@@ -43,7 +46,7 @@ class EventAccess(DataAccessBase):
 
         # Delete the document and return a success message
         DataAccessBase.EVENT_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Event deleted")
+        return DataAccessBase.sendSuccess("Event deleted", id=id)
 
     @staticmethod
     @DataAccessBase.dict_wrap

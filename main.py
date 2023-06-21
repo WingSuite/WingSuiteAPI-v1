@@ -28,6 +28,12 @@ from endpoints.unit import (
     add_officers,
     delete_officers
 )
+from endpoints.event import (
+    create_event,
+    update_event,
+    get_event_info,
+    delete_event
+)
 from endpoints.metadata import (
     get_metadata,
     delete_metadata,
@@ -91,6 +97,12 @@ app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
+
+# Event routes
+app.register_blueprint(create_event, url_prefix="/event/")
+app.register_blueprint(update_event, url_prefix="/event/")
+app.register_blueprint(get_event_info, url_prefix="/event/")
+app.register_blueprint(delete_event, url_prefix="/event/")
 
 # Cadet metadata routes
 app.register_blueprint(get_metadata, url_prefix="/meta/")

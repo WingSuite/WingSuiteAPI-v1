@@ -4,16 +4,12 @@ from flask_jwt_extended import (
     create_refresh_token,
     jwt_required,
 )
-from . import (
-  get_metadata,
-  delete_metadata,
-  update_metadata
-)
+from . import get_metadata, delete_metadata, update_metadata
 from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
-    ARGS
+    ARGS,
 )
 from database.user import UserAccess
 from flask import request
@@ -31,6 +27,8 @@ def update_endpoint():
     try:
         data = request.get_json()
         return "sucess"
+    except:
+        return
 
 
 @delete_metadata.route("/delete/", methods=["GET"])
