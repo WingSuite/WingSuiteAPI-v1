@@ -20,7 +20,8 @@ class DataAccessBase:
     REGISTER_COL = DB["registerList"]
     UNIT_COL = DB["units"]
     EVENT_COL = DB["events"]
-    BLACKLIST_COL = DB["jwt_blacklist"]
+    BLACKLIST_COL = DB["jwtBlacklist"]
+    CURRENT_STATS_COL = DB["currentStats"]
 
     # Set config constants
     CONFIG = config

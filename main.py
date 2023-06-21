@@ -34,6 +34,12 @@ from endpoints.event import (
     get_event_info,
     delete_event
 )
+from endpoints.feedback import (
+    create_feedback,
+    update_feedback,
+    get_feedback_info,
+    delete_feedback
+)
 from endpoints.metadata import (
     get_metadata,
     delete_metadata,
@@ -103,6 +109,13 @@ app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
+
+# Feedback routes
+app.register_blueprint(create_feedback, url_prefix="/feedback/")
+app.register_blueprint(update_feedback, url_prefix="/feedback/")
+app.register_blueprint(get_feedback_info, url_prefix="/feedback/")
+app.register_blueprint(delete_feedback, url_prefix="/feedback/")
+
 
 # Cadet metadata routes
 app.register_blueprint(get_metadata, url_prefix="/meta/")

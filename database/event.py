@@ -69,7 +69,7 @@ class EventAccess(DataAccessBase):
         # Search the collection based on id
         event = DataAccessBase.EVENT_COL.find_one({"_id": id})
 
-        # Return if the given ueventnit is not in the database
+        # Return if the given event is not in the database
         if event is None:
             return {
                 "status": "error",

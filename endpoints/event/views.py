@@ -3,7 +3,6 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
-    # successResponse,
     ARGS,
 )
 from . import create_event, update_event, get_event_info, delete_event
