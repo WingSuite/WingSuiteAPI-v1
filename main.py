@@ -40,11 +40,6 @@ from endpoints.statistics.feedback import (
     get_feedback_info,
     delete_feedback
 )
-from endpoints.metadata import (
-    get_metadata,
-    delete_metadata,
-    update_metadata
-)
 
 # Miscellaneous Imports
 from config.config import config
@@ -115,12 +110,6 @@ app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
-
-
-# Cadet metadata routes
-app.register_blueprint(get_metadata, url_prefix="/meta/")
-app.register_blueprint(delete_metadata, url_prefix="/meta/")
-app.register_blueprint(update_metadata, url_prefix="/meta/")
 
 """
 APP RUNTIME HANDLING
