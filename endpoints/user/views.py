@@ -14,11 +14,14 @@ from . import (
     everyone,
     get_feedback,
     get_user,
+    get_events,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.statistics.feedback import FeedbackAccess
+from database.event import EventAccess
 from database.user import UserAccess
+from database.unit import UnitAccess
 from config.config import permissions
 
 
@@ -255,6 +258,63 @@ def get_user_endpoint():
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_events.route("/get_events/", methods=["POST"])
+@param_check(ARGS.user.get_events)
+@jwt_required()
+def get_events_endpoint():
+    """Method to get the notifications based on the user's units"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get the user's information from the database
+        result = UserAccess.get_user(id)
+
+        # Iterate through the user's units and get their event information
+        user_events = {}
+        for i in result.message.info.units:
+            # Set ptr on start of given ID
+            ptr = UnitAccess.get_unit(i)
+
+            # Iterate until the very root of the unit's tree
+            while ptr.status == "success":
+                # Get the unit object
+                unit = ptr.message.info
+
+                # Get event info
+                events = EventAccess.get_event_by_unit_id(
+                    unit._id, data["start_datetime"], data["end_datetime"]
+                )
+
+                # If the queried event(s) is not None add em
+                if events.status == "success":
+                    for event in events.message:
+                        user_events[event.info._id] = event.info
+
+                ptr = UnitAccess.get_unit(unit.parent)
+
+        # Turn user_events into a list of content
+        user_events = [user_events[item] for item in user_events]
+
+        # Sort the user events by start datetime
+        user_events = sorted(user_events, key=lambda x: x["start_datetime"])
+
+        # Return response data
+        return successResponse(user_events)
 
     # Error handling
     except Exception as e:

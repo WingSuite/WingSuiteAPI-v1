@@ -64,6 +64,36 @@ class EventAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
+    def get_event_by_unit_id(
+        id: str, start: int = None, end: str = None
+    ) -> DictParse:
+        """Method to get an event by unit ID"""
+
+        # Set query
+        query = {"unit": id}
+
+        # If start and end are provided, search between those datetimes
+        if start is not None or end is not None:
+            query["start_datetime"] = {"$gte": start, "$lte": end}
+
+        # Search the collection based on id
+        events = list(DataAccessBase.EVENT_COL.find(query))
+
+        # Return if the given event is not in the database
+        if len(events) == 0:
+            return {
+                "status": "error",
+                "message": "No events found with given unit ID",
+            }
+
+        # Cast every event into an event object
+        events = [Event(**item) for item in events]
+
+        # Return with a Event object
+        return DataAccessBase.sendSuccess(events)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
     def get_event_by_id(id: str) -> DictParse:
         """Method to get an event by ID"""
 
@@ -86,7 +116,7 @@ class EventAccess(DataAccessBase):
         """Method to get an event by name"""
 
         # Search the collection based on id
-        events = DataAccessBase.EVENT_COL.find({'name': {'$regex': name}})
+        events = DataAccessBase.EVENT_COL.find({"name": {"$regex": name}})
 
         # Return if the given event is not in the database
         if events is None:

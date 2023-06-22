@@ -38,7 +38,8 @@
       "who_am_i": [],
       "everyone": ["page_size", "page_index"],
       "get_feedback": ["page_size", "page_index"],
-      "get_user": ["id"]
+      "get_user": ["id"],
+      "get_events": ["start_datetime", "end_datetime"]
     }
   },
   "models": {
