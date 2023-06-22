@@ -36,7 +36,7 @@ def create_event_endpoint():
         result = EventAccess.create_event(**data)
 
         # Add event to the unit
-        unit.add_event(result.id, data["datetime"])
+        unit.add_event(result.id, data["start_datetime"], data["end_datetime"])
 
         # Update the unit
         UnitAccess.update_unit(id=data["unit"], **unit.info)

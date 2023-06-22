@@ -15,7 +15,8 @@ class EventAccess(DataAccessBase):
         name: str,
         unit: str,
         location: str,
-        datetime: int,
+        start_datetime: int,
+        end_datetime: int,
         description: str,
         **kwargs: Any
     ) -> DictParse:

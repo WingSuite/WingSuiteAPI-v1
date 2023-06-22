@@ -7,7 +7,8 @@
       "delete_feedback": ["id"]
     },
     "event": {
-      "create_event": ["name", "unit", "location", "datetime", "description"],
+      "create_event": ["name", "unit", "location", "start_datetime",
+        "end_datetime", "description"],
       "update_event": ["id"],
       "get_event_info": ["id"],
       "delete_event": ["id"]
@@ -42,11 +43,13 @@
   "models": {
     "statistics":{
       "feedback": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name", "feedback"]
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "feedback", "datetime_created"]
       }
     },
     "event": {
-      "init": ["_id", "name", "unit", "location", "datetime", "description"]
+      "init": ["_id", "name", "unit", "location", "start_datetime",
+        "end_datetime", "description"]
     },
     "unit": {
       "init": ["_id", "name", "unit_type", "parent", "children", "officers",

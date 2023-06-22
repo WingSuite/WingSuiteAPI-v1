@@ -21,7 +21,9 @@ class Unit:
         # Save info
         self.info = DictParse(kwargs)
 
-    def add_event(self: "Unit", id: str, datetime: int) -> bool:
+    def add_event(
+        self: "Unit", id: str, start_datetime: int, end_datetime: int
+    ) -> bool:
         """
         Adds new event to the unit
 
@@ -29,11 +31,17 @@ class Unit:
         """
 
         # Append to the end of the list
-        self.info.events.append({"event_id": id, "datetime": datetime})
+        self.info.events.append(
+            {
+                "event_id": id,
+                "start_datetime": start_datetime,
+                "end_datetime": end_datetime,
+            }
+        )
 
         # Sort the list
         self.info.events = sorted(
-            self.info.events, key=lambda x: x["datetime"], reverse=True
+            self.info.events, key=lambda x: x["start_datetime"], reverse=True
         )
 
     def delete_event(self: "Unit", id: str) -> bool:
@@ -50,7 +58,7 @@ class Unit:
 
         # Sort the list
         self.info.events = sorted(
-            self.info.events, key=lambda x: x["datetime"], reverse=True
+            self.info.events, key=lambda x: x["start_datetime"], reverse=True
         )
 
     def add_member(self: "Unit", id: str) -> bool:

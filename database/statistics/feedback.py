@@ -5,6 +5,7 @@ from models.statistics.feedback import Feedback
 from typing import Any
 import uuid
 import math
+import time
 
 
 class FeedbackAccess(DataAccessBase):
@@ -24,6 +25,7 @@ class FeedbackAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "feedback"
+        data["datetime_created"] = int(time.time())
 
         # Insert into the collection
         DataAccessBase.CURRENT_STATS_COL.insert_one(data)
