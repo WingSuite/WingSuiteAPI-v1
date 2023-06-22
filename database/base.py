@@ -30,7 +30,7 @@ class DataAccessBase:
         """Error message format method"""
 
         # Prep the message
-        message = {"status": "success", "message": message}
+        message = {"status": "error", "message": message}
         message.update(kwargs)
 
         # Return the success message

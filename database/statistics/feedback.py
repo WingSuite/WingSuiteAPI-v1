@@ -28,7 +28,7 @@ class FeedbackAccess(DataAccessBase):
         DataAccessBase.CURRENT_STATS_COL.insert_one(data)
 
         # Return a statement
-        return DataAccessBase.sendSuccess("Feedback created", id=data["_id"])
+        return DataAccessBase.sendSuccess("Feedback created")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -42,7 +42,7 @@ class FeedbackAccess(DataAccessBase):
 
         # Delete the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Feedback deleted", id=id)
+        return DataAccessBase.sendSuccess("Feedback deleted")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -61,7 +61,7 @@ class FeedbackAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_feedback() -> DictParse:
+    def get_feedback(id: str) -> DictParse:
         # Search the collection based on id
         feedback = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
 

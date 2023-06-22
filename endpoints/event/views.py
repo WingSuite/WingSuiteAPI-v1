@@ -90,6 +90,12 @@ def get_event_info_endpoint():
 
         # Get the event's information from the database
         result = EventAccess.get_event_by_id(id)
+
+        # Return error if no feedback was provided
+        if result.status == "error":
+            return result, 200
+
+        # Format message
         result.message = result.message.info
 
         # Return response data

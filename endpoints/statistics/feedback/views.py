@@ -78,6 +78,12 @@ def get_feedback_info_endpoint():
 
         # Get the feedback's information from the database
         result = FeedbackAccess.get_feedback(id)
+
+        # Return error if no feedback was provided
+        if result.status == "error":
+            return result, 200
+
+        # Format message
         result.message = result.message.info
 
         # Return response data
