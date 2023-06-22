@@ -1,7 +1,7 @@
 # Imports
 from config.config import config, arguments
 from utils.dict_parse import DictParse
-from typing import Any
+from typing import Any, List
 
 
 class User:
@@ -22,13 +22,18 @@ class User:
         self.info = DictParse(kwargs)
 
     def get_generic_info(
-        self: "User", includeFullName: bool = True, lastNameFirst: bool = True
+        self: "User",
+        includeFullName: bool = True,
+        lastNameFirst: bool = True,
+        other_protections: List[str] = [],
     ) -> DictParse:
         """Returns content that doesn't include any security concerns"""
 
         # FIlter out any secure data
         data = {
-            k: v for k, v in self.info.items() if k not in config.privateInfo
+            k: v
+            for k, v in self.info.items()
+            if k not in config.privateInfo + other_protections
         }
 
         # Append full name information to the data based on the

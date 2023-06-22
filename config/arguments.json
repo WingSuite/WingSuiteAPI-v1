@@ -33,7 +33,8 @@
     "user": {
       "add_permissions": ["id", "permissions"],
       "delete_permissions": ["id", "permissions"],
-      "who_am_i": []
+      "who_am_i": [],
+      "everyone": ["page_size", "page_index"]
     }
   },
   "models": {
