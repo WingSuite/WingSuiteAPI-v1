@@ -1,6 +1,7 @@
 [
     "*",
     "auth.authorize_user",
+    "auth.reject_user",
     "user.add_permissions",
     "user.delete_permissions",
     "unit.create_unit",

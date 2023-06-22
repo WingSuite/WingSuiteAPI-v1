@@ -28,6 +28,7 @@
       "register": ["first_name", "last_name", "email", "phone_number",
         "password"],
       "authorize_user": ["id"],
+      "reject_user": ["id"],
       "signout": ["access", "refresh"]
     },
     "user": {

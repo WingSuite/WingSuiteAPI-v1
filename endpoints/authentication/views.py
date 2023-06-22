@@ -8,13 +8,14 @@ from . import (
     login,
     register,
     authorize,
+    reject,
     signout,
 )
 from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
-    ARGS
+    ARGS,
 )
 from database.user import UserAccess
 from flask import request
@@ -91,6 +92,28 @@ def authorize_user_endpoint():
 
         # Get the user's instance based on the given information
         result = UserAccess.add_user(data["id"])
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@reject.route("/reject_user/", methods=["POST"])
+@permissions_required(["auth.reject_user"])
+@param_check(ARGS.authentication.reject_user)
+def reject_user_endpoint():
+    """Log In Handling"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the user's instance based on the given information
+        result = UserAccess.reject_user(data["id"])
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

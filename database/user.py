@@ -137,6 +137,23 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
+    def reject_user(id: str) -> DictParse:
+        """Reject the user from being a user on this platform"""
+
+        # Check if user is in the REGISTER_COL
+        user = DataAccessBase.REGISTER_COL.find_one({"_id": id})
+        if user is not None:
+            # If the user exists delete their record
+            DataAccessBase.REGISTER_COL.delete_one({"_id": id})
+
+            # Return
+            return DataAccessBase.sendSuccess("User denied")
+
+        # Return an error if else
+        return DataAccessBase.sendError("User not found")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
     def login(email: str, password: str) -> Union[User, DictParse]:
         """
         Method that returns the user object based

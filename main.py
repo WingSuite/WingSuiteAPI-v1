@@ -7,12 +7,18 @@ from flask import Flask
 from database.base import DataAccessBase
 
 # Endpoint Imports
-from endpoints.authentication import login, register, authorize, signout
+from endpoints.authentication import (
+    login,
+    register,
+    authorize,
+    reject,
+    signout,
+)
 from endpoints.user import (
     add_permissions,
     delete_permissions,
     who_am_i,
-    everyone
+    everyone,
 )
 from endpoints.unit import (
     create_unit,
@@ -78,6 +84,7 @@ ROUTE HANDLING
 app.register_blueprint(login, url_prefix="/auth/")
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
+app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 
 # User routes
