@@ -7,11 +7,18 @@ from endpoints.base import (
     successResponse,
     ARGS,
 )
-from . import add_permissions, delete_permissions, who_am_i, everyone
+from . import (
+    add_permissions,
+    delete_permissions,
+    who_am_i,
+    everyone,
+    get_feedback,
+)
 from flask_jwt_extended import jwt_required, decode_token
-from config.config import permissions
-from database.user import UserAccess
 from flask import request
+from database.statistics.feedback import FeedbackAccess
+from database.user import UserAccess
+from config.config import permissions
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
@@ -153,7 +160,7 @@ def who_am_i_endpoint():
         return serverErrorResponse(str(e))
 
 
-@everyone.route("/everyone/", methods=["GET"])
+@everyone.route("/everyone/", methods=["POST"])
 @param_check(ARGS.user.everyone)
 @jwt_required()
 def everyone_endpoint():
@@ -167,6 +174,38 @@ def everyone_endpoint():
         # Get the content information based on the given page size and
         # page index
         results = UserAccess.get_users(**data)
+
+        # If the resulting information is in error, respond with error
+        if results.status == "error":
+            return clientErrorResponse(results.message)
+
+        # Return the content of the information
+        return results, 200
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_feedback.route("/get_feedback/", methods=["POST"])
+@param_check(ARGS.user.get_feedback)
+@jwt_required()
+def get_feedback_endpoint():
+    """Method to get the feedback information for a user"""
+
+    # Try to process the endpoint
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get feedbacks from database
+        results = FeedbackAccess.get_own_feedback(id, **data)
 
         # If the resulting information is in error, respond with error
         if results.status == "error":

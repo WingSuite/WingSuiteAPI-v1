@@ -113,6 +113,15 @@ class UserAccess(DataAccessBase):
         if page_size <= 0 or page_index < 0:
             return DataAccessBase.sendError("Invalid pagination size or index")
 
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            DataAccessBase.USER_COL.count_documents({}) / page_size
+        )
+
+        # Check if the page_index is outside the page range
+        if page_index >= pages:
+            return DataAccessBase.sendError("Pagination index out of bounds")
+
         # Calculate skip value
         skips = page_size * (page_index)
 
@@ -126,11 +135,6 @@ class UserAccess(DataAccessBase):
             )
             for item in list(results)
         ]
-
-        # Get the total amount of pages based on pagination size
-        pages = math.ceil(
-            DataAccessBase.USER_COL.count_documents({}) / page_size
-        )
 
         # Return the results and the page size
         return DataAccessBase.sendSuccess(results, pages=pages)

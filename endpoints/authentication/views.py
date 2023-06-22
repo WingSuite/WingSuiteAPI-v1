@@ -21,7 +21,7 @@ from database.user import UserAccess
 from flask import request
 
 
-@login.route("/login/", methods=["GET"])
+@login.route("/login/", methods=["POST"])
 @param_check(ARGS.authentication.login)
 def login_endpoint():
     """Log In Handling"""
