@@ -2,6 +2,7 @@
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
 from models.statistics.feedback import Feedback
+from models.user import User
 from typing import Any
 import uuid
 import math
@@ -128,6 +129,17 @@ class FeedbackAccess(DataAccessBase):
 
         # Turn result into a list
         result = list(result)
+
+        # Convert every `from_user`'s ID to name
+        for i in range(len(result)):
+            # Get the information of the iterated ID
+            user = User(**DataAccessBase.USER_COL.find_one(
+                {"_id": result[i]["from_user"]}
+            ))
+
+            # Replace the content of the `from_user` attribute in the current
+            # result list
+            result[i]["from_user"] = user.get_fullname(lastNameFirst=True)
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)

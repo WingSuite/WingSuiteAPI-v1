@@ -212,7 +212,7 @@ def get_feedback_endpoint():
             return clientErrorResponse(results.message)
 
         # Return the content of the information
-        return results, 200
+        return results, (200 if results.status == "success" else 400)
 
     # Error handling
     except Exception as e:
