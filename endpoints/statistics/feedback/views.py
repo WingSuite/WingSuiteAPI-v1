@@ -16,7 +16,7 @@ from flask import request
 
 
 @create_feedback.route("/create_feedback/", methods=["POST"])
-@permissions_required(["feedback.create_feedback"])
+@permissions_required(["statistic.feedback.create_feedback"])
 @param_check(ARGS.feedback.create_feedback)
 def create_feedback_endpoint():
     """Method to handle the creation of a new feedback"""
@@ -38,10 +38,10 @@ def create_feedback_endpoint():
 
 
 @update_feedback.route("/update_feedback/", methods=["POST"])
-@permissions_required(["feedback.update_feedback"])
+@permissions_required(["statistic.feedback.update_feedback"])
 @param_check(ARGS.feedback.update_feedback)
 def update_feedback_endpoint():
-    """Method to handle the update of a feedbacl"""
+    """Method to handle the update of a feedback"""
 
     # Try to parse information
     try:
@@ -63,7 +63,7 @@ def update_feedback_endpoint():
 
 
 @get_feedback_info.route("/get_feedback_info/", methods=["GET"])
-@permissions_required(["feedback.get_feedback_info"])
+@permissions_required(["statistic.feedback.get_feedback_info"])
 @param_check(ARGS.feedback.get_feedback_info)
 def get_feedback_info_endpoint():
     """Method to get the info of an feedback"""
@@ -95,7 +95,7 @@ def get_feedback_info_endpoint():
 
 
 @delete_feedback.route("/delete_feedback/", methods=["POST"])
-@permissions_required(["feedback.delete_feedback"])
+@permissions_required(["statistic.feedback.delete_feedback"])
 @param_check(ARGS.feedback.delete_feedback)
 def delete_feedback_endpoint():
     """Method to handle the deletion of an feedback"""
