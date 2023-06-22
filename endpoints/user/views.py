@@ -3,9 +3,11 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
-    ARGS
+    clientErrorResponse,
+    successResponse,
+    ARGS,
 )
-from . import add_permissions, delete_permissions, who_am_i
+from . import add_permissions, delete_permissions, who_am_i, everyone
 from flask_jwt_extended import jwt_required, decode_token
 from config.config import permissions
 from database.user import UserAccess
@@ -62,7 +64,7 @@ def add_permissions_endpoint():
         }
 
         # Return response data
-        return message, 200
+        return successResponse(message)
 
     # Error handling
     except Exception as e:
@@ -119,7 +121,7 @@ def delete_permissions_endpoint():
         }
 
         # Return response data
-        return message, 200
+        return successResponse(message)
 
     # Error handling
     except Exception as e:
@@ -128,7 +130,7 @@ def delete_permissions_endpoint():
 
 @who_am_i.route("/who_am_i/", methods=["GET"])
 @jwt_required()
-def who_am_i():
+def who_am_i_endpoint():
     """Method to return the user's information"""
 
     # Try to parse information
@@ -145,6 +147,33 @@ def who_am_i():
 
         # Return the results of the database query
         return content, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@everyone.route("/everyone/", methods=["GET"])
+@param_check(ARGS.user.everyone)
+@jwt_required()
+def everyone_endpoint():
+    """Method to get every person in the user's database"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the content information based on the given page size and
+        # page index
+        results = UserAccess.get_users(**data)
+
+        # If the resulting information is in error, respond with error
+        if results.status == "error":
+            return clientErrorResponse(results.message)
+
+        # Return the content of the information
+        return results, 200
 
     # Error handling
     except Exception as e:

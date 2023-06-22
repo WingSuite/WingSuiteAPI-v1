@@ -2,7 +2,7 @@
 from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
-from typing import Union, Any
+from typing import Any
 from database.user import UserAccess
 from models.unit import Unit
 from models.user import User
@@ -39,6 +39,7 @@ class UnitAccess(DataAccessBase):
         }
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
+        data["events"] = []
 
         # Insert into the collection
         DataAccessBase.UNIT_COL.insert_one(data)
@@ -147,7 +148,7 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def update_unit(id: str, **kwargs) -> DictParse:
+    def update_unit(id: str, **kwargs: Any) -> DictParse:
         """Method to delete a unit"""
 
         # Check if the unit based on its id does exist
@@ -171,7 +172,7 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_unit(id: str) -> Union[Unit, DictParse]:
+    def get_unit(id: str) -> DictParse:
         """Method to get a unit by ID"""
 
         # Search the collection based on id

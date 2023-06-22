@@ -2,6 +2,7 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from config.config import config, arguments
 from database.user import UserAccess
+from typing import List, Any
 from functools import wraps
 from flask import request
 
@@ -21,18 +22,18 @@ def serverErrorResponse(message: str) -> dict:
     return {"status": "error", "message": message}, 500
 
 
-def permissions_required(required_permissions):
+def permissions_required(required_permissions: List[str]) -> object:
     """Function to decorate endpoints with needed permissions"""
 
     # Modify required_permission so that the root permission key is included
     required_permissions.insert(0, config.rootPermissionString)
 
-    def decorator(fn):
+    def decorator(func: object) -> object:
         """Decorator definition for this functionality"""
 
-        @wraps(fn)
+        @wraps(func)
         @jwt_required()
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             """Wrapper that checks if the user has the correct permissions"""
 
             # Get user's permissions based on the user's given ID
@@ -46,7 +47,7 @@ def permissions_required(required_permissions):
 
             # If so, continue on with the function that is being decorated
             else:
-                return fn(*args, **kwargs)
+                return func(*args, **kwargs)
 
         # Return the functionality of the wrapper
         return wrapper
@@ -55,14 +56,14 @@ def permissions_required(required_permissions):
     return decorator
 
 
-def param_check(required_params):
+def param_check(required_params: List[str]) -> object:
     """Method that checks for minimum parameters"""
 
-    def decorator(func):
+    def decorator(func: object) -> object:
         """Decorator definition"""
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             """Wrapping definition"""
 
             # Get the JSON body

@@ -1,6 +1,7 @@
 # Imports
-from config.config import arguments
 from utils.dict_parse import DictParse
+from config.config import arguments
+from typing import Any
 
 
 class Unit:
@@ -9,7 +10,7 @@ class Unit:
     # Static variable declaration
     REQ_ARGS = arguments.models.unit
 
-    def __init__(self, **kwargs):
+    def __init__(self: "Unit", **kwargs: Any) -> None:
         """Constructor for base unit"""
 
         # Check if kwargs has the minimum arguments
@@ -20,7 +21,39 @@ class Unit:
         # Save info
         self.info = DictParse(kwargs)
 
-    def add_member(self, id):
+    def add_event(self: "Unit", id: str, datetime: int) -> bool:
+        """
+        Adds new event to the unit
+
+        NOTE: Remember to create the event as well
+        """
+
+        # Append to the end of the list
+        self.info.events.append({"event_id": id, "datetime": datetime})
+
+        # Sort the list
+        self.info.events = sorted(
+            self.info.events, key=lambda x: x["datetime"], reverse=True
+        )
+
+    def delete_event(self: "Unit", id: str) -> bool:
+        """
+        Deletes a specific event to the unit
+
+        NOTE: Remember to delete the event as well
+        """
+
+        # Append to the end of the list
+        self.info.events = [
+            item for item in self.info.events if item["event_id"] != id
+        ]
+
+        # Sort the list
+        self.info.events = sorted(
+            self.info.events, key=lambda x: x["datetime"], reverse=True
+        )
+
+    def add_member(self: "Unit", id: str) -> bool:
         """
         Add a new member to the members list
 
@@ -33,7 +66,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_member(self, id):
+    def delete_member(self: "Unit", id: str) -> bool:
         """
         Remove a member to the members list
 
@@ -53,7 +86,7 @@ class Unit:
         # Return true
         return True
 
-    def add_officer(self, id):
+    def add_officer(self: "Unit", id: str) -> bool:
         """
         Add a new officer to the officers list
 
@@ -66,7 +99,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_officer(self, id):
+    def delete_officer(self: "Unit", id: str) -> bool:
         """
         Remove a officer to the officers list
 
@@ -86,7 +119,7 @@ class Unit:
         # Return true
         return True
 
-    def add_child(self, id):
+    def add_child(self: "Unit", id: str) -> bool:
         """Method to add a child"""
 
         # Add child to the children's list if it doesn't exist
@@ -96,7 +129,7 @@ class Unit:
         # Return true
         return True
 
-    def delete_child(self, id):
+    def delete_child(self: "Unit", id: str) -> bool:
         """Method to delete a child"""
 
         # Add child to the children's list if it doesn't exist

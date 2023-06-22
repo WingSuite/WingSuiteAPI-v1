@@ -2,6 +2,7 @@
 from utils.dict_parse import DictParse
 from config.config import config
 from functools import wraps
+from typing import Any
 import pymongo
 
 
@@ -18,24 +19,38 @@ class DataAccessBase:
     USER_COL = DB["users"]
     REGISTER_COL = DB["registerList"]
     UNIT_COL = DB["units"]
-    BLACKLIST_COL = DB["jwt_blacklist"]
+    EVENT_COL = DB["events"]
+    BLACKLIST_COL = DB["jwtBlacklist"]
+    CURRENT_STATS_COL = DB["currentStats"]
 
     # Set config constants
     CONFIG = config
 
-    def sendError(message):
+    def sendError(message: str, **kwargs: Any) -> dict:
         """Error message format method"""
-        return {"status": "error", "message": message}
 
-    def sendSuccess(message):
+        # Prep the message
+        message = {"status": "error", "message": message}
+        message.update(kwargs)
+
+        # Return the success message
+        return message
+
+    def sendSuccess(message: str, **kwargs: Any) -> dict:
         """Success message format method"""
-        return {"status": "success", "message": message}
 
-    def dict_wrap(func):
+        # Prep the message
+        message = {"status": "success", "message": message}
+        message.update(kwargs)
+
+        # Return the success message
+        return message
+
+    def dict_wrap(func: object) -> object:
         """Dictionary to object wrapper"""
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> DictParse:
             """Wrapping definition"""
 
             # Return with parsing wrapping if all else is good

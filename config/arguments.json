@@ -1,5 +1,17 @@
 {
   "endpoints": {
+    "feedback": {
+      "create_feedback": ["from_user", "to_user", "name", "feedback"],
+      "update_feedback": ["id"],
+      "get_feedback_info": ["id"],
+      "delete_feedback": ["id"]
+    },
+    "event": {
+      "create_event": ["name", "unit", "location", "datetime", "description"],
+      "update_event": ["id"],
+      "get_event_info": ["id"],
+      "delete_event": ["id"]
+    },
     "unit": {
       "create_unit": ["name", "unit_type", "parent", "children", "officers",
         "members"],
@@ -21,10 +33,19 @@
     "user": {
       "add_permissions": ["id", "permissions"],
       "delete_permissions": ["id", "permissions"],
-      "who_am_i": []
+      "who_am_i": [],
+      "everyone": ["page_size", "page_index"]
     }
   },
   "models": {
+    "statistics":{
+      "feedback": {
+        "init": ["_id", "stat_type", "from_user", "to_user", "name", "feedback"]
+      }
+    },
+    "event": {
+      "init": ["_id", "name", "unit", "location", "datetime", "description"]
+    },
     "unit": {
       "init": ["_id", "name", "unit_type", "parent", "children", "officers",
         "members"]

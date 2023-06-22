@@ -7,16 +7,12 @@ from flask import Flask
 from database.base import DataAccessBase
 
 # Endpoint Imports
-from endpoints.authentication import (
-    login,
-    register,
-    authorize,
-    signout
-)
+from endpoints.authentication import login, register, authorize, signout
 from endpoints.user import (
     add_permissions,
     delete_permissions,
-    who_am_i
+    who_am_i,
+    everyone
 )
 from endpoints.unit import (
     create_unit,
@@ -26,12 +22,19 @@ from endpoints.unit import (
     add_members,
     delete_members,
     add_officers,
-    delete_officers
+    delete_officers,
 )
-from endpoints.metadata import (
-    get_metadata,
-    delete_metadata,
-    update_metadata
+from endpoints.event import (
+    create_event,
+    update_event,
+    get_event_info,
+    delete_event,
+)
+from endpoints.statistics.feedback import (
+    create_feedback,
+    update_feedback,
+    get_feedback_info,
+    delete_feedback,
 )
 
 # Miscellaneous Imports
@@ -81,6 +84,7 @@ app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
+app.register_blueprint(everyone, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")
@@ -92,10 +96,17 @@ app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
 
-# Cadet metadata routes
-app.register_blueprint(get_metadata, url_prefix="/meta/")
-app.register_blueprint(delete_metadata, url_prefix="/meta/")
-app.register_blueprint(update_metadata, url_prefix="/meta/")
+# Event routes
+app.register_blueprint(create_event, url_prefix="/event/")
+app.register_blueprint(update_event, url_prefix="/event/")
+app.register_blueprint(get_event_info, url_prefix="/event/")
+app.register_blueprint(delete_event, url_prefix="/event/")
+
+# Statistic Feedback routes
+app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
+app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
+app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
+app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
 
 """
 APP RUNTIME HANDLING

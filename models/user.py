@@ -1,6 +1,7 @@
 # Imports
 from config.config import config, arguments
 from utils.dict_parse import DictParse
+from typing import Any, List
 
 
 class User:
@@ -9,7 +10,7 @@ class User:
     # Static variable declaration
     REQ_ARGS = arguments.models.user
 
-    def __init__(self, **kwargs):
+    def __init__(self: "User", **kwargs: Any) -> None:
         """Constructor for the User class"""
 
         # Check if kwargs has the minimum arguments
@@ -20,12 +21,19 @@ class User:
         # Save info
         self.info = DictParse(kwargs)
 
-    def get_generic_info(self, includeFullName=True, lastNameFirst=True):
+    def get_generic_info(
+        self: "User",
+        includeFullName: bool = True,
+        lastNameFirst: bool = True,
+        other_protections: List[str] = [],
+    ) -> DictParse:
         """Returns content that doesn't include any security concerns"""
 
         # FIlter out any secure data
         data = {
-            k: v for k, v in self.info.items() if k not in config.privateInfo
+            k: v
+            for k, v in self.info.items()
+            if k not in config.privateInfo + other_protections
         }
 
         # Append full name information to the data based on the
@@ -36,7 +44,7 @@ class User:
         # Return the data
         return data
 
-    def get_fullname(self, lastNameFirst):
+    def get_fullname(self: "User", lastNameFirst: bool) -> str:
         """Returns the user's full name"""
 
         # Get the user's names
@@ -52,7 +60,7 @@ class User:
         else:
             return f"{first_name}{middle_initial} {last_name}"
 
-    def add_permission(self, permission):
+    def add_permission(self: "User", permission: str) -> bool:
         "Add new permissions to the user"
 
         # If the given permission is already in the permissions
@@ -66,7 +74,7 @@ class User:
             self.info.permissions.append(permission)
             return True
 
-    def delete_permission(self, permission):
+    def delete_permission(self: "User", permission: str) -> bool:
         "Remove permission to the user"
 
         # If the given permission is already in the permissions list,
@@ -80,7 +88,7 @@ class User:
         else:
             return False
 
-    def add_unit(self, id):
+    def add_unit(self: "User", id: str) -> bool:
         """Unit adder method"""
 
         # Add the ID of the unit to the user's information if the ID is not
@@ -95,7 +103,7 @@ class User:
         # Return true
         return True
 
-    def delete_unit(self, id):
+    def delete_unit(self: "User", id: str) -> bool:
         """Unit remover method"""
 
         # Remove the ID of the unit to the user's information if the ID is not

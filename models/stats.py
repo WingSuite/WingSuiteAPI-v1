@@ -5,7 +5,7 @@ from utils.dict_parse import DictParse
 
 class Stats:
     """Stats class model"""
-    """When created make sure to create an id type specefic to user"""
+    """When created make sure to create an id type specific to user"""
 
     # Static variable declaration
     REQ_ARGS = arguments.models.stats

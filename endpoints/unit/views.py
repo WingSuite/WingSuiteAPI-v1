@@ -1,8 +1,9 @@
-# Import the test blueprint
+# Imports
 from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
+    successResponse,
     ARGS,
 )
 from . import (
@@ -94,7 +95,7 @@ def _update_personnel_helper(id, users, operation, participation):
     }
 
     # Return
-    return message, 200
+    return successResponse(message)
 
 
 @create_unit.route("/create_unit/", methods=["POST"])

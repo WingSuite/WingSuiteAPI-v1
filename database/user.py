@@ -6,6 +6,7 @@ from typing import Union, Any
 from utils.hash import sha256
 from models.user import User
 import uuid
+import math
 
 
 class UserAccess(DataAccessBase):
@@ -90,7 +91,7 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_user(id: str) -> Union[User, DictParse]:
+    def get_user(id: str) -> DictParse:
         """Base method for get_user methods"""
 
         # Get the results from the query
@@ -102,6 +103,37 @@ class UserAccess(DataAccessBase):
 
         # Return results based on types of representation
         return DataAccessBase.sendSuccess(User(**user))
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_users(page_size: int, page_index: int) -> DictParse:
+        """Get a list of users based on the page size and the index"""
+
+        # Check if the page_size or page_index is negative
+        if page_size <= 0 or page_index < 0:
+            return DataAccessBase.sendError("Invalid pagination size or index")
+
+        # Calculate skip value
+        skips = page_size * (page_index)
+
+        # Get the list of users based on the given page size and index
+        results = DataAccessBase.USER_COL.find().skip(skips).limit(page_size)
+
+        # Turn each document into a Unit object
+        results = [
+            User(**item).get_generic_info(
+                other_protections=["phone_number", "permissions"]
+            )
+            for item in list(results)
+        ]
+
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            DataAccessBase.USER_COL.count_documents({}) / page_size
+        )
+
+        # Return the results and the page size
+        return DataAccessBase.sendSuccess(results, pages=pages)
 
     @staticmethod
     @DataAccessBase.dict_wrap

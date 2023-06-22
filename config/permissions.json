@@ -10,5 +10,13 @@
     "unit.add_members",
     "unit.delete_members",
     "unit.add_officers",
-    "unit.delete_officers"
+    "unit.delete_officers",
+    "event.create_event",
+    "event.update_event",
+    "event.get_event_info",
+    "event.delete_event",
+    "statistic.feedback.create_feedback",
+    "statistic.feedback.update_feedback",
+    "statistic.feedback.get_feedback_info",
+    "statistic.feedback.delete_feedback"
 ]
