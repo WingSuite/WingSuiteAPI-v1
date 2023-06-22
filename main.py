@@ -19,7 +19,8 @@ from endpoints.user import (
     delete_permissions,
     who_am_i,
     everyone,
-    get_feedback
+    get_feedback,
+    get_user
 )
 from endpoints.unit import (
     create_unit,
@@ -94,6 +95,7 @@ app.register_blueprint(delete_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
 app.register_blueprint(everyone, url_prefix="/user/")
 app.register_blueprint(get_feedback, url_prefix="/user/")
+app.register_blueprint(get_user, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")

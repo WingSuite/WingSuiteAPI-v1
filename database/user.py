@@ -129,12 +129,7 @@ class UserAccess(DataAccessBase):
         results = DataAccessBase.USER_COL.find().skip(skips).limit(page_size)
 
         # Turn each document into a Unit object
-        results = [
-            User(**item).get_generic_info(
-                other_protections=["phone_number", "permissions"]
-            )
-            for item in list(results)
-        ]
+        results = [User(**item) for item in list(results)]
 
         # Return the results and the page size
         return DataAccessBase.sendSuccess(results, pages=pages)

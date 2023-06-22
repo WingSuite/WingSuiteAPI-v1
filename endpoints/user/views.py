@@ -13,6 +13,7 @@ from . import (
     who_am_i,
     everyone,
     get_feedback,
+    get_user,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
@@ -179,6 +180,14 @@ def everyone_endpoint():
         if results.status == "error":
             return clientErrorResponse(results.message)
 
+        # Format message
+        results.message = [
+            item.get_generic_info(
+                other_protections=["phone_number", "permissions"]
+            )
+            for item in results.message
+        ]
+
         # Return the content of the information
         return results, 200
 
@@ -213,6 +222,39 @@ def get_feedback_endpoint():
 
         # Return the content of the information
         return results, (200 if results.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_user.route("/get_user/", methods=["POST"])
+@param_check(ARGS.user.get_user)
+@jwt_required()
+def get_user_endpoint():
+    """Endpoint to get the user's information"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the id of the target unit
+        id = data.pop("id")
+
+        # Get the unit's information from the database
+        result = UserAccess.get_user(id)
+
+        # If the resulting information is in error, respond with error
+        if result.status == "error":
+            return clientErrorResponse(result.message)
+
+        result.message = result.message.get_generic_info(
+            other_protections=["phone_number", "permissions"]
+        )
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
