@@ -5,7 +5,7 @@ from endpoints.base import (
     serverErrorResponse,
     clientErrorResponse,
     successResponse,
-    ARGS
+    ARGS,
 )
 from . import add_permissions, delete_permissions, who_am_i, everyone
 from flask_jwt_extended import jwt_required, decode_token
@@ -152,6 +152,7 @@ def who_am_i_endpoint():
     except Exception as e:
         return serverErrorResponse(str(e))
 
+
 @everyone.route("/everyone/", methods=["GET"])
 @param_check(ARGS.user.everyone)
 @jwt_required()
@@ -173,7 +174,6 @@ def everyone_endpoint():
 
         # Return the content of the information
         return results, 200
-
 
     # Error handling
     except Exception as e:
