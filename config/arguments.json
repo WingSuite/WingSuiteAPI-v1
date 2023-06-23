@@ -20,6 +20,12 @@
         "delete_warrior": ["id"]
       }
     },
+    "notification": {
+      "create_notification": ["name", "unit", "notification"],
+      "update_notification": ["id"],
+      "get_notification_info": ["id"],
+      "delete_notification": ["id"]
+    },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
         "end_datetime", "description"],
@@ -57,7 +63,7 @@
     }
   },
   "models": {
-    "statistics":{
+    "statistic":{
       "feedback": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
@@ -68,6 +74,10 @@
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "warrior"]
       }
+    },
+    "notification": {
+      "init": ["_id", "name", "unit", "created_datetime", "notification",
+        "author"]
     },
     "event": {
       "init": ["_id", "name", "unit", "location", "start_datetime",

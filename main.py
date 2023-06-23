@@ -39,6 +39,12 @@ from endpoints.event import (
     get_event_info,
     delete_event,
 )
+from endpoints.notification import (
+    create_notification,
+    update_notification,
+    get_notification_info,
+    delete_notification,
+)
 from endpoints.statistics.feedback import (
     create_feedback,
     update_feedback,
@@ -99,6 +105,7 @@ ROUTE HANDLING
 app.register_blueprint(login, url_prefix="/auth/")
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
+
 app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 
@@ -126,6 +133,12 @@ app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
+
+# Notification routes
+app.register_blueprint(create_notification, url_prefix="/notification/")
+app.register_blueprint(update_notification, url_prefix="/notification/")
+app.register_blueprint(get_notification_info, url_prefix="/notification/")
+app.register_blueprint(delete_notification, url_prefix="/notification/")
 
 # Statistic Feedback routes
 app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")

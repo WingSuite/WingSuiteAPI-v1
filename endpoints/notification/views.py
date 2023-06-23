@@ -1,0 +1,124 @@
+# Import the test blueprint
+from endpoints.base import (
+    permissions_required,
+    param_check,
+    serverErrorResponse,
+    ARGS,
+)
+from . import (
+    create_notification,
+    update_notification,
+    get_notification_info,
+    delete_notification,
+)
+from flask_jwt_extended import jwt_required, decode_token
+from flask import request
+from database.notification import NotificationAccess
+
+
+@create_notification.route("/create_notification/", methods=["POST"])
+@permissions_required(["notification.create_notification"])
+@param_check(ARGS.notification.create_notification)
+@jwt_required()
+def create_notification_endpoint():
+    """Method to handle the creation of a new notification"""
+
+    # Try to parse information
+    try:
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add the notification to the database
+        result = NotificationAccess.create_notification(**data, author=id)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@update_notification.route("/update_notification/", methods=["POST"])
+@permissions_required(["notification.update_notification"])
+@param_check(ARGS.notification.update_notification)
+def update_notification_endpoint():
+    """Method to handle the update of a notification"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the id of the target notification
+        id = data.pop("id")
+
+        # Add the notification to the database
+        result = NotificationAccess.update_notification(id, **data)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_notification_info.route("/get_notification_info/", methods=["GET"])
+@permissions_required(["notification.get_notification_info"])
+@param_check(ARGS.notification.get_notification_info)
+def get_notification_info_endpoint():
+    """Method to get the info of a notification"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the id of the target notification
+        id = data.pop("id")
+
+        # Get the notification's information from the database
+        result = NotificationAccess.get_notification(id)
+
+        # Return error if no notification was provided
+        if result.status == "error":
+            return result, 200
+
+        # Format message
+        result.message = result.message.info
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@delete_notification.route("/delete_notification/", methods=["POST"])
+@permissions_required(["notification.delete_notification"])
+@param_check(ARGS.notification.delete_notification)
+def delete_notification_endpoint():
+    """Method to handle the deletion of a notification"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Add the event to the database
+        result = NotificationAccess.delete_notification(**data)
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))

@@ -4,17 +4,17 @@ from config.config import arguments
 from typing import Any
 
 
-class Warrior:
-    """Warrior model class"""
+class Notification:
+    """Feedback model class"""
 
     # Static variable declaration
-    REQ_ARGS = arguments.models.statistic
+    REQ_ARGS = arguments.models
 
-    def __init__(self: "Warrior", **kwargs: Any) -> None:
+    def __init__(self: "Notification", **kwargs: Any) -> None:
         """Constructor for base unit"""
 
         # Check if kwargs has the minimum arguments
-        for arg in Warrior.REQ_ARGS.warrior.init:
+        for arg in Notification.REQ_ARGS.notification.init:
             if arg not in kwargs:
                 return False
 

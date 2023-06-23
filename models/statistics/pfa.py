@@ -8,7 +8,7 @@ class PFA:
     """Pfa model class"""
 
     # Static variable declaration
-    REQ_ARGS = arguments.models.statistics
+    REQ_ARGS = arguments.models.statistic
 
     def __init__(self: "PFA", **kwargs: Any) -> None:
         """Constructor for base unit"""
