@@ -85,9 +85,15 @@ class FeedbackAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def get_own_feedback(
-        id: str, page_size: int, page_index: int
+        id: str, page_size: int, page_index: int, sent: bool
     ) -> DictParse:
         """Method to retrieve a multiple feedback based on the receiver's ID"""
+
+        # Generate query based on whether to return sent or received documents
+        if sent:
+            query = {"stat_type": "feedback", "from_user": id}
+        else:
+            query = {"stat_type": "feedback", "to_user": id}
 
         # Check if the page_size or page_index is negative
         if page_size <= 0 or page_index < 0:
@@ -95,11 +101,7 @@ class FeedbackAccess(DataAccessBase):
 
         # Get the total amount of pages based on pagination size
         pages = math.ceil(
-            (
-                DataAccessBase.CURRENT_STATS_COL.count_documents(
-                    {"stat_type": "feedback", "to_user": id}
-                )
-            )
+            (DataAccessBase.CURRENT_STATS_COL.count_documents(query))
             / page_size
         )
 
@@ -112,9 +114,7 @@ class FeedbackAccess(DataAccessBase):
 
         # Search the collection based on id
         result = (
-            DataAccessBase.CURRENT_STATS_COL.find(
-                {"stat_type": "feedback", "to_user": id}
-            )
+            DataAccessBase.CURRENT_STATS_COL.find(query)
             .skip(skips)
             .limit(page_size)
         )

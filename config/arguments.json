@@ -37,7 +37,7 @@
       "delete_permissions": ["id", "permissions"],
       "who_am_i": [],
       "everyone": ["page_size", "page_index"],
-      "get_feedback": ["page_size", "page_index"],
+      "get_feedback": ["page_size", "page_index", "sent"],
       "get_user": ["id"],
       "get_events": ["start_datetime", "end_datetime"]
     }
