@@ -17,7 +17,7 @@ from flask import request
 
 @create_warrior.route("/create_warrior/", methods=["POST"])
 @permissions_required(["statistic.warrior.create_warrior"])
-@param_check(ARGS.warrior.create_warrior)
+@param_check(ARGS.statistic.warrior.create_warrior)
 def create_warrior_endpoint():
     """Method to handle the creation of a new warrior"""
 
@@ -39,7 +39,7 @@ def create_warrior_endpoint():
 
 @update_warrior.route("/update_warrior/", methods=["POST"])
 @permissions_required(["statistic.warrior.update_warrior"])
-@param_check(ARGS.warrior.update_warrior)
+@param_check(ARGS.statistic.warrior.update_warrior)
 def update_warrior_endpoint():
     """Method to handle the update of a warrior"""
 
@@ -64,7 +64,7 @@ def update_warrior_endpoint():
 
 @get_warrior_info.route("/get_warrior_info/", methods=["GET"])
 @permissions_required(["statistic.warrior.get_warrior_info"])
-@param_check(ARGS.warrior.get_warrior_info)
+@param_check(ARGS.statistic.warrior.get_warrior_info)
 def get_warrior_info_endpoint():
     """Method to get the info of an warrior"""
 
@@ -96,7 +96,7 @@ def get_warrior_info_endpoint():
 
 @delete_warrior.route("/delete_warrior/", methods=["POST"])
 @permissions_required(["statistic.warrior.delete_warrior"])
-@param_check(ARGS.warrior.delete_warrior)
+@param_check(ARGS.statistic.warrior.delete_warrior)
 def delete_warrior_endpoint():
     """Method to handle the deletion of a warrior"""
 
