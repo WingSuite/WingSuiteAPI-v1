@@ -1,20 +1,20 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-from models.statistics.pfa import Pfa
+from models.statistics.pfa import PFA
 from typing import Any
 import uuid
 
 
-class PfaAccess(DataAccessBase):
-    """Class that handles pfa information"""
+class PFAAccess(DataAccessBase):
+    """Class that handles PFA information"""
 
     @staticmethod
     @DataAccessBase.dict_wrap
     def create_pfa(
         from_user: str, to_user: str, name: str, pfa: str, **kwargs: Any
     ) -> DictParse:
-        """Method to create a pfa"""
+        """Method to create a PFA"""
 
         # Prep data to be inserted
         data = {
@@ -28,36 +28,36 @@ class PfaAccess(DataAccessBase):
         DataAccessBase.CURRENT_STATS_COL.insert_one(data)
 
         # Return a statement
-        return DataAccessBase.sendSuccess("Pfa created")
+        return DataAccessBase.sendSuccess("PFA created")
 
     @staticmethod
     @DataAccessBase.dict_wrap
     def delete_pfa(id: str) -> DictParse:
-        """Method to delete an pfa"""
+        """Method to delete an PFA"""
 
-        # Check if the pfa based on its id does not exist
+        # Check if the PFA based on its id does not exist
         pfa = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
         if pfa is None:
-            return DataAccessBase.sendError("Pfa does not exist")
+            return DataAccessBase.sendError("PFA does not exist")
 
         # Delete the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Pfa deleted")
+        return DataAccessBase.sendSuccess("PFA deleted")
 
     @staticmethod
     @DataAccessBase.dict_wrap
     def update_pfa(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a pfa"""
+        """Method to delete a PFA"""
 
-        # Check if the pfa based on its id does exist
+        # Check if the PFA based on its id does exist
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
-            return DataAccessBase.sendError("Pfa does not exist")
+            return DataAccessBase.sendError("PFA does not exist")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(
             {"_id": id}, {"$set": kwargs}
         )
-        return DataAccessBase.sendSuccess("Pfa updated")
+        return DataAccessBase.sendSuccess("PFA updated")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -65,12 +65,12 @@ class PfaAccess(DataAccessBase):
         # Search the collection based on id
         pfa = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
 
-        # Return if the given pfa is not in the database
+        # Return if the given PFA is not in the database
         if pfa is None:
             return {
                 "status": "error",
-                "message": "Pfa not found",
+                "message": "PFA not found",
             }
 
-        # Return with a pfa object
-        return DataAccessBase.sendSuccess(Pfa(**pfa))
+        # Return with a PFA object
+        return DataAccessBase.sendSuccess(PFA(**pfa))

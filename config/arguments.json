@@ -1,22 +1,24 @@
 {
   "endpoints": {
-    "feedback": {
-      "create_feedback": ["from_user", "to_user", "name", "feedback"],
-      "update_feedback": ["id"],
-      "get_feedback_info": ["id"],
-      "delete_feedback": ["id"]
-    },
-    "pfa": {
-      "create_pfa": ["from_user", "to_user", "name", "pfa"],
-      "update_pfa": ["id"],
-      "get_pfa_info": ["id"],
-      "delete_pfa": ["id"]
-    },
-    "warrior": {
-      "create_warrior": ["from_user", "to_user", "name", "warrior"],
-      "update_warrior": ["id"],
-      "get_warrior_info": ["id"],
-      "delete_warrior": ["id"]
+    "statistic": {
+      "feedback": {
+        "create_feedback": ["from_user", "to_user", "name", "feedback"],
+        "update_feedback": ["id"],
+        "get_feedback_info": ["id"],
+        "delete_feedback": ["id"]
+      },
+      "pfa": {
+        "create_pfa": ["from_user", "to_user", "name", "pfa"],
+        "update_pfa": ["id"],
+        "get_pfa_info": ["id"],
+        "delete_pfa": ["id"]
+      },
+      "warrior": {
+        "create_warrior": ["from_user", "to_user", "name", "warrior"],
+        "update_warrior": ["id"],
+        "get_warrior_info": ["id"],
+        "delete_warrior": ["id"]
+      }
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
@@ -59,6 +61,7 @@
       "feedback": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
+      },
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "pfa"]
       },

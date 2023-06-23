@@ -27,5 +27,5 @@
     "statistic.warrior.create_warrior",
     "statistic.warrior.update_warrior",
     "statistic.warrior.get_warrior_info",
-    "statistic.pfa.delete_warrior"
+    "statistic.warrior.delete_warrior"
 ]

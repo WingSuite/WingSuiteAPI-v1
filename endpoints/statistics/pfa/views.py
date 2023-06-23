@@ -11,23 +11,23 @@ from . import (
     get_pfa_info,
     delete_pfa,
 )
-from database.statistics.pfa import PfaAccess
+from database.statistics.pfa import PFAAccess
 from flask import request
 
 
 @create_pfa.route("/create_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.create_pfa"])
-@param_check(ARGS.pfa.create_pfa)
+@param_check(ARGS.statistic.pfa.create_pfa)
 def create_pfa_endpoint():
-    """Method to handle the creation of a new pfa"""
+    """Method to handle the creation of a new PFA"""
 
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add the pfa to the database
-        result = PfaAccess.create_pfa(**data)
+        # Add the PFA to the database
+        result = PFAAccess.create_pfa(**data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -39,20 +39,20 @@ def create_pfa_endpoint():
 
 @update_pfa.route("/update_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.update_pfa"])
-@param_check(ARGS.pfa.update_pfa)
+@param_check(ARGS.statistic.pfa.update_pfa)
 def update_pfa_endpoint():
-    """Method to handle the update of a pfa"""
+    """Method to handle the update of a PFA"""
 
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
-        # Get the id of the target pfa
+        # Get the id of the target PFA
         id = data.pop("id")
 
-        # Add the pfa to the database
-        result = PfaAccess.update_pfa(id, **data)
+        # Add the PFA to the database
+        result = PFAAccess.update_pfa(id, **data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -64,22 +64,22 @@ def update_pfa_endpoint():
 
 @get_pfa_info.route("/get_pfa_info/", methods=["GET"])
 @permissions_required(["statistic.pfa.get_pfa_info"])
-@param_check(ARGS.pfa.get_pfa_info)
+@param_check(ARGS.statistic.pfa.get_pfa_info)
 def get_pfa_info_endpoint():
-    """Method to get the info of an pfa"""
+    """Method to get the info of an PFA"""
 
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
-        # Get the id of the target pfa
+        # Get the id of the target PFA
         id = data.pop("id")
 
-        # Get the pfa's information from the database
-        result = PfaAccess.get_pfa(id)
+        # Get the PFA's information from the database
+        result = PFAAccess.get_pfa(id)
 
-        # Return error if no pfa was provided
+        # Return error if no PFA was provided
         if result.status == "error":
             return result, 200
 
@@ -96,9 +96,9 @@ def get_pfa_info_endpoint():
 
 @delete_pfa.route("/delete_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.delete_pfa"])
-@param_check(ARGS.pfa.delete_pfa)
+@param_check(ARGS.statistic.pfa.delete_pfa)
 def delete_pfa_endpoint():
-    """Method to handle the deletion of a pfa"""
+    """Method to handle the deletion of a PFA"""
 
     # Try to parse information
     try:
@@ -106,7 +106,7 @@ def delete_pfa_endpoint():
         data = request.get_json()
 
         # Add the event to the database
-        result = PfaAccess.delete_pfa(**data)
+        result = PFAAccess.delete_pfa(**data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

@@ -133,7 +133,7 @@ app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
 
-# Statistic Pfa routes
+# Statistic PFA routes
 app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
