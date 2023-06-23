@@ -7,11 +7,22 @@ from endpoints.base import (
     successResponse,
     ARGS,
 )
-from . import add_permissions, delete_permissions, who_am_i, everyone
+from . import (
+    add_permissions,
+    delete_permissions,
+    who_am_i,
+    everyone,
+    get_feedback,
+    get_user,
+    get_events,
+)
 from flask_jwt_extended import jwt_required, decode_token
-from config.config import permissions
-from database.user import UserAccess
 from flask import request
+from database.statistics.feedback import FeedbackAccess
+from database.event import EventAccess
+from database.user import UserAccess
+from database.unit import UnitAccess
+from config.config import permissions
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
@@ -153,7 +164,7 @@ def who_am_i_endpoint():
         return serverErrorResponse(str(e))
 
 
-@everyone.route("/everyone/", methods=["GET"])
+@everyone.route("/everyone/", methods=["POST"])
 @param_check(ARGS.user.everyone)
 @jwt_required()
 def everyone_endpoint():
@@ -172,8 +183,138 @@ def everyone_endpoint():
         if results.status == "error":
             return clientErrorResponse(results.message)
 
+        # Format message
+        results.message = [
+            item.get_generic_info(
+                other_protections=["phone_number", "permissions"]
+            )
+            for item in results.message
+        ]
+
         # Return the content of the information
         return results, 200
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_feedback.route("/get_feedback/", methods=["POST"])
+@param_check(ARGS.user.get_feedback)
+@jwt_required()
+def get_feedback_endpoint():
+    """Method to get the feedback information for a user"""
+
+    # Try to process the endpoint
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get feedbacks from database
+        results = FeedbackAccess.get_own_feedback(id, **data)
+
+        # If the resulting information is in error, respond with error
+        if results.status == "error":
+            return clientErrorResponse(results.message)
+
+        # Return the content of the information
+        return results, (200 if results.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_user.route("/get_user/", methods=["POST"])
+@param_check(ARGS.user.get_user)
+@jwt_required()
+def get_user_endpoint():
+    """Endpoint to get the user's information"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the id of the target unit
+        id = data.pop("id")
+
+        # Get the unit's information from the database
+        result = UserAccess.get_user(id)
+
+        # If the resulting information is in error, respond with error
+        if result.status == "error":
+            return clientErrorResponse(result.message)
+
+        result.message = result.message.get_generic_info(
+            other_protections=["phone_number", "permissions"]
+        )
+
+        # Return response data
+        return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_events.route("/get_events/", methods=["POST"])
+@param_check(ARGS.user.get_events)
+@jwt_required()
+def get_events_endpoint():
+    """Method to get the notifications based on the user's units"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get the user's information from the database
+        result = UserAccess.get_user(id)
+
+        # Iterate through the user's units and get their event information
+        user_events = {}
+        for i in result.message.info.units:
+            # Set ptr on start of given ID
+            ptr = UnitAccess.get_unit(i)
+
+            # Iterate until the very root of the unit's tree
+            while ptr.status == "success":
+                # Get the unit object
+                unit = ptr.message.info
+
+                # Get event info
+                events = EventAccess.get_event_by_unit_id(
+                    unit._id, data["start_datetime"], data["end_datetime"]
+                )
+
+                # If the queried event(s) is not None add em
+                if events.status == "success":
+                    for event in events.message:
+                        user_events[event.info._id] = event.info
+
+                ptr = UnitAccess.get_unit(unit.parent)
+
+        # Turn user_events into a list of content
+        user_events = [user_events[item] for item in user_events]
+
+        # Sort the user events by start datetime
+        user_events = sorted(user_events, key=lambda x: x["start_datetime"])
+
+        # Return response data
+        return successResponse(user_events)
 
     # Error handling
     except Exception as e:

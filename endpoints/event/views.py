@@ -29,17 +29,8 @@ def create_event_endpoint():
         if unit.status == "error":
             return unit
 
-        # Update unit so that its easier to use
-        unit = unit.message
-
         # Add the event to the database
         result = EventAccess.create_event(**data)
-
-        # Add event to the unit
-        unit.add_event(result.id, data["datetime"])
-
-        # Update the unit
-        UnitAccess.update_unit(id=data["unit"], **unit.info)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -124,9 +115,6 @@ def delete_event_endpoint():
         if event.status == "error":
             return event
 
-        # Get event object
-        event = event.message
-
         # Get the unit object of the target unit
         unit = UnitAccess.get_unit(event.info.unit)
 
@@ -134,17 +122,8 @@ def delete_event_endpoint():
         if unit.status == "error":
             return unit
 
-        # Update unit so that its easier to use
-        unit = unit.message
-
         # Add the event to the database
         result = EventAccess.delete_event(**data)
-
-        # Add event to the unit
-        unit.delete_event(result.id)
-
-        # Update the unit
-        UnitAccess.update_unit(id=unit.info._id, **unit.info)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

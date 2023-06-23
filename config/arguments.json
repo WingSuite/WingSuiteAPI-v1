@@ -19,7 +19,8 @@
       "delete_warrior": ["id"]
     },
     "event": {
-      "create_event": ["name", "unit", "location", "datetime", "description"],
+      "create_event": ["name", "unit", "location", "start_datetime",
+        "end_datetime", "description"],
       "update_event": ["id"],
       "get_event_info": ["id"],
       "delete_event": ["id"]
@@ -40,20 +41,24 @@
       "register": ["first_name", "last_name", "email", "phone_number",
         "password"],
       "authorize_user": ["id"],
+      "reject_user": ["id"],
       "signout": ["access", "refresh"]
     },
     "user": {
       "add_permissions": ["id", "permissions"],
       "delete_permissions": ["id", "permissions"],
       "who_am_i": [],
-      "everyone": ["page_size", "page_index"]
+      "everyone": ["page_size", "page_index"],
+      "get_feedback": ["page_size", "page_index", "sent"],
+      "get_user": ["id"],
+      "get_events": ["start_datetime", "end_datetime"]
     }
   },
   "models": {
     "statistics":{
       "feedback": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name", "feedback"]
-      },
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "feedback", "datetime_created"]
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "pfa"]
       },
@@ -62,7 +67,8 @@
       }
     },
     "event": {
-      "init": ["_id", "name", "unit", "location", "datetime", "description"]
+      "init": ["_id", "name", "unit", "location", "start_datetime",
+        "end_datetime", "description"]
     },
     "unit": {
       "init": ["_id", "name", "unit_type", "parent", "children", "officers",

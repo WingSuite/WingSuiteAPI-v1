@@ -113,6 +113,15 @@ class UserAccess(DataAccessBase):
         if page_size <= 0 or page_index < 0:
             return DataAccessBase.sendError("Invalid pagination size or index")
 
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            DataAccessBase.USER_COL.count_documents({}) / page_size
+        )
+
+        # Check if the page_index is outside the page range
+        if page_index >= pages:
+            return DataAccessBase.sendError("Pagination index out of bounds")
+
         # Calculate skip value
         skips = page_size * (page_index)
 
@@ -120,20 +129,27 @@ class UserAccess(DataAccessBase):
         results = DataAccessBase.USER_COL.find().skip(skips).limit(page_size)
 
         # Turn each document into a Unit object
-        results = [
-            User(**item).get_generic_info(
-                other_protections=["phone_number", "permissions"]
-            )
-            for item in list(results)
-        ]
-
-        # Get the total amount of pages based on pagination size
-        pages = math.ceil(
-            DataAccessBase.USER_COL.count_documents({}) / page_size
-        )
+        results = [User(**item) for item in list(results)]
 
         # Return the results and the page size
         return DataAccessBase.sendSuccess(results, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def reject_user(id: str) -> DictParse:
+        """Reject the user from being a user on this platform"""
+
+        # Check if user is in the REGISTER_COL
+        user = DataAccessBase.REGISTER_COL.find_one({"_id": id})
+        if user is not None:
+            # If the user exists delete their record
+            DataAccessBase.REGISTER_COL.delete_one({"_id": id})
+
+            # Return
+            return DataAccessBase.sendSuccess("User denied")
+
+        # Return an error if else
+        return DataAccessBase.sendError("User not found")
 
     @staticmethod
     @DataAccessBase.dict_wrap
