@@ -59,6 +59,7 @@
       "feedback": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
+      },
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "pfa"]
       },
