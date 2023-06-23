@@ -45,6 +45,18 @@ from endpoints.statistics.feedback import (
     get_feedback_info,
     delete_feedback,
 )
+from endpoints.statistics.pfa import (
+    create_pfa,
+    update_pfa,
+    get_pfa_info,
+    delete_pfa,
+)
+from endpoints.statistics.warrior import (
+    create_warrior,
+    update_warrior,
+    get_warrior_info,
+    delete_warrior,
+)
 
 # Miscellaneous Imports
 from config.config import config
@@ -120,6 +132,18 @@ app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
+
+# Statistic Pfa routes
+app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
+app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
+app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
+app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
+
+# Statistic Warrior routes
+app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
+app.register_blueprint(update_warrior, url_prefix="/statistic/warrior/")
+app.register_blueprint(get_warrior_info, url_prefix="/statistic/warrior/")
+app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")
 
 """
 APP RUNTIME HANDLING
