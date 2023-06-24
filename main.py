@@ -9,6 +9,7 @@ from database.base import DataAccessBase
 # Endpoint Imports
 from endpoints.authentication import (
     login,
+    refresh,
     register,
     authorize,
     reject,
@@ -111,8 +112,6 @@ def check_if_token_in_blacklist(jwt_header, jwt_payload):
 def my_expired_token_callback(*kwargs):
     """Function to customize the expired token message"""
 
-    print(kwargs)
-
     # Return a custom error message
     return {
         "status": "expired",
@@ -126,9 +125,9 @@ ROUTE HANDLING
 
 # Authentication routes
 app.register_blueprint(login, url_prefix="/auth/")
+app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
-
 app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 

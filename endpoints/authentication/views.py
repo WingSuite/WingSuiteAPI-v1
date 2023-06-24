@@ -2,10 +2,12 @@
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
+    get_jwt_identity,
     jwt_required,
 )
 from . import (
     login,
+    refresh,
     register,
     authorize,
     reject,
@@ -56,6 +58,21 @@ def login_endpoint():
     # Error handling
     except Exception as e:
         return serverErrorResponse(str(e))
+
+
+@refresh.route("/refresh/", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh_endpoint():
+    """Method to refresh user's access token"""
+
+    # Get the identity from the refresh token
+    current_user = get_jwt_identity()
+
+    # Create a new access token
+    new_token = create_access_token(identity=current_user)
+
+    # Return the new token
+    return {"access_token": new_token}, 200
 
 
 @register.route("/register/", methods=["POST"])
