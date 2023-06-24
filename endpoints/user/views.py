@@ -254,6 +254,9 @@ def get_feedback_endpoint():
         # Get feedbacks from database
         results = FeedbackAccess.get_own_feedback(id, **data)
 
+        # Reverse feedback order
+        results.message = results.message[::-1]
+
         # If the resulting information is in error, respond with error
         if results.status == "error":
             return clientErrorResponse(results.message)
@@ -375,7 +378,9 @@ def get_notifications_endpoints():
 
         # Sort the user events by start datetime
         user_notifications = sorted(
-            user_notifications, key=lambda x: x["created_datetime"]
+            user_notifications,
+            key=lambda x: x["created_datetime"],
+            reverse=True,
         )
 
         # Return response data
