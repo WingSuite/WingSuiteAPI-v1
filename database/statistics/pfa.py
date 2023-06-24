@@ -12,7 +12,7 @@ class PFAAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def create_pfa(
-        from_user: str, to_user: str, name: str, pfa: str, **kwargs: Any
+        from_user: str, to_user: str, name: str, pushup: str, situp: str, run: str, points: str, **kwargs: Any
     ) -> DictParse:
         """Method to create a PFA"""
 
