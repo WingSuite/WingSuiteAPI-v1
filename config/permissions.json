@@ -9,7 +9,6 @@
 
     "unit.create_unit",
     "unit.update_unit",
-    "unit.get_unit_info",
     "unit.delete_unit",
     "unit.add_members",
     "unit.delete_members",

@@ -102,7 +102,7 @@ def _update_personnel_helper(id, users, operation, participation):
 
 
 @create_unit.route("/create_unit/", methods=["POST"])
-@permissions_required(["user.create_unit"])
+@permissions_required(["unit.create_unit"])
 @param_check(ARGS.unit.create_unit)
 def create_unit_endpoint():
     """Method to handle the creation of a new unit"""
@@ -124,7 +124,7 @@ def create_unit_endpoint():
 
 
 @update_unit.route("/update_unit/", methods=["POST"])
-@permissions_required(["user.update_unit"])
+@permissions_required(["unit.update_unit"])
 @param_check(ARGS.unit.update_unit)
 def update_unit_endpoint():
     """Method to handle the update of a unit"""
@@ -148,8 +148,7 @@ def update_unit_endpoint():
         return serverErrorResponse(str(e))
 
 
-@get_unit_info.route("/get_unit_info/", methods=["GET"])
-@permissions_required(["user.get_unit_info"])
+@get_unit_info.route("/get_unit_info/", methods=["POST"])
 @param_check(ARGS.unit.get_unit_info)
 def get_unit_info_endpoint():
     """Method to get the info of a unit"""
