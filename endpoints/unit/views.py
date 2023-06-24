@@ -2,6 +2,7 @@
 from endpoints.base import (
     permissions_required,
     param_check,
+    clientErrorResponse,
     serverErrorResponse,
     successResponse,
     ARGS,
@@ -10,15 +11,17 @@ from . import (
     create_unit,
     update_unit,
     get_unit_info,
+    get_all_units,
     delete_unit,
     add_members,
     delete_members,
     add_officers,
     delete_officers,
 )
+from flask_jwt_extended import jwt_required
+from flask import request
 from database.unit import UnitAccess
 from database.user import UserAccess
-from flask import request
 
 
 def _update_personnel_helper(id, users, operation, participation):
@@ -165,6 +168,36 @@ def get_unit_info_endpoint():
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_all_units.route("/get_all_units/", methods=["POST"])
+@param_check(ARGS.unit.get_all_units)
+@jwt_required()
+def get_all_units_endpoint():
+    """Method to get all unit IDs"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the content information based on the given page size and
+        # page index
+        results = UnitAccess.get_units(**data)
+
+        # If the resulting information is in error, respond with error
+        if results.status == "error":
+            return clientErrorResponse(results.message)
+
+        # Format message
+        results.message = [item.info for item in results.message]
+
+        # Return the content of the information
+        return results, 200
 
     # Error handling
     except Exception as e:

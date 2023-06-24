@@ -38,6 +38,7 @@
         "members"],
       "update_unit": ["id"],
       "get_unit_info": ["id"],
+      "get_all_units": ["page_size", "page_index"],
       "delete_unit": ["id"],
       "add_members": ["id", "users"],
       "delete_members": ["id", "users"],

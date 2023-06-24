@@ -7,6 +7,7 @@ from database.user import UserAccess
 from models.unit import Unit
 from models.user import User
 import uuid
+import math
 
 
 class UnitAccess(DataAccessBase):
@@ -185,5 +186,35 @@ class UnitAccess(DataAccessBase):
                 "message": "Unit not found",
             }
 
-        # Return with a User object
+        # Return with a Unit object
         return DataAccessBase.sendSuccess(Unit(**unit))
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_units(page_size: int, page_index: int) -> DictParse:
+        """Get a list of units based on the page size and the index"""
+
+        # Check if the page_size or page_index is negative
+        if page_size <= 0 or page_index < 0:
+            return DataAccessBase.sendError("Invalid pagination size or index")
+
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            DataAccessBase.UNIT_COL.count_documents({}) / page_size
+        )
+
+        # Check if the page_index is outside the page range
+        if page_index >= pages:
+            return DataAccessBase.sendError("Pagination index out of bounds")
+
+        # Calculate skip value
+        skips = page_size * (page_index)
+
+        # Get the list of units based on the given page size and index
+        results = DataAccessBase.UNIT_COL.find().skip(skips).limit(page_size)
+
+        # Turn each document into a Unit object
+        results = [Unit(**item) for item in list(results)]
+
+        # Return the results and the page size
+        return DataAccessBase.sendSuccess(results, pages=pages)

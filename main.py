@@ -28,6 +28,7 @@ from endpoints.unit import (
     create_unit,
     update_unit,
     get_unit_info,
+    get_all_units,
     delete_unit,
     add_members,
     delete_members,
@@ -124,6 +125,7 @@ app.register_blueprint(get_notifications, url_prefix="/user/")
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
+app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
