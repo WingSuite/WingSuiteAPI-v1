@@ -22,7 +22,7 @@ from endpoints.user import (
     get_user,
     get_feedbacks,
     get_events,
-    get_notifications
+    get_notifications,
 )
 from endpoints.unit import (
     create_unit,
@@ -94,9 +94,30 @@ jwt = JWTManager(app)
 # Define the blacklist checker for JWT
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    """Function to test if the user's token is blacklisted"""
+
+    # Get the JWT token information
     jti = jwt_payload["jti"]
+
+    # Check if the token is blacklisted
     query = DataAccessBase.BLACKLIST_COL.find_one({"access_jti": jti})
+
+    # Return true if it is, false if not
     return query is not None
+
+
+# Customize expired token message
+@jwt.expired_token_loader
+def my_expired_token_callback(*kwargs):
+    """Function to customize the expired token message"""
+
+    print(kwargs)
+
+    # Return a custom error message
+    return {
+        "status": "expired",
+        "message": "Your access is expired",
+    }, 401
 
 
 """
