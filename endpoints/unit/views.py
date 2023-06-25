@@ -18,6 +18,7 @@ from . import (
     add_officers,
     delete_officers,
 )
+from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
 from database.unit import UnitAccess
@@ -192,8 +193,12 @@ def get_all_units_endpoint():
         if results.status == "error":
             return clientErrorResponse(results.message)
 
-        # Format message
+        # Sort and Format message
         results.message = [item.info for item in results.message]
+        results.message = sorted(
+            results.message,
+            key=lambda x: (config.unitTypes.index(x["unit_type"]), x["name"])
+        )
 
         # Return the content of the information
         return results, 200
