@@ -43,7 +43,9 @@ def permissions_required(required_permissions: List[str]) -> object:
 
             # IF the user does not have sufficient permissions, deny the user
             if not user_permissions.intersection(required_permissions):
-                clientErrorResponse("You do not have access to this feature")
+                return clientErrorResponse(
+                    "You do not have access to this feature"
+                )
 
             # If so, continue on with the function that is being decorated
             else:

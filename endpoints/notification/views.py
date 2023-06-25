@@ -6,22 +6,22 @@ from endpoints.base import (
     ARGS,
 )
 from . import (
-    create_pfa,
-    update_pfa,
-    get_pfa_info,
-    delete_pfa,
+    create_notification,
+    update_notification,
+    get_notification_info,
+    delete_notification,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
-from database.statistics.pfa import PFAAccess
+from database.notification import NotificationAccess
 
 
-@create_pfa.route("/create_pfa/", methods=["POST"])
-@permissions_required(["statistic.pfa.create_pfa"])
-@param_check(ARGS.statistic.pfa.create_pfa)
+@create_notification.route("/create_notification/", methods=["POST"])
+@permissions_required(["notification.create_notification"])
+@param_check(ARGS.notification.create_notification)
 @jwt_required()
-def create_pfa_endpoint():
-    """Method to handle the creation of a new PFA"""
+def create_notification_endpoint():
+    """Method to handle the creation of a new notification"""
 
     # Try to parse information
     try:
@@ -34,8 +34,8 @@ def create_pfa_endpoint():
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add the PFA to the database
-        result = PFAAccess.create_pfa(**data, from_user=id)
+        # Add the notification to the database
+        result = NotificationAccess.create_notification(**data, author=id)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -45,22 +45,22 @@ def create_pfa_endpoint():
         return serverErrorResponse(str(e))
 
 
-@update_pfa.route("/update_pfa/", methods=["POST"])
-@permissions_required(["statistic.pfa.update_pfa"])
-@param_check(ARGS.statistic.pfa.update_pfa)
-def update_pfa_endpoint():
-    """Method to handle the update of a PFA"""
+@update_notification.route("/update_notification/", methods=["POST"])
+@permissions_required(["notification.update_notification"])
+@param_check(ARGS.notification.update_notification)
+def update_notification_endpoint():
+    """Method to handle the update of a notification"""
 
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
-        # Get the id of the target PFA
+        # Get the id of the target notification
         id = data.pop("id")
 
-        # Add the PFA to the database
-        result = PFAAccess.update_pfa(id, **data)
+        # Add the notification to the database
+        result = NotificationAccess.update_notification(id, **data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -70,24 +70,24 @@ def update_pfa_endpoint():
         return serverErrorResponse(str(e))
 
 
-@get_pfa_info.route("/get_pfa_info/", methods=["GET"])
-@permissions_required(["statistic.pfa.get_pfa_info"])
-@param_check(ARGS.statistic.pfa.get_pfa_info)
-def get_pfa_info_endpoint():
-    """Method to get the info of an PFA"""
+@get_notification_info.route("/get_notification_info/", methods=["GET"])
+@permissions_required(["notification.get_notification_info"])
+@param_check(ARGS.notification.get_notification_info)
+def get_notification_info_endpoint():
+    """Method to get the info of a notification"""
 
     # Try to parse information
     try:
         # Parse information from the call's body
         data = request.get_json()
 
-        # Get the id of the target PFA
+        # Get the id of the target notification
         id = data.pop("id")
 
-        # Get the PFA's information from the database
-        result = PFAAccess.get_pfa(id)
+        # Get the notification's information from the database
+        result = NotificationAccess.get_notification(id)
 
-        # Return error if no PFA was provided
+        # Return error if no notification was provided
         if result.status == "error":
             return result, 200
 
@@ -102,11 +102,11 @@ def get_pfa_info_endpoint():
         return serverErrorResponse(str(e))
 
 
-@delete_pfa.route("/delete_pfa/", methods=["POST"])
-@permissions_required(["statistic.pfa.delete_pfa"])
-@param_check(ARGS.statistic.pfa.delete_pfa)
-def delete_pfa_endpoint():
-    """Method to handle the deletion of a PFA"""
+@delete_notification.route("/delete_notification/", methods=["POST"])
+@permissions_required(["notification.delete_notification"])
+@param_check(ARGS.notification.delete_notification)
+def delete_notification_endpoint():
+    """Method to handle the deletion of a notification"""
 
     # Try to parse information
     try:
@@ -114,7 +114,7 @@ def delete_pfa_endpoint():
         data = request.get_json()
 
         # Add the event to the database
-        result = PFAAccess.delete_pfa(**data)
+        result = NotificationAccess.delete_notification(**data)
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

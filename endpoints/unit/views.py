@@ -2,6 +2,7 @@
 from endpoints.base import (
     permissions_required,
     param_check,
+    clientErrorResponse,
     serverErrorResponse,
     successResponse,
     ARGS,
@@ -10,15 +11,17 @@ from . import (
     create_unit,
     update_unit,
     get_unit_info,
+    get_all_units,
     delete_unit,
     add_members,
     delete_members,
     add_officers,
     delete_officers,
 )
+from flask_jwt_extended import jwt_required
+from flask import request
 from database.unit import UnitAccess
 from database.user import UserAccess
-from flask import request
 
 
 def _update_personnel_helper(id, users, operation, participation):
@@ -99,7 +102,7 @@ def _update_personnel_helper(id, users, operation, participation):
 
 
 @create_unit.route("/create_unit/", methods=["POST"])
-@permissions_required(["user.create_unit"])
+@permissions_required(["unit.create_unit"])
 @param_check(ARGS.unit.create_unit)
 def create_unit_endpoint():
     """Method to handle the creation of a new unit"""
@@ -121,7 +124,7 @@ def create_unit_endpoint():
 
 
 @update_unit.route("/update_unit/", methods=["POST"])
-@permissions_required(["user.update_unit"])
+@permissions_required(["unit.update_unit"])
 @param_check(ARGS.unit.update_unit)
 def update_unit_endpoint():
     """Method to handle the update of a unit"""
@@ -145,8 +148,7 @@ def update_unit_endpoint():
         return serverErrorResponse(str(e))
 
 
-@get_unit_info.route("/get_unit_info/", methods=["GET"])
-@permissions_required(["user.get_unit_info"])
+@get_unit_info.route("/get_unit_info/", methods=["POST"])
 @param_check(ARGS.unit.get_unit_info)
 def get_unit_info_endpoint():
     """Method to get the info of a unit"""
@@ -165,6 +167,36 @@ def get_unit_info_endpoint():
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_all_units.route("/get_all_units/", methods=["POST"])
+@param_check(ARGS.unit.get_all_units)
+@jwt_required()
+def get_all_units_endpoint():
+    """Method to get all unit IDs"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the content information based on the given page size and
+        # page index
+        results = UnitAccess.get_units(**data)
+
+        # If the resulting information is in error, respond with error
+        if results.status == "error":
+            return clientErrorResponse(results.message)
+
+        # Format message
+        results.message = [item.info for item in results.message]
+
+        # Return the content of the information
+        return results, 200
 
     # Error handling
     except Exception as e:

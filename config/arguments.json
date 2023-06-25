@@ -2,7 +2,7 @@
   "endpoints": {
     "statistic": {
       "feedback": {
-        "create_feedback": ["from_user", "to_user", "name", "feedback"],
+        "create_feedback": ["to_user", "name", "feedback"],
         "update_feedback": ["id"],
         "get_feedback_info": ["id"],
         "delete_feedback": ["id"]
@@ -14,11 +14,17 @@
         "delete_pfa": ["id"]
       },
       "warrior": {
-        "create_warrior": ["from_user", "to_user", "name", "warrior"],
+        "create_warrior": ["to_user", "name", "warrior"],
         "update_warrior": ["id"],
         "get_warrior_info": ["id"],
         "delete_warrior": ["id"]
       }
+    },
+    "notification": {
+      "create_notification": ["name", "unit", "notification"],
+      "update_notification": ["id"],
+      "get_notification_info": ["id"],
+      "delete_notification": ["id"]
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
@@ -32,6 +38,7 @@
         "members"],
       "update_unit": ["id"],
       "get_unit_info": ["id"],
+      "get_all_units": ["page_size", "page_index"],
       "delete_unit": ["id"],
       "add_members": ["id", "users"],
       "delete_members": ["id", "users"],
@@ -51,13 +58,14 @@
       "delete_permissions": ["id", "permissions"],
       "who_am_i": [],
       "everyone": ["page_size", "page_index"],
-      "get_feedback": ["page_size", "page_index", "sent"],
       "get_user": ["id"],
-      "get_events": ["start_datetime", "end_datetime"]
+      "get_feedback": ["page_size", "page_index", "sent"],
+      "get_events": ["start_datetime", "end_datetime"],
+      "get_notifications": ["start_datetime", "end_datetime"]
     }
   },
   "models": {
-    "statistics":{
+    "statistic":{
       "feedback": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
@@ -68,6 +76,10 @@
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "warrior"]
       }
+    },
+    "notification": {
+      "init": ["_id", "name", "unit", "created_datetime", "notification",
+        "author"]
     },
     "event": {
       "init": ["_id", "name", "unit", "location", "start_datetime",

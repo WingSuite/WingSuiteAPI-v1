@@ -8,7 +8,7 @@ class Feedback:
     """Feedback model class"""
 
     # Static variable declaration
-    REQ_ARGS = arguments.models.statistics
+    REQ_ARGS = arguments.models.statistic
 
     def __init__(self: "Feedback", **kwargs: Any) -> None:
         """Constructor for base unit"""

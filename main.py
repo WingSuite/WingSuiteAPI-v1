@@ -9,6 +9,7 @@ from database.base import DataAccessBase
 # Endpoint Imports
 from endpoints.authentication import (
     login,
+    refresh,
     register,
     authorize,
     reject,
@@ -19,14 +20,16 @@ from endpoints.user import (
     delete_permissions,
     who_am_i,
     everyone,
-    get_feedback,
     get_user,
-    get_events
+    get_feedbacks,
+    get_events,
+    get_notifications,
 )
 from endpoints.unit import (
     create_unit,
     update_unit,
     get_unit_info,
+    get_all_units,
     delete_unit,
     add_members,
     delete_members,
@@ -38,6 +41,12 @@ from endpoints.event import (
     update_event,
     get_event_info,
     delete_event,
+)
+from endpoints.notification import (
+    create_notification,
+    update_notification,
+    get_notification_info,
+    delete_notification,
 )
 from endpoints.statistics.feedback import (
     create_feedback,
@@ -86,9 +95,28 @@ jwt = JWTManager(app)
 # Define the blacklist checker for JWT
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    """Function to test if the user's token is blacklisted"""
+
+    # Get the JWT token information
     jti = jwt_payload["jti"]
+
+    # Check if the token is blacklisted
     query = DataAccessBase.BLACKLIST_COL.find_one({"access_jti": jti})
+
+    # Return true if it is, false if not
     return query is not None
+
+
+# Customize expired token message
+@jwt.expired_token_loader
+def my_expired_token_callback(*kwargs):
+    """Function to customize the expired token message"""
+
+    # Return a custom error message
+    return {
+        "status": "expired",
+        "message": "Your access is expired",
+    }, 401
 
 
 """
@@ -97,6 +125,7 @@ ROUTE HANDLING
 
 # Authentication routes
 app.register_blueprint(login, url_prefix="/auth/")
+app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
@@ -107,14 +136,16 @@ app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
 app.register_blueprint(everyone, url_prefix="/user/")
-app.register_blueprint(get_feedback, url_prefix="/user/")
 app.register_blueprint(get_user, url_prefix="/user/")
+app.register_blueprint(get_feedbacks, url_prefix="/user/")
 app.register_blueprint(get_events, url_prefix="/user/")
+app.register_blueprint(get_notifications, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
+app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
@@ -126,6 +157,12 @@ app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
+
+# Notification routes
+app.register_blueprint(create_notification, url_prefix="/notification/")
+app.register_blueprint(update_notification, url_prefix="/notification/")
+app.register_blueprint(get_notification_info, url_prefix="/notification/")
+app.register_blueprint(delete_notification, url_prefix="/notification/")
 
 # Statistic Feedback routes
 app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
