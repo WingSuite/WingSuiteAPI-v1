@@ -30,7 +30,7 @@ from config.config import permissions
 @add_permissions.route("/add_permissions/", methods=["POST"])
 @permissions_required(["user.add_permissions"])
 @param_check(ARGS.user.add_permissions)
-def add_permissions_endpoint():
+def add_permissions_endpoint(**kwargs):
     """Method to handle the adding of new permissions to the user"""
 
     # Try to parse information
@@ -87,7 +87,7 @@ def add_permissions_endpoint():
 @delete_permissions.route("/delete_permissions/", methods=["POST"])
 @permissions_required(["user.delete_permissions"])
 @param_check(ARGS.user.delete_permissions)
-def delete_permissions_endpoint():
+def delete_permissions_endpoint(**kwargs):
     """Method to handle the adding of new permissions to the user"""
 
     # Try to parse information
@@ -143,7 +143,7 @@ def delete_permissions_endpoint():
 
 @who_am_i.route("/who_am_i/", methods=["GET"])
 @jwt_required()
-def who_am_i_endpoint():
+def who_am_i_endpoint(**kwargs):
     """Method to return the user's information"""
 
     # Try to parse information
@@ -169,7 +169,7 @@ def who_am_i_endpoint():
 @everyone.route("/everyone/", methods=["POST"])
 @param_check(ARGS.user.everyone)
 @jwt_required()
-def everyone_endpoint():
+def everyone_endpoint(**kwargs):
     """Method to get every person in the user's database"""
 
     # Try to parse information
@@ -204,7 +204,7 @@ def everyone_endpoint():
 @get_user.route("/get_user/", methods=["POST"])
 @param_check(ARGS.user.get_user)
 @jwt_required()
-def get_user_endpoint():
+def get_user_endpoint(**kwargs):
     """Endpoint to get the user's information"""
 
     # Try to parse information
@@ -237,7 +237,7 @@ def get_user_endpoint():
 @get_feedbacks.route("/get_feedbacks/", methods=["POST"])
 @param_check(ARGS.user.get_feedback)
 @jwt_required()
-def get_feedback_endpoint():
+def get_feedback_endpoint(**kwargs):
     """Method to get the feedback information for a user"""
 
     # Try to process the endpoint
@@ -272,7 +272,7 @@ def get_feedback_endpoint():
 @get_events.route("/get_events/", methods=["POST"])
 @param_check(ARGS.user.get_events)
 @jwt_required()
-def get_events_endpoint():
+def get_events_endpoint(**kwargs):
     """Method to get the events based on the user's units"""
 
     # Try to parse information

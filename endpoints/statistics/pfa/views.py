@@ -20,7 +20,7 @@ from database.statistics.pfa import PFAAccess
 @permissions_required(["statistic.pfa.create_pfa"])
 @param_check(ARGS.statistic.pfa.create_pfa)
 @jwt_required()
-def create_pfa_endpoint():
+def create_pfa_endpoint(**kwargs):
     """Method to handle the creation of a new PFA"""
 
     # Try to parse information
@@ -48,7 +48,7 @@ def create_pfa_endpoint():
 @update_pfa.route("/update_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.update_pfa"])
 @param_check(ARGS.statistic.pfa.update_pfa)
-def update_pfa_endpoint():
+def update_pfa_endpoint(**kwargs):
     """Method to handle the update of a PFA"""
 
     # Try to parse information
@@ -73,7 +73,7 @@ def update_pfa_endpoint():
 @get_pfa_info.route("/get_pfa_info/", methods=["GET"])
 @permissions_required(["statistic.pfa.get_pfa_info"])
 @param_check(ARGS.statistic.pfa.get_pfa_info)
-def get_pfa_info_endpoint():
+def get_pfa_info_endpoint(**kwargs):
     """Method to get the info of an PFA"""
 
     # Try to parse information
@@ -105,7 +105,7 @@ def get_pfa_info_endpoint():
 @delete_pfa.route("/delete_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.delete_pfa"])
 @param_check(ARGS.statistic.pfa.delete_pfa)
-def delete_pfa_endpoint():
+def delete_pfa_endpoint(**kwargs):
     """Method to handle the deletion of a PFA"""
 
     # Try to parse information

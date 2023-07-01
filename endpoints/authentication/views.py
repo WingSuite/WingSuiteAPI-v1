@@ -25,7 +25,7 @@ from flask import request
 
 @login.route("/login/", methods=["POST"])
 @param_check(ARGS.authentication.login)
-def login_endpoint():
+def login_endpoint(**kwargs):
     """Log In Handling"""
 
     # Try to parse information
@@ -62,7 +62,7 @@ def login_endpoint():
 
 @refresh.route("/refresh/", methods=["POST"])
 @jwt_required(refresh=True)
-def refresh_endpoint():
+def refresh_endpoint(**kwargs):
     """Method to refresh user's access token"""
 
     # Get the identity from the refresh token
@@ -77,7 +77,7 @@ def refresh_endpoint():
 
 @register.route("/register/", methods=["POST"])
 @param_check(ARGS.authentication.register)
-def register_endpoint():
+def register_endpoint(**kwargs):
     """Log In Handling"""
 
     # Try to parse information
@@ -99,7 +99,7 @@ def register_endpoint():
 @authorize.route("/authorize_user/", methods=["POST"])
 @permissions_required(["auth.authorize_user"])
 @param_check(ARGS.authentication.authorize_user)
-def authorize_user_endpoint():
+def authorize_user_endpoint(**kwargs):
     """Log In Handling"""
 
     # Try to parse information
@@ -121,7 +121,7 @@ def authorize_user_endpoint():
 @reject.route("/reject_user/", methods=["POST"])
 @permissions_required(["auth.reject_user"])
 @param_check(ARGS.authentication.reject_user)
-def reject_user_endpoint():
+def reject_user_endpoint(**kwargs):
     """Log In Handling"""
 
     # Try to parse information
@@ -143,7 +143,7 @@ def reject_user_endpoint():
 @signout.route("/signout/", methods=["POST"])
 @param_check(ARGS.authentication.signout)
 @jwt_required()
-def signout_endpoint():
+def signout_endpoint(**kwargs):
     """Sign Out Handling"""
 
     # Try to parse information

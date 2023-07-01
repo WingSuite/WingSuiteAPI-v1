@@ -20,7 +20,7 @@ from database.notification import NotificationAccess
 @permissions_required(["notification.create_notification"])
 @param_check(ARGS.notification.create_notification)
 @jwt_required()
-def create_notification_endpoint():
+def create_notification_endpoint(**kwargs):
     """Method to handle the creation of a new notification"""
 
     # Try to parse information
@@ -48,7 +48,7 @@ def create_notification_endpoint():
 @update_notification.route("/update_notification/", methods=["POST"])
 @permissions_required(["notification.update_notification"])
 @param_check(ARGS.notification.update_notification)
-def update_notification_endpoint():
+def update_notification_endpoint(**kwargs):
     """Method to handle the update of a notification"""
 
     # Try to parse information
@@ -73,7 +73,7 @@ def update_notification_endpoint():
 @get_notification_info.route("/get_notification_info/", methods=["GET"])
 @permissions_required(["notification.get_notification_info"])
 @param_check(ARGS.notification.get_notification_info)
-def get_notification_info_endpoint():
+def get_notification_info_endpoint(**kwargs):
     """Method to get the info of a notification"""
 
     # Try to parse information
@@ -105,7 +105,7 @@ def get_notification_info_endpoint():
 @delete_notification.route("/delete_notification/", methods=["POST"])
 @permissions_required(["notification.delete_notification"])
 @param_check(ARGS.notification.delete_notification)
-def delete_notification_endpoint():
+def delete_notification_endpoint(**kwargs):
     """Method to handle the deletion of a notification"""
 
     # Try to parse information

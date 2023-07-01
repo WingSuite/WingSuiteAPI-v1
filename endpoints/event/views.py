@@ -14,7 +14,7 @@ from flask import request
 @create_event.route("/create_event/", methods=["POST"])
 @permissions_required(["event.create_event"])
 @param_check(ARGS.event.create_event)
-def create_event_endpoint():
+def create_event_endpoint(**kwargs):
     """Method to handle the creation of a new event"""
 
     # Try to parse information
@@ -43,7 +43,7 @@ def create_event_endpoint():
 @update_event.route("/update_event/", methods=["POST"])
 @permissions_required(["event.update_event"])
 @param_check(ARGS.event.update_event)
-def update_event_endpoint():
+def update_event_endpoint(**kwargs):
     """Method to handle the update of an event"""
 
     # Try to parse information
@@ -68,7 +68,7 @@ def update_event_endpoint():
 @get_event_info.route("/get_event_info/", methods=["GET"])
 @permissions_required(["event.get_event_info"])
 @param_check(ARGS.event.get_event_info)
-def get_event_info_endpoint():
+def get_event_info_endpoint(**kwargs):
     """Method to get the info of an event"""
 
     # Try to parse information
@@ -100,7 +100,7 @@ def get_event_info_endpoint():
 @delete_event.route("/delete_event/", methods=["POST"])
 @permissions_required(["event.delete_event"])
 @param_check(ARGS.event.delete_event)
-def delete_event_endpoint():
+def delete_event_endpoint(**kwargs):
     """Method to handle the deletion of an event"""
 
     # Try to parse information

@@ -49,7 +49,11 @@ def permissions_required(required_permissions: List[str]) -> object:
 
             # If so, continue on with the function that is being decorated
             else:
-                return func(*args, **kwargs)
+                # Check if the user has root key
+                root = config.rootPermissionString in user_permissions
+                
+                # Return the function with information provided
+                return func(*args, **kwargs, root=root)
 
         # Return the functionality of the wrapper
         return wrapper

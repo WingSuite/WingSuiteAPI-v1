@@ -105,7 +105,7 @@ def _update_personnel_helper(id, users, operation, participation):
 @create_unit.route("/create_unit/", methods=["POST"])
 @permissions_required(["unit.create_unit"])
 @param_check(ARGS.unit.create_unit)
-def create_unit_endpoint():
+def create_unit_endpoint(**kwargs):
     """Method to handle the creation of a new unit"""
 
     # Try to parse information
@@ -127,7 +127,7 @@ def create_unit_endpoint():
 @update_unit.route("/update_unit/", methods=["POST"])
 @permissions_required(["unit.update_unit"])
 @param_check(ARGS.unit.update_unit)
-def update_unit_endpoint():
+def update_unit_endpoint(**kwargs):
     """Method to handle the update of a unit"""
 
     # Try to parse information
@@ -151,7 +151,7 @@ def update_unit_endpoint():
 
 @get_unit_info.route("/get_unit_info/", methods=["POST"])
 @param_check(ARGS.unit.get_unit_info)
-def get_unit_info_endpoint():
+def get_unit_info_endpoint(**kwargs):
     """Method to get the info of a unit"""
 
     # Try to parse information
@@ -177,7 +177,7 @@ def get_unit_info_endpoint():
 @get_all_units.route("/get_all_units/", methods=["POST"])
 @param_check(ARGS.unit.get_all_units)
 @jwt_required()
-def get_all_units_endpoint():
+def get_all_units_endpoint(**kwargs):
     """Method to get all unit IDs"""
 
     # Try to parse information
@@ -211,7 +211,7 @@ def get_all_units_endpoint():
 @delete_unit.route("/delete_unit/", methods=["POST"])
 @permissions_required(["user.delete_unit"])
 @param_check(ARGS.unit.delete_unit)
-def delete_unit_endpoint():
+def delete_unit_endpoint(**kwargs):
     """Method to handle the deletion of a unit"""
 
     # Try to parse information
@@ -233,7 +233,7 @@ def delete_unit_endpoint():
 @add_members.route("/add_members/", methods=["POST"])
 @permissions_required(["user.add_members"])
 @param_check(ARGS.unit.add_members)
-def add_members_endpoint():
+def add_members_endpoint(**kwargs):
     """Method to add a new members to the unit"""
 
     # Try to parse information
@@ -254,7 +254,7 @@ def add_members_endpoint():
 @delete_members.route("/delete_members/", methods=["POST"])
 @permissions_required(["user.delete_members"])
 @param_check(ARGS.unit.delete_members)
-def delete_members_endpoint():
+def delete_members_endpoint(**kwargs):
     """Method to delete members to the unit"""
 
     # Try to parse information
@@ -275,7 +275,7 @@ def delete_members_endpoint():
 @add_officers.route("/add_officers/", methods=["POST"])
 @permissions_required(["user.add_officers"])
 @param_check(ARGS.unit.add_officers)
-def add_officers_endpoint():
+def add_officers_endpoint(**kwargs):
     """Method to add a new officers to the unit"""
 
     # Try to parse information
@@ -296,7 +296,7 @@ def add_officers_endpoint():
 @delete_officers.route("/delete_officers/", methods=["POST"])
 @permissions_required(["user.delete_officers"])
 @param_check(ARGS.unit.delete_officers)
-def delete_officers_endpoint():
+def delete_officers_endpoint(**kwargs):
     """Method to delete officers to the unit"""
 
     # Try to parse information

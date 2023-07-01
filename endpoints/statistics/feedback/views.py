@@ -20,7 +20,7 @@ from database.statistics.feedback import FeedbackAccess
 @permissions_required(["statistic.feedback.create_feedback"])
 @param_check(ARGS.statistic.feedback.create_feedback)
 @jwt_required()
-def create_feedback_endpoint():
+def create_feedback_endpoint(**kwargs):
     """Method to handle the creation of a new feedback"""
 
     # Try to parse information
@@ -48,7 +48,7 @@ def create_feedback_endpoint():
 @update_feedback.route("/update_feedback/", methods=["POST"])
 @permissions_required(["statistic.feedback.update_feedback"])
 @param_check(ARGS.statistic.feedback.update_feedback)
-def update_feedback_endpoint():
+def update_feedback_endpoint(**kwargs):
     """Method to handle the update of a feedback"""
 
     # Try to parse information
@@ -73,7 +73,7 @@ def update_feedback_endpoint():
 @get_feedback_info.route("/get_feedback_info/", methods=["GET"])
 @permissions_required(["statistic.feedback.get_feedback_info"])
 @param_check(ARGS.statistic.feedback.get_feedback_info)
-def get_feedback_info_endpoint():
+def get_feedback_info_endpoint(**kwargs):
     """Method to get the info of an feedback"""
 
     # Try to parse information
@@ -105,7 +105,7 @@ def get_feedback_info_endpoint():
 @delete_feedback.route("/delete_feedback/", methods=["POST"])
 @permissions_required(["statistic.feedback.delete_feedback"])
 @param_check(ARGS.statistic.feedback.delete_feedback)
-def delete_feedback_endpoint():
+def delete_feedback_endpoint(**kwargs):
     """Method to handle the deletion of an feedback"""
 
     # Try to parse information
