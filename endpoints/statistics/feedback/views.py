@@ -11,7 +11,6 @@ from . import (
     get_feedback_info,
     delete_feedback,
 )
-from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.statistics.feedback import FeedbackAccess
 
@@ -19,23 +18,16 @@ from database.statistics.feedback import FeedbackAccess
 @create_feedback.route("/create_feedback/", methods=["POST"])
 @permissions_required(["statistic.feedback.create_feedback"])
 @param_check(ARGS.statistic.feedback.create_feedback)
-@jwt_required()
 def create_feedback_endpoint(**kwargs):
     """Method to handle the creation of a new feedback"""
 
     # Try to parse information
     try:
-        # Get the access token
-        token = request.headers.get("Authorization", None).split()[1]
-
-        # Decode the JWT Token and get the ID of the user
-        id = decode_token(token)["sub"]["_id"]
-
         # Parse information from the call's body
         data = request.get_json()
 
         # Add the feedback to the database
-        result = FeedbackAccess.create_feedback(**data, from_user=id)
+        result = FeedbackAccess.create_feedback(**data, from_user=kwargs["id"])
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

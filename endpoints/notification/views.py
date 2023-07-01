@@ -11,7 +11,6 @@ from . import (
     get_notification_info,
     delete_notification,
 )
-from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.notification import NotificationAccess
 
@@ -19,23 +18,18 @@ from database.notification import NotificationAccess
 @create_notification.route("/create_notification/", methods=["POST"])
 @permissions_required(["notification.create_notification"])
 @param_check(ARGS.notification.create_notification)
-@jwt_required()
 def create_notification_endpoint(**kwargs):
     """Method to handle the creation of a new notification"""
 
     # Try to parse information
     try:
-        # Get the access token
-        token = request.headers.get("Authorization", None).split()[1]
-
-        # Decode the JWT Token and get the ID of the user
-        id = decode_token(token)["sub"]["_id"]
-
         # Parse information from the call's body
         data = request.get_json()
 
         # Add the notification to the database
-        result = NotificationAccess.create_notification(**data, author=id)
+        result = NotificationAccess.create_notification(
+            **data, author=kwargs["id"]
+        )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

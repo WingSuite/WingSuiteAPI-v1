@@ -11,7 +11,6 @@ from . import (
     get_pfa_info,
     delete_pfa,
 )
-from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.statistics.pfa import PFAAccess
 
@@ -19,23 +18,16 @@ from database.statistics.pfa import PFAAccess
 @create_pfa.route("/create_pfa/", methods=["POST"])
 @permissions_required(["statistic.pfa.create_pfa"])
 @param_check(ARGS.statistic.pfa.create_pfa)
-@jwt_required()
 def create_pfa_endpoint(**kwargs):
     """Method to handle the creation of a new PFA"""
 
     # Try to parse information
     try:
-        # Get the access token
-        token = request.headers.get("Authorization", None).split()[1]
-
-        # Decode the JWT Token and get the ID of the user
-        id = decode_token(token)["sub"]["_id"]
-
         # Parse information from the call's body
         data = request.get_json()
 
         # Add the PFA to the database
-        result = PFAAccess.create_pfa(**data, from_user=id)
+        result = PFAAccess.create_pfa(**data, from_user=kwargs["id"])
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
