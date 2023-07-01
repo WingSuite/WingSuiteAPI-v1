@@ -3,6 +3,7 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
+    clientErrorResponse,
     ARGS,
 )
 from . import create_event, update_event, get_event_info, delete_event
@@ -29,11 +30,18 @@ def create_event_endpoint(**kwargs):
         if unit.status == "error":
             return unit
 
-        # Add the event to the database
-        result = EventAccess.create_event(**data)
+        # Extract unit information
+        unit = unit.message.info
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the event to the database
+            result = EventAccess.create_event(**data)
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
+
+        return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
     except Exception as e:
@@ -54,11 +62,28 @@ def update_event_endpoint(**kwargs):
         # Get the id of the target event
         id = data.pop("id")
 
-        # Add the event to the database
-        result = EventAccess.update_event(id, **data)
+        # Get the event
+        event = EventAccess.get_event_by_id(id)
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the unit exists
+        if event.status == "error":
+            return event
+
+        # Extract event
+        event = event.message.info
+
+        print(event)
+
+        # Get the unit from event
+        unit = UnitAccess.get_unit(event.unit).message
+
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the event to the database
+            result = EventAccess.update_event(id, **data)
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
@@ -116,17 +141,22 @@ def delete_event_endpoint(**kwargs):
             return event
 
         # Get the unit object of the target unit
-        unit = UnitAccess.get_unit(event.info.unit)
+        unit = UnitAccess.get_unit(event.message.info.unit)
 
         # Check if the unit exists
         if unit.status == "error":
             return unit
 
-        # Add the event to the database
-        result = EventAccess.delete_event(**data)
+        # Extract unit information
+        unit = unit.message.info
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the event to the database
+            result = EventAccess.delete_event(**data)
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:

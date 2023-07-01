@@ -51,9 +51,9 @@ def permissions_required(required_permissions: List[str]) -> object:
             else:
                 # Check if the user has root key
                 root = config.rootPermissionString in user_permissions
-                
+
                 # Return the function with information provided
-                return func(*args, **kwargs, root=root)
+                return func(*args, **kwargs, isRoot=root, id=id)
 
         # Return the functionality of the wrapper
         return wrapper
