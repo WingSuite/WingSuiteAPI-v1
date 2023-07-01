@@ -24,6 +24,7 @@ from endpoints.user import (
     get_feedbacks,
     get_events,
     get_notifications,
+    get_users_units
 )
 from endpoints.unit import (
     create_unit,
@@ -140,6 +141,7 @@ app.register_blueprint(get_user, url_prefix="/user/")
 app.register_blueprint(get_feedbacks, url_prefix="/user/")
 app.register_blueprint(get_events, url_prefix="/user/")
 app.register_blueprint(get_notifications, url_prefix="/user/")
+app.register_blueprint(get_users_units, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")

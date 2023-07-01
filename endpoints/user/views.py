@@ -16,6 +16,7 @@ from . import (
     get_feedbacks,
     get_events,
     get_notifications,
+    get_users_units,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
@@ -24,7 +25,7 @@ from database.notification import NotificationAccess
 from database.event import EventAccess
 from database.user import UserAccess
 from database.unit import UnitAccess
-from config.config import permissions
+from config.config import permissions, config
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
@@ -329,7 +330,7 @@ def get_events_endpoint(**kwargs):
 @get_notifications.route("/get_notifications/", methods=["POST"])
 @param_check(ARGS.user.get_notifications)
 @jwt_required()
-def get_notifications_endpoints():
+def get_notifications_endpoint(**kwargs):
     """Method to get notifications based on the user's units"""
 
     # Try to parse information
@@ -385,6 +386,68 @@ def get_notifications_endpoints():
 
         # Return response data
         return successResponse(user_notifications)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_users_units.route("/get_users_units/", methods=["GET"])
+@jwt_required()
+def get_users_units_endpoint(**kwargs):
+    """Endpoint to the user's available units"""
+
+    # Try to parse information
+    try:
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get the user's information from the database
+        user = UserAccess.get_user(id).message.info
+
+        # Check if the user is a root user
+        if config.rootPermissionString in user.permissions:
+            # Get all of the units
+            results = UnitAccess.get_units(page_size=3000, page_index=0)
+
+            # If the resulting information is in error, respond with error
+            if results.status == "error":
+                return clientErrorResponse(results.message)
+
+            # Sort and Format message
+            results = [item.info for item in results.message]
+            results = sorted(
+                results,
+                key=lambda x: (
+                    config.unitTypes.index(x["unit_type"]),
+                    x["name"],
+                ),
+            )
+
+            # Return results
+            return successResponse(results)
+
+        # Create a tracker
+        results = []
+
+        # If not, return the content of the user's information
+        for item in user.units:
+            # Get the unit information
+            results.append(UnitAccess.get_unit(item).message.info)
+
+            # Sort and Format message
+            results = sorted(
+                results,
+                key=lambda x: (
+                    config.unitTypes.index(x["unit_type"]),
+                    x["name"],
+                ),
+            )
+
+            return successResponse(results)
 
     # Error handling
     except Exception as e:
