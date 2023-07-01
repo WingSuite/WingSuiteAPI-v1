@@ -41,6 +41,7 @@ def create_event_endpoint(**kwargs):
             # Return response data
             return result, (200 if result.status == "success" else 400)
 
+        # Return error if not
         return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
@@ -65,17 +66,15 @@ def update_event_endpoint(**kwargs):
         # Get the event
         event = EventAccess.get_event_by_id(id)
 
-        # Check if the unit exists
+        # Check if the event exists
         if event.status == "error":
             return event
 
         # Extract event
         event = event.message.info
 
-        print(event)
-
         # Get the unit from event
-        unit = UnitAccess.get_unit(event.unit).message
+        unit = UnitAccess.get_unit(event.unit).message.info
 
         # Check if the user is rooted or is officer of the unit
         if kwargs["isRoot"] or kwargs["id"] in unit.officers:
@@ -84,6 +83,9 @@ def update_event_endpoint(**kwargs):
 
             # Return response data
             return result, (200 if result.status == "success" else 400)
+
+        # Return error if not
+        return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
     except Exception as e:
@@ -157,6 +159,9 @@ def delete_event_endpoint(**kwargs):
 
             # Return response data
             return result, (200 if result.status == "success" else 400)
+
+        # Return error if not
+        return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
     except Exception as e:

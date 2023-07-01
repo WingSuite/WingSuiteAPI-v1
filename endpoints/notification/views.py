@@ -3,6 +3,7 @@ from endpoints.base import (
     permissions_required,
     param_check,
     serverErrorResponse,
+    clientErrorResponse,
     ARGS,
 )
 from . import (
@@ -13,6 +14,7 @@ from . import (
 )
 from flask import request
 from database.notification import NotificationAccess
+from database.unit import UnitAccess
 
 
 @create_notification.route("/create_notification/", methods=["POST"])
@@ -26,13 +28,28 @@ def create_notification_endpoint(**kwargs):
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add the notification to the database
-        result = NotificationAccess.create_notification(
-            **data, author=kwargs["id"]
-        )
+        # Get the unit object of the target unit
+        unit = UnitAccess.get_unit(data["unit"])
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the unit exists
+        if unit.status == "error":
+            return unit
+
+        # Extract unit information
+        unit = unit.message.info
+
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the notification to the database
+            result = NotificationAccess.create_notification(
+                **data, author=kwargs["id"]
+            )
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
+
+        # Return error if not
+        return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
     except Exception as e:
@@ -53,11 +70,31 @@ def update_notification_endpoint(**kwargs):
         # Get the id of the target notification
         id = data.pop("id")
 
-        # Add the notification to the database
-        result = NotificationAccess.update_notification(id, **data)
+        # Get the notification
+        notification = NotificationAccess.get_notification(id)
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the unit exists
+        if notification.status == "error":
+            return notification
+
+        # Extract notification
+        notification = notification.message.info
+
+        # Get the unit from notification
+        unit = UnitAccess.get_unit(notification.unit).message.info
+
+        print(unit)
+
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the notification to the database
+            result = NotificationAccess.update_notification(id, **data)
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
+
+        # Return error if not
+        return clientErrorResponse("You don't have access to this feature")
 
     # Error handling
     except Exception as e:
@@ -107,11 +144,30 @@ def delete_notification_endpoint(**kwargs):
         # Parse information from the call's body
         data = request.get_json()
 
-        # Add the event to the database
-        result = NotificationAccess.delete_notification(**data)
+        # Get the notification
+        notification = NotificationAccess.get_notification(**data)
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+        # Check if the unit exists
+        if notification.status == "error":
+            return notification
+
+        # Get the unit object of the target unit
+        unit = UnitAccess.get_unit(notification.message.info.unit)
+
+        # Check if the unit exists
+        if unit.status == "error":
+            return unit
+
+        # Extract unit information
+        unit = unit.message.info
+
+        # Check if the user is rooted or is officer of the unit
+        if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+            # Add the event to the database
+            result = NotificationAccess.delete_notification(**data)
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
 
     # Error handling
     except Exception as e:
