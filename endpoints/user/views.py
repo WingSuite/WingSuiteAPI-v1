@@ -290,9 +290,21 @@ def get_events_endpoint(**kwargs):
         # Get the user's information from the database
         result = UserAccess.get_user(id)
 
+        # Extract user info
+        result = result.message.info
+
+        # Check if the user is admin
+        isAdmin = config.rootPermissionString in result.permissions
+
+        # If the user is an admin, get all of the unit IDs
+        units = result.units
+        if isAdmin:
+            units = UnitAccess.get_units(page_size=2000, page_index=0).message
+            units = [item.info._id for item in units]
+
         # Iterate through the user's units and get their event information
         user_events = {}
-        for i in result.message.info.units:
+        for i in units:
             # Set ptr on start of given ID
             ptr = UnitAccess.get_unit(i)
 
@@ -347,9 +359,21 @@ def get_notifications_endpoint(**kwargs):
         # Get the user's information from the database
         result = UserAccess.get_user(id)
 
+        # Extract user info
+        result = result.message.info
+
+        # Check if the user is admin
+        isAdmin = config.rootPermissionString in result.permissions
+
+        # If the user is an admin, get all of the unit IDs
+        units = result.units
+        if isAdmin:
+            units = UnitAccess.get_units(page_size=2000, page_index=0).message
+            units = [item.info._id for item in units]
+
         # Iterate through the user's units and get their event information
         user_notifications = {}
-        for i in result.message.info.units:
+        for i in units:
             # Set ptr on start of given ID
             ptr = UnitAccess.get_unit(i)
 
