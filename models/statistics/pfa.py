@@ -20,3 +20,12 @@ class PFA:
 
         # Save info
         self.info = DictParse(kwargs)
+
+    def calculate_composite(self: "PFA") -> float:
+        """Method to calculate the composite score from raw subscores"""
+
+        # Variable declaration
+        composite = 0
+
+        # Return composite score
+        return composite

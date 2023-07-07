@@ -8,7 +8,8 @@
         "delete_feedback": ["id"]
       },
       "pfa": {
-        "create_pfa": ["from_user", "to_user", "name", "pushup", "situp", "run", "points"],
+        "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
+          "run", "age", "gender"],
         "update_pfa": ["id"],
         "get_pfa_info": ["id"],
         "delete_pfa": ["id"]
@@ -71,7 +72,8 @@
           "feedback", "datetime_created"]
       },
       "pfa": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name", "pushup", "situp", "run", "points"]
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "datetime_taken", "subscores", "info"]
       },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name", "warrior"]

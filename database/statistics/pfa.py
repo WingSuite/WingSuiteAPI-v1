@@ -15,21 +15,45 @@ class PFAAccess(DataAccessBase):
         from_user: str,
         to_user: str,
         name: str,
+        datetime_taken: int,
         pushup: str,
         situp: str,
         run: str,
-        points: str,
+        age: int,
+        gender: str,
         **kwargs: Any
     ) -> DictParse:
         """Method to create a PFA"""
 
-        # Prep data to be inserted
+        # Combine kwargs and args
         data = {
             k: v for k, v in locals().items() if k not in ["kwargs", "args"]
         }
+
+        # Add or update data
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
+        data["subscores"] = {
+            "pushup": pushup,
+            "situp": situp,
+            "run": run,
+        }
+        data["info"] = {
+            "age": age,
+            "gender": gender,
+        }
+
+        # Remove unncessary data
+        del data["pushup"]
+        del data["situp"]
+        del data["run"]
+        del data["age"]
+        del data["gender"]
+
+        # Get an object representation of the given info
+        pfa_obj = PFA(**data)
+        print(pfa_obj.info.composite_score)
 
         # Insert into the collection
         DataAccessBase.CURRENT_STATS_COL.insert_one(data)
