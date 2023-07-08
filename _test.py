@@ -1,3 +1,16 @@
-from utils.pfa.calculator import calculate_pfa
+from models.statistics.pfa import PFA
 
-print(calculate_pfa("male", 72, 55, 60, "10:30"))
+a = PFA(
+    **{
+        "_id": 1234,
+        "stat_type": "pfa",
+        "from_user": 0,
+        "to_user": 1,
+        "name": "TEST PFA",
+        "datetime_taken": 0,
+        "subscores": {"pushup": 78, "situp": 68, "run": "11:07"},
+        "info": {"age": 19, "gender": "male"},
+    }
+)
+
+print(a.info)

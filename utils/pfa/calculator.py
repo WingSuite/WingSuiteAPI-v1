@@ -11,6 +11,17 @@ from utils.pfa.male import (
     MaleScoreH,
     MaleScoreI,
 )
+from utils.pfa.female import (
+    FemaleScoreA,
+    FemaleScoreB,
+    FemaleScoreC,
+    FemaleScoreD,
+    FemaleScoreE,
+    FemaleScoreF,
+    FemaleScoreG,
+    FemaleScoreH,
+    FemaleScoreI,
+)
 
 
 def _seconds(time_str: str) -> int:
@@ -101,8 +112,45 @@ def calculate_pfa(
             pushup_map = MaleScoreI.pushup_map
             situp_map = MaleScoreI.situp_map
             run_map = MaleScoreI.run_map
-        else:
-            return "Age is not realistic"
+    elif gender == "female":
+        if age < 25:
+            pushup_map = FemaleScoreA.pushup_map
+            situp_map = FemaleScoreA.situp_map
+            run_map = FemaleScoreA.run_map
+        elif age >= 25 and age <= 29:
+            pushup_map = FemaleScoreB.pushup_map
+            situp_map = FemaleScoreB.situp_map
+            run_map = FemaleScoreB.run_map
+        elif age >= 30 and age <= 34:
+            pushup_map = FemaleScoreC.pushup_map
+            situp_map = FemaleScoreC.situp_map
+            run_map = FemaleScoreC.run_map
+        elif age >= 35 and age <= 39:
+            pushup_map = FemaleScoreD.pushup_map
+            situp_map = FemaleScoreD.situp_map
+            run_map = FemaleScoreD.run_map
+        elif age >= 40 and age <= 44:
+            pushup_map = FemaleScoreE.pushup_map
+            situp_map = FemaleScoreE.situp_map
+            run_map = FemaleScoreE.run_map
+        elif age >= 45 and age <= 49:
+            pushup_map = FemaleScoreF.pushup_map
+            situp_map = FemaleScoreF.situp_map
+            run_map = FemaleScoreF.run_map
+        elif age >= 50 and age <= 54:
+            pushup_map = FemaleScoreG.pushup_map
+            situp_map = FemaleScoreG.situp_map
+            run_map = FemaleScoreG.run_map
+        elif age >= 55 and age <= 59:
+            pushup_map = FemaleScoreH.pushup_map
+            situp_map = FemaleScoreH.situp_map
+            run_map = FemaleScoreH.run_map
+        elif age >= 60:
+            pushup_map = FemaleScoreI.pushup_map
+            situp_map = FemaleScoreI.situp_map
+            run_map = FemaleScoreI.run_map
+    else:
+        return -1
 
     # Variable declaration
     composite = 0

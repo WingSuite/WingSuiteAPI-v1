@@ -53,10 +53,9 @@ class PFAAccess(DataAccessBase):
 
         # Get an object representation of the given info
         pfa_obj = PFA(**data)
-        print(pfa_obj.info.composite_score)
 
         # Insert into the collection
-        DataAccessBase.CURRENT_STATS_COL.insert_one(data)
+        DataAccessBase.CURRENT_STATS_COL.insert_one(pfa_obj.info)
 
         # Return a statement
         return DataAccessBase.sendSuccess("PFA created")
