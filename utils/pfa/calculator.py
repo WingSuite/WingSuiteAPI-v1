@@ -1,6 +1,16 @@
 # Imports
-from utils.pfa.male.male_score_a import MaleScoreA
 from datetime import datetime
+from utils.pfa.male import (
+    MaleScoreA,
+    MaleScoreB,
+    MaleScoreC,
+    MaleScoreD,
+    MaleScoreE,
+    MaleScoreF,
+    MaleScoreG,
+    MaleScoreH,
+    MaleScoreI,
+)
 
 
 def _seconds(time_str: str) -> int:
@@ -55,11 +65,44 @@ def calculate_pfa(
 
     # Map for males
     if gender == "male":
-        # Map for males less than 25 years
         if age < 25:
             pushup_map = MaleScoreA.pushup_map
             situp_map = MaleScoreA.situp_map
             run_map = MaleScoreA.run_map
+        elif age >= 25 and age <= 29:
+            pushup_map = MaleScoreB.pushup_map
+            situp_map = MaleScoreB.situp_map
+            run_map = MaleScoreB.run_map
+        elif age >= 30 and age <= 34:
+            pushup_map = MaleScoreC.pushup_map
+            situp_map = MaleScoreC.situp_map
+            run_map = MaleScoreC.run_map
+        elif age >= 35 and age <= 39:
+            pushup_map = MaleScoreD.pushup_map
+            situp_map = MaleScoreD.situp_map
+            run_map = MaleScoreD.run_map
+        elif age >= 40 and age <= 44:
+            pushup_map = MaleScoreE.pushup_map
+            situp_map = MaleScoreE.situp_map
+            run_map = MaleScoreE.run_map
+        elif age >= 45 and age <= 49:
+            pushup_map = MaleScoreF.pushup_map
+            situp_map = MaleScoreF.situp_map
+            run_map = MaleScoreF.run_map
+        elif age >= 50 and age <= 54:
+            pushup_map = MaleScoreG.pushup_map
+            situp_map = MaleScoreG.situp_map
+            run_map = MaleScoreG.run_map
+        elif age >= 55 and age <= 59:
+            pushup_map = MaleScoreH.pushup_map
+            situp_map = MaleScoreH.situp_map
+            run_map = MaleScoreH.run_map
+        elif age >= 60:
+            pushup_map = MaleScoreI.pushup_map
+            situp_map = MaleScoreI.situp_map
+            run_map = MaleScoreI.run_map
+        else:
+            return "Age is not realistic"
 
     # Variable declaration
     composite = 0

@@ -1,3 +1,3 @@
 from utils.pfa.calculator import calculate_pfa
 
-print(calculate_pfa("male", 19, 0, 60, "10:30"))
+print(calculate_pfa("male", 72, 55, 60, "10:30"))
