@@ -16,11 +16,13 @@ from . import (
     get_feedbacks,
     get_events,
     get_notifications,
+    get_pfa_data,
     get_users_units,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.statistics.feedback import FeedbackAccess
+from database.statistics.pfa import PFAAccess
 from database.notification import NotificationAccess
 from database.event import EventAccess
 from database.user import UserAccess
@@ -410,6 +412,47 @@ def get_notifications_endpoint(**kwargs):
 
         # Return response data
         return successResponse(user_notifications)
+
+    # Error handling
+    except Exception as e:
+        return serverErrorResponse(str(e))
+
+
+@get_pfa_data.route("/get_pfa_data/", methods=["POST"])
+@param_check(ARGS.user.get_pfa_data)
+@jwt_required()
+def get_pfa_data_endpoint(**kwargs):
+    """Endpoint to get user's PFA information"""
+
+    # Try to parse information
+    try:
+        # Parse information from the call's body
+        data = request.get_json()
+
+        # Get the access token
+        token = request.headers.get("Authorization", None).split()[1]
+
+        # Decode the JWT Token and get the ID of the user
+        id = decode_token(token)["sub"]["_id"]
+
+        # Get the user's information from the database
+        user = UserAccess.get_user(id)
+
+        # Extract user info
+        user = user.message.info
+
+        # Get PFA information based on the user's id
+        result = PFAAccess.get_own_pfa(id=id, **data)
+
+        # Sort the user events by start datetime
+        result.message = sorted(
+            result.message,
+            key=lambda x: x["datetime_taken"],
+            reverse=True,
+        )
+
+        # Return the information
+        return result, 200
 
     # Error handling
     except Exception as e:

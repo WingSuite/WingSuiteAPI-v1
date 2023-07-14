@@ -62,7 +62,8 @@
       "get_user": ["id"],
       "get_feedback": ["page_size", "page_index", "sent"],
       "get_events": ["start_datetime", "end_datetime"],
-      "get_notifications": ["start_datetime", "end_datetime"]
+      "get_notifications": ["start_datetime", "end_datetime"],
+      "get_pfa_data": ["page_size", "page_index"]
     }
   },
   "models": {
