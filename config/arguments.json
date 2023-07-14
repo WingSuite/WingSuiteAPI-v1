@@ -45,7 +45,8 @@
       "add_members": ["id", "users"],
       "delete_members": ["id", "users"],
       "add_officers": ["id", "users"],
-      "delete_officers": ["id", "users"]
+      "delete_officers": ["id", "users"],
+      "get_all_members": ["id"]
     },
     "authentication": {
       "login": ["email", "password"],

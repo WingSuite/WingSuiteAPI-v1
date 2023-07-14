@@ -5,6 +5,7 @@ from database.user import UserAccess
 from typing import List, Any
 from functools import wraps
 from flask import request
+import traceback
 
 
 def successResponse(message: str) -> dict:
@@ -95,6 +96,28 @@ def param_check(required_params: List[str]) -> object:
 
     # End of decorator definition
     return decorator
+
+
+def error_handler(func):
+    """Decorator to handle errors inside function endpoints"""
+
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        """Wrapping definition"""
+
+        # Try to execute the function
+        try:
+            return func(*args, **kwargs)
+
+        # If the exception occurs, print the error to the console and
+        # return a server error response
+        except Exception:
+            print(f"Caught an exception in {func.__name__}():")
+            traceback.print_exc()
+            return serverErrorResponse("A server error occurred")
+
+    # Return the wrapper
+    return wrapper
 
 
 # Export an arguments config variable
