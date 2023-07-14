@@ -107,7 +107,7 @@ class WarriorAccess(DataAccessBase):
         )
 
         # Check if the page_index is outside the page range
-        if page_index >= pages:
+        if page_index >= pages and pages != 0:
             return DataAccessBase.sendError("Pagination index out of bounds")
 
         # Calculate skip value
