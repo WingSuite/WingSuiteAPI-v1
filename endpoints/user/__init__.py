@@ -11,6 +11,7 @@ get_feedbacks = Blueprint("feedback", __name__)
 get_events = Blueprint("get_events", __name__)
 get_notifications = Blueprint("get_notifications", __name__)
 get_pfa_data = Blueprint("get_pfa_data", __name__)
+get_warrior_data = Blueprint("get_warrior_data", __name__)
 get_users_units = Blueprint("get_users_units", __name__)
 
 # Import views
