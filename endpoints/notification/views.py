@@ -1,6 +1,7 @@
 # Import the test blueprint
 from endpoints.base import (
-    clientErrorResponse,
+    client_error_response,
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -18,6 +19,7 @@ from database.unit import UnitAccess
 
 
 @create_notification.route("/create_notification/", methods=["POST"])
+@is_root
 @permissions_required(["notification.create_notification"])
 @param_check(ARGS.notification.create_notification)
 @error_handler
@@ -48,10 +50,11 @@ def create_notification_endpoint(**kwargs):
         return result, (200 if result.status == "success" else 400)
 
     # Return error if not
-    return clientErrorResponse("You don't have access to this feature")
+    return client_error_response("You don't have access to this feature")
 
 
 @update_notification.route("/update_notification/", methods=["POST"])
+@is_root
 @permissions_required(["notification.update_notification"])
 @param_check(ARGS.notification.update_notification)
 @error_handler
@@ -86,7 +89,7 @@ def update_notification_endpoint(**kwargs):
         return result, (200 if result.status == "success" else 400)
 
     # Return error if not
-    return clientErrorResponse("You don't have access to this feature")
+    return client_error_response("You don't have access to this feature")
 
 
 @get_notification_info.route("/get_notification_info/", methods=["GET"])
@@ -117,6 +120,7 @@ def get_notification_info_endpoint(**kwargs):
 
 
 @delete_notification.route("/delete_notification/", methods=["POST"])
+@is_root
 @permissions_required(["notification.delete_notification"])
 @param_check(ARGS.notification.delete_notification)
 @error_handler

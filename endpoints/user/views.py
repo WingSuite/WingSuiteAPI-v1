@@ -1,7 +1,7 @@
 # Import the test blueprint
 from endpoints.base import (
-    successResponse,
-    clientErrorResponse,
+    success_response,
+    client_error_response,
     permissions_required,
     param_check,
     error_handler,
@@ -79,7 +79,7 @@ def add_permissions_endpoint(**kwargs):
     }
 
     # Return response data
-    return successResponse(message)
+    return success_response(message)
 
 
 @delete_permissions.route("/delete_permissions/", methods=["POST"])
@@ -131,7 +131,7 @@ def delete_permissions_endpoint(**kwargs):
     }
 
     # Return response data
-    return successResponse(message)
+    return success_response(message)
 
 
 @who_am_i.route("/who_am_i/", methods=["GET"])
@@ -170,7 +170,7 @@ def everyone_endpoint(**kwargs):
 
     # If the resulting information is in error, respond with error
     if results.status == "error":
-        return clientErrorResponse(results.message)
+        return client_error_response(results.message)
 
     # Format message
     results.message = [
@@ -202,7 +202,7 @@ def get_user_endpoint(**kwargs):
 
     # If the resulting information is in error, respond with error
     if result.status == "error":
-        return clientErrorResponse(result.message)
+        return client_error_response(result.message)
 
     result.message = result.message.get_generic_info(
         other_protections=["phone_number", "permissions"]
@@ -236,7 +236,7 @@ def get_feedback_endpoint(**kwargs):
 
     # If the resulting information is in error, respond with error
     if results.status == "error":
-        return clientErrorResponse(results.message)
+        return client_error_response(results.message)
 
     # Return the content of the information
     return results, (200 if results.status == "success" else 400)
@@ -294,6 +294,7 @@ def get_events_endpoint(**kwargs):
                 for event in events.message:
                     user_events[event.info._id] = event.info
 
+            # Iterate upwards
             ptr = UnitAccess.get_unit(unit.parent)
 
     # Turn user_events into a list of content
@@ -303,7 +304,7 @@ def get_events_endpoint(**kwargs):
     user_events = sorted(user_events, key=lambda x: x["start_datetime"])
 
     # Return response data
-    return successResponse(user_events)
+    return success_response(user_events)
 
 
 @get_notifications.route("/get_notifications/", methods=["POST"])
@@ -375,7 +376,7 @@ def get_notifications_endpoint(**kwargs):
     )
 
     # Return response data
-    return successResponse(user_notifications)
+    return success_response(user_notifications)
 
 
 @get_pfa_data.route("/get_pfa_data/", methods=["POST"])
@@ -472,7 +473,7 @@ def get_users_units_endpoint(**kwargs):
 
         # If the resulting information is in error, respond with error
         if results.status == "error":
-            return clientErrorResponse(results.message)
+            return client_error_response(results.message)
 
         # Sort and Format message
         results = [item.info for item in results.message]
@@ -485,23 +486,41 @@ def get_users_units_endpoint(**kwargs):
         )
 
         # Return results
-        return successResponse(results)
+        return success_response(results)
 
-    # Create a tracker
-    results = []
+    # Iterate through the user's units and get their event information
+    units = set()
+    stack = user.units
+    while stack:
+        # Get the top of the stack
+        unit = stack.pop()
 
-    # If not, return the content of the user's information
-    for item in user.units:
-        # Get the unit information
-        results.append(UnitAccess.get_unit(item).message.info)
+        # Set ptr on start of given ID
+        ptr = UnitAccess.get_unit(unit).message.info
 
-        # Sort and Format message
-        results = sorted(
-            results,
-            key=lambda x: (
-                config.unitTypes.index(x["unit_type"]),
-                x["name"],
-            ),
-        )
+        # Add child ID to tracker
+        units.add(ptr._id)
 
-        return successResponse(results)
+        # Pass if the length of children is 1
+        if len(ptr.children) > 2:
+            pass
+
+        # Iterate through each children and append to stack
+        for child in reversed(ptr.children):
+            # Append to stack if the child node is not in the stack
+            if child not in units:
+                stack.append(child)
+
+    # Process unit information
+    units = [UnitAccess.get_unit(unit).message.info for unit in units]
+
+    # Sort and Format message
+    results = sorted(
+        list(units),
+        key=lambda x: (
+            config.unitTypes.index(x["unit_type"]),
+            x["name"],
+        ),
+    )
+
+    return success_response(results)

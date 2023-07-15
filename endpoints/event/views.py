@@ -1,6 +1,7 @@
 # Import the test blueprint
 from endpoints.base import (
-    clientErrorResponse,
+    client_error_response,
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -13,6 +14,7 @@ from flask import request
 
 
 @create_event.route("/create_event/", methods=["POST"])
+@is_root
 @permissions_required(["event.create_event"])
 @param_check(ARGS.event.create_event)
 @error_handler
@@ -41,10 +43,11 @@ def create_event_endpoint(**kwargs):
         return result, (200 if result.status == "success" else 400)
 
     # Return error if not
-    return clientErrorResponse("You don't have access to this feature")
+    return client_error_response("You don't have access to this feature")
 
 
 @update_event.route("/update_event/", methods=["POST"])
+@is_root
 @permissions_required(["event.update_event"])
 @param_check(ARGS.event.update_event)
 @error_handler
@@ -79,7 +82,7 @@ def update_event_endpoint(**kwargs):
         return result, (200 if result.status == "success" else 400)
 
     # Return error if not
-    return clientErrorResponse("You don't have access to this feature")
+    return client_error_response("You don't have access to this feature")
 
 
 @get_event_info.route("/get_event_info/", methods=["GET"])
@@ -110,6 +113,7 @@ def get_event_info_endpoint(**kwargs):
 
 
 @delete_event.route("/delete_event/", methods=["POST"])
+@is_root
 @permissions_required(["event.delete_event"])
 @param_check(ARGS.event.delete_event)
 @error_handler
@@ -145,4 +149,4 @@ def delete_event_endpoint(**kwargs):
         return result, (200 if result.status == "success" else 400)
 
     # Return error if not
-    return clientErrorResponse("You don't have access to this feature")
+    return client_error_response("You don't have access to this feature")

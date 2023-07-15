@@ -1,7 +1,7 @@
 # Imports
 from endpoints.base import (
-    successResponse,
-    clientErrorResponse,
+    success_response,
+    client_error_response,
     permissions_required,
     param_check,
     error_handler,
@@ -20,7 +20,7 @@ from . import (
     get_all_members,
 )
 from config.config import config
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.unit import UnitAccess
 from database.user import UserAccess
@@ -100,7 +100,7 @@ def _update_personnel_helper(id, users, operation, participation):
     }
 
     # Return
-    return successResponse(message)
+    return success_response(message)
 
 
 @create_unit.route("/create_unit/", methods=["POST"])
@@ -176,7 +176,7 @@ def get_all_units_endpoint(**kwargs):
 
     # If the resulting information is in error, respond with error
     if results.status == "error":
-        return clientErrorResponse(results.message)
+        return client_error_response(results.message)
 
     # Sort and Format message
     results.message = [item.info for item in results.message]
@@ -187,6 +187,64 @@ def get_all_units_endpoint(**kwargs):
 
     # Return the content of the information
     return results, 200
+
+
+@get_all_members.route("/get_all_members/", methods=["POST"])
+@param_check(ARGS.unit.get_all_members)
+@error_handler
+def get_all_members_endpoint(**kwargs):
+    """Function to handle getting all the members of a unit"""
+
+    # Parse information from the call's body
+    # data = request.get_json()
+
+    # Get the access token
+    token = request.headers.get("Authorization", None).split()[1]
+
+    # Decode the JWT Token and get the ID of the user
+    id = decode_token(token)["sub"]["_id"]
+
+    # Get the user's information from the database
+    result = UserAccess.get_user(id)
+
+    # Extract user info
+    result = result.message.info
+
+    # Check if the user is admin
+    isAdmin = config.rootPermissionString in result.permissions
+
+    # Get a list of units that the user is a parent of
+    unit_results = result.units
+
+    # Iterate through the user's units and get their event information
+    units = set()
+    stack = unit_results
+    while stack:
+        # Get the top of the stack
+        unit = stack.pop()
+
+        # Set ptr on start of given ID
+        ptr = UnitAccess.get_unit(unit).message.info
+
+        # Add child ID to tracker
+        units.add(ptr._id)
+
+        # Pass if the length of children is 1
+        if len(ptr.children) > 2:
+            pass
+
+        # Iterate through each children and append to stack
+        for child in reversed(ptr.children):
+            # Append to stack if the child node is not in the stack
+            if child not in units:
+                stack.append(child)
+
+    # If the user is an admin, get all of the unit IDs
+    if isAdmin:
+        units = UnitAccess.get_units(page_size=2000, page_index=0).message
+        units = [item.info._id for item in units]
+
+    return {}, 200
 
 
 @delete_unit.route("/delete_unit/", methods=["POST"])
@@ -268,12 +326,3 @@ def delete_officers_endpoint(**kwargs):
     return _update_personnel_helper(
         **data, operation="delete", participation="officer"
     )
-
-
-@get_all_members.route("/get_all_members/", methods=["POST"])
-@param_check(ARGS.unit.get_all_members)
-@error_handler
-def get_all_members_endpoint(**kwargs):
-    """Function to handle getting all the members of a unit"""
-
-    return {}, 200

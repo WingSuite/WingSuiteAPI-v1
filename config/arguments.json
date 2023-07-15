@@ -41,12 +41,12 @@
       "update_unit": ["id"],
       "get_unit_info": ["id"],
       "get_all_units": ["page_size", "page_index"],
+      "get_all_members": ["id"],
       "delete_unit": ["id"],
       "add_members": ["id", "users"],
       "delete_members": ["id", "users"],
       "add_officers": ["id", "users"],
-      "delete_officers": ["id", "users"],
-      "get_all_members": ["id"]
+      "delete_officers": ["id", "users"]
     },
     "authentication": {
       "login": ["email", "password"],
