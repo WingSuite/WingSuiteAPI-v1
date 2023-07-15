@@ -270,32 +270,22 @@ def get_events_endpoint(**kwargs):
     # If the user is an admin, get all of the unit IDs
     units = result.units
     if isAdmin:
-        units = UnitAccess.get_units(page_size=2000, page_index=0).message
+        units = UnitAccess.get_all_units(page_size=2000, page_index=0).message
         units = [item.info._id for item in units]
 
     # Iterate through the user's units and get their event information
     user_events = {}
-    for i in units:
-        # Set ptr on start of given ID
-        ptr = UnitAccess.get_unit(i)
+    units_above = UnitAccess.get_units_above(units).message
+    for i in units_above:
+        # Get event info
+        events = EventAccess.get_event_by_unit_id(
+            i._id, data["start_datetime"], data["end_datetime"]
+        )
 
-        # Iterate until the very root of the unit's tree
-        while ptr.status == "success":
-            # Get the unit object
-            unit = ptr.message.info
-
-            # Get event info
-            events = EventAccess.get_event_by_unit_id(
-                unit._id, data["start_datetime"], data["end_datetime"]
-            )
-
-            # If the queried event(s) is not None add em
-            if events.status == "success":
-                for event in events.message:
-                    user_events[event.info._id] = event.info
-
-            # Iterate upwards
-            ptr = UnitAccess.get_unit(unit.parent)
+        # If the queried event(s) is not None add em
+        if events.status == "success":
+            for event in events.message:
+                user_events[event.info._id] = event.info
 
     # Turn user_events into a list of content
     user_events = [user_events[item] for item in user_events]
@@ -335,33 +325,24 @@ def get_notifications_endpoint(**kwargs):
     # If the user is an admin, get all of the unit IDs
     units = result.units
     if isAdmin:
-        units = UnitAccess.get_units(page_size=2000, page_index=0).message
+        units = UnitAccess.get_all_units(page_size=2000, page_index=0).message
         units = [item.info._id for item in units]
 
     # Iterate through the user's units and get their event information
     user_notifications = {}
-    for i in units:
-        # Set ptr on start of given ID
-        ptr = UnitAccess.get_unit(i)
+    units_above = UnitAccess.get_units_above(units).message
+    for i in units_above:
+        # Get event info
+        notifications = NotificationAccess.get_notification_by_unit_id(
+            i._id, data["start_datetime"], data["end_datetime"]
+        )
 
-        # Iterate until the very root of the unit's tree
-        while ptr.status == "success":
-            # Get the unit object
-            unit = ptr.message.info
-
-            # Get event info
-            notifications = NotificationAccess.get_notification_by_unit_id(
-                unit._id, data["start_datetime"], data["end_datetime"]
-            )
-
-            # If the queried event(s) is not None add em
-            if notifications.status == "success":
-                for notification in notifications.message:
-                    user_notifications[
-                        notification.info._id
-                    ] = notification.info
-
-            ptr = UnitAccess.get_unit(unit.parent)
+        # If the queried event(s) is not None add em
+        if notifications.status == "success":
+            for notification in notifications.message:
+                user_notifications[
+                    notification.info._id
+                ] = notification.info
 
     # Turn user_events into a list of content
     user_notifications = [
@@ -469,7 +450,7 @@ def get_users_units_endpoint(**kwargs):
     # Check if the user is a root user
     if config.rootPermissionString in user.permissions:
         # Get all of the units
-        results = UnitAccess.get_units(page_size=3000, page_index=0)
+        results = UnitAccess.get_all_units(page_size=3000, page_index=0)
 
         # If the resulting information is in error, respond with error
         if results.status == "error":
@@ -488,31 +469,8 @@ def get_users_units_endpoint(**kwargs):
         # Return results
         return success_response(results)
 
-    # Iterate through the user's units and get their event information
-    units = set()
-    stack = user.units
-    while stack:
-        # Get the top of the stack
-        unit = stack.pop()
-
-        # Set ptr on start of given ID
-        ptr = UnitAccess.get_unit(unit).message.info
-
-        # Add child ID to tracker
-        units.add(ptr._id)
-
-        # Pass if the length of children is 1
-        if len(ptr.children) > 2:
-            pass
-
-        # Iterate through each children and append to stack
-        for child in reversed(ptr.children):
-            # Append to stack if the child node is not in the stack
-            if child not in units:
-                stack.append(child)
-
     # Process unit information
-    units = [UnitAccess.get_unit(unit).message.info for unit in units]
+    units = UnitAccess.get_units_below(user.units).message
 
     # Sort and Format message
     results = sorted(

@@ -2,7 +2,7 @@
 from utils.dict_parse import DictParse
 from config.config import config
 from .base import DataAccessBase
-from typing import Any
+from typing import Any, List
 from database.user import UserAccess
 from models.unit import Unit
 from models.user import User
@@ -191,7 +191,7 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_units(page_size: int, page_index: int) -> DictParse:
+    def get_all_units(page_size: int, page_index: int) -> DictParse:
         """Get a list of units based on the page size and the index"""
 
         # Check if the page_size or page_index is negative
@@ -218,3 +218,62 @@ class UnitAccess(DataAccessBase):
 
         # Return the results and the page size
         return DataAccessBase.sendSuccess(results, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_units_below(user_units: List[str]) -> DictParse:
+        """Method to get the units below the user's units"""
+
+        # Iterate through the user's units and get their event information
+        units = set()
+        stack = list(user_units)
+        while stack:
+            # Get the top of the stack
+            node = stack.pop()
+
+            # Set ptr on start of given ID
+            ptr = UnitAccess.get_unit(node).message.info
+
+            # Add child ID to tracker
+            units.add(ptr._id)
+
+            # Pass if the length of children is 1
+            if len(ptr.children) > 2:
+                pass
+
+            # Iterate through each children and append to stack
+            for child in reversed(ptr.children):
+                # Append to stack if the child node is not in the stack
+                if child not in units:
+                    stack.append(child)
+
+        # Process unit information
+        units = [UnitAccess.get_unit(unit).message.info for unit in units]
+
+        # Return the units
+        return DataAccessBase.sendSuccess(units)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_units_above(user_units: List[str]) -> DictParse:
+        """Method to get the units below the user's units"""
+
+        # Iterate through the user's units and get their event information
+        units = set()
+        for root in user_units:
+            # Set ptr on start of given ID
+            ptr = UnitAccess.get_unit(root)
+
+            # Iterate through the stack to reverse upwards
+            while ptr.status == "success":
+                # Add iterate unit id to the units set
+                units.add(ptr.message.info._id)
+
+                # Iterate upwards
+                ptr = UnitAccess.get_unit(ptr.message.info.parent)
+
+        # Process unit information
+        units = [UnitAccess.get_unit(unit).message.info for unit in units]
+
+        # Return the units
+        return DataAccessBase.sendSuccess(units)

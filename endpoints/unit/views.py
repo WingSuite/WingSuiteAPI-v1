@@ -2,6 +2,7 @@
 from endpoints.base import (
     success_response,
     client_error_response,
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -20,7 +21,7 @@ from . import (
     get_all_members,
 )
 from config.config import config
-from flask_jwt_extended import jwt_required, decode_token
+from flask_jwt_extended import jwt_required
 from flask import request
 from database.unit import UnitAccess
 from database.user import UserAccess
@@ -172,7 +173,7 @@ def get_all_units_endpoint(**kwargs):
 
     # Get the content information based on the given page size and
     # page index
-    results = UnitAccess.get_units(**data)
+    results = UnitAccess.get_all_units(**data)
 
     # If the resulting information is in error, respond with error
     if results.status == "error":
@@ -190,61 +191,52 @@ def get_all_units_endpoint(**kwargs):
 
 
 @get_all_members.route("/get_all_members/", methods=["POST"])
+@is_root
 @param_check(ARGS.unit.get_all_members)
 @error_handler
 def get_all_members_endpoint(**kwargs):
     """Function to handle getting all the members of a unit"""
 
     # Parse information from the call's body
-    # data = request.get_json()
+    data = request.get_json()
 
-    # Get the access token
-    token = request.headers.get("Authorization", None).split()[1]
+    # Get the unit object of the target unit
+    unit = UnitAccess.get_unit(data["id"])
 
-    # Decode the JWT Token and get the ID of the user
-    id = decode_token(token)["sub"]["_id"]
+    # Check if the unit exists
+    if unit.status == "error":
+        return unit
+
+    # Extract unit information
+    unit = unit.message.info
 
     # Get the user's information from the database
-    result = UserAccess.get_user(id)
+    user = UserAccess.get_user(kwargs["id"]).message.info
 
-    # Extract user info
-    result = result.message.info
+    # Process unit information
+    units = UnitAccess.get_units_below(user.units).message
+    units = [item._id for item in units]
 
-    # Check if the user is admin
-    isAdmin = config.rootPermissionString in result.permissions
+    # Check if the user is rooted or is officer of the unit
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or kwargs["id"] in unit.members
+        or unit._id in units
+    ):
+        # Get the list of members in the unit
+        members = [
+            UserAccess.get_user(member).message.get_generic_info(
+                other_protections=["units", "permissions"]
+            )
+            for member in unit.members
+        ]
 
-    # Get a list of units that the user is a parent of
-    unit_results = result.units
+        # Return information
+        return success_response(members)
 
-    # Iterate through the user's units and get their event information
-    units = set()
-    stack = unit_results
-    while stack:
-        # Get the top of the stack
-        unit = stack.pop()
-
-        # Set ptr on start of given ID
-        ptr = UnitAccess.get_unit(unit).message.info
-
-        # Add child ID to tracker
-        units.add(ptr._id)
-
-        # Pass if the length of children is 1
-        if len(ptr.children) > 2:
-            pass
-
-        # Iterate through each children and append to stack
-        for child in reversed(ptr.children):
-            # Append to stack if the child node is not in the stack
-            if child not in units:
-                stack.append(child)
-
-    # If the user is an admin, get all of the unit IDs
-    if isAdmin:
-        units = UnitAccess.get_units(page_size=2000, page_index=0).message
-        units = [item.info._id for item in units]
-
-    return {}, 200
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @delete_unit.route("/delete_unit/", methods=["POST"])
