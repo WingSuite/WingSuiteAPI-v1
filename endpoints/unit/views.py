@@ -13,6 +13,7 @@ from . import (
     update_unit,
     get_unit_info,
     get_all_units,
+    get_all_officers,
     delete_unit,
     add_members,
     delete_members,
@@ -234,6 +235,55 @@ def get_all_members_endpoint(**kwargs):
 
         # Return information
         return success_response(members)
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
+
+
+@get_all_officers.route("/get_all_officers/", methods=["POST"])
+@is_root
+@param_check(ARGS.unit.get_all_officers)
+@error_handler
+def get_all_officers_endpoint(**kwargs):
+    """Function to handle getting all the officers of a unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit
+    unit = UnitAccess.get_unit(data["id"])
+
+    # Check if the unit exists
+    if unit.status == "error":
+        return unit
+
+    # Extract unit information
+    unit = unit.message.info
+
+    # Get the user's information from the database
+    user = UserAccess.get_user(kwargs["id"]).message.info
+
+    # Process unit information
+    units = UnitAccess.get_units_below(user.units).message
+    units = [item._id for item in units]
+
+    # Check if the user is rooted or is officer of the unit
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or kwargs["id"] in unit.members
+        or unit._id in units
+    ):
+        # Get the list of members in the unit
+        officers = [
+            UserAccess.get_user(member).message.get_generic_info(
+                other_protections=["units", "permissions"]
+            )
+            for member in unit.officers
+        ]
+
+        # Return information
+        return success_response(officers)
 
     # Return error if not
     return client_error_response("You don't have access to this information")

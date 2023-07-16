@@ -42,6 +42,7 @@
       "get_unit_info": ["id"],
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],
+      "get_all_officers": ["id"],
       "delete_unit": ["id"],
       "add_members": ["id", "users"],
       "delete_members": ["id", "users"],
