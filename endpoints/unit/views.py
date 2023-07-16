@@ -102,7 +102,7 @@ def _update_personnel_helper(id, users, operation, participation):
     }
 
     # Return
-    return success_response(message)
+    return message, 200
 
 
 @create_unit.route("/create_unit/", methods=["POST"])
