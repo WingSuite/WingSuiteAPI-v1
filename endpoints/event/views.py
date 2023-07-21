@@ -32,10 +32,10 @@ def create_event_endpoint(**kwargs):
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
-    isSuperiorOfficer = isOfficerFromAbove(data["unit"], kwargs["id"])
+    is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the event to the database
         result = EventAccess.create_event(**data)
 
@@ -67,14 +67,15 @@ def update_event_endpoint(**kwargs):
     if event.status == "error":
         return event
 
-    # Extract event
+    # Extract unit from event
     event = event.message.info
-
-    # Get the unit from event
     unit = UnitAccess.get_unit(event.unit).message.info
 
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(unit._id, kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the event to the database
         result = EventAccess.update_event(id, **data)
 
@@ -132,16 +133,15 @@ def delete_event_endpoint(**kwargs):
 
     # Get the unit object of the target unit
     unit = UnitAccess.get_unit(event.message.info.unit)
-
-    # Check if the unit exists
     if unit.status == "error":
         return unit
-
-    # Extract unit information
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(unit._id, kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the event to the database
         result = EventAccess.delete_event(**data)
 

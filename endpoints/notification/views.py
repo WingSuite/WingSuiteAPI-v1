@@ -37,10 +37,10 @@ def create_notification_endpoint(**kwargs):
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
-    isSuperiorOfficer = isOfficerFromAbove(data["unit"], kwargs["id"])
+    is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the notification to the database
         result = NotificationAccess.create_notification(
             **data, author=kwargs["id"]
@@ -74,14 +74,15 @@ def update_notification_endpoint(**kwargs):
     if notification.status == "error":
         return notification
 
-    # Extract notification
+    # Extract unit from notification
     notification = notification.message.info
-
-    # Get the unit from notification
     unit = UnitAccess.get_unit(notification.unit).message.info
 
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(unit._id, kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the notification to the database
         result = NotificationAccess.update_notification(id, **data)
 
@@ -139,16 +140,15 @@ def delete_notification_endpoint(**kwargs):
 
     # Get the unit object of the target unit
     unit = UnitAccess.get_unit(notification.message.info.unit)
-
-    # Check if the unit exists
     if unit.status == "error":
         return unit
-
-    # Extract unit information
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(unit._id, kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Add the event to the database
         result = NotificationAccess.delete_notification(**data)
 
