@@ -21,6 +21,7 @@ from . import (
     delete_officers,
     get_all_members,
 )
+from utils.permissions import isOfficerFromAbove
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
@@ -323,8 +324,11 @@ def add_members_endpoint(**kwargs):
         return unit
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="member"
