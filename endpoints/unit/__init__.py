@@ -4,6 +4,7 @@ from flask import Blueprint
 # Blueprint initialization
 create_unit = Blueprint("create_unit", __name__)
 update_unit = Blueprint("update_unit", __name__)
+update_frontpage = Blueprint("update_frontpage", __name__)
 get_unit_info = Blueprint("get_unit_info", __name__)
 get_all_units = Blueprint("get_all_units", __name__)
 get_all_members = Blueprint("get_all_members", __name__)

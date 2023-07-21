@@ -39,6 +39,7 @@
       "create_unit": ["name", "unit_type", "parent", "children", "officers",
         "members"],
       "update_unit": ["id"],
+      "update_frontpage": ["id", "frontpage"],
       "get_unit_info": ["id"],
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],

@@ -11,6 +11,7 @@ from endpoints.base import (
 from . import (
     create_unit,
     update_unit,
+    update_frontpage,
     get_unit_info,
     get_all_units,
     get_all_officers,
@@ -142,6 +143,44 @@ def update_unit_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@update_frontpage.route("/update_frontpage/", methods=["POST"])
+@is_root
+@permissions_required(["unit.update_frontpage"])
+@param_check(ARGS.unit.update_frontpage)
+@error_handler
+def update_frontpage_endpoint(**kwargs):
+    """Endpoint to update the unit's frontpage"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
+        # Update the front page
+        res = UnitAccess.update_unit(
+            id=data["id"], frontpage=data["frontpage"]
+        )
+
+        # Return message
+        return (
+            client_error_response(res.message)
+            if res.status == "error"
+            else success_response("Frontpage Updated")
+        )
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @get_unit_info.route("/get_unit_info/", methods=["POST"])

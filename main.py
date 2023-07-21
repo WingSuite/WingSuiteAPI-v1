@@ -31,6 +31,7 @@ from endpoints.user import (
 from endpoints.unit import (
     create_unit,
     update_unit,
+    update_frontpage,
     get_unit_info,
     get_all_units,
     get_all_officers,
@@ -153,6 +154,7 @@ app.register_blueprint(get_users_units, url_prefix="/user/")
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
+app.register_blueprint(update_frontpage, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
