@@ -13,9 +13,10 @@ from . import (
     get_notification_info,
     delete_notification,
 )
-from flask import request
+from utils.permissions import isOfficerFromAbove
 from database.notification import NotificationAccess
 from database.unit import UnitAccess
+from flask import request
 
 
 @create_notification.route("/create_notification/", methods=["POST"])
@@ -29,18 +30,17 @@ def create_notification_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
-    # Get the unit object of the target unit
+    # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["unit"])
-
-    # Check if the unit exists
     if unit.status == "error":
         return unit
-
-    # Extract unit information
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["unit"], kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
         # Add the notification to the database
         result = NotificationAccess.create_notification(
             **data, author=kwargs["id"]

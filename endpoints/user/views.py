@@ -276,8 +276,8 @@ def get_events_endpoint(**kwargs):
     # Setup information for iteration
     user_events = {}
     iterable_units = []
-    units_below = UnitAccess.get_units_above(units).message
-    for i in units_below:
+    units_above = UnitAccess.get_units_above(units).message
+    for i in units_above:
         # Check if the user is an officer for the iterated unit
         if id in i.officers:
             # Get the units below
@@ -285,7 +285,7 @@ def get_events_endpoint(**kwargs):
 
             # Append to iterable_units
             iterable_units += temp_below
-    iterable_units += units_below
+    iterable_units += units_above
 
     # Iterate through the user's units and get their event information
     for i in iterable_units:
@@ -340,10 +340,22 @@ def get_notifications_endpoint(**kwargs):
         units = UnitAccess.get_all_units(page_size=2000, page_index=0).message
         units = [item.info._id for item in units]
 
-    # Iterate through the user's units and get their event information
+    # Setup information for iteration
     user_notifications = {}
-    units_above = UnitAccess.get_units_above(units).message
-    for i in units_above:
+    iterable_units = []
+    units_abov = UnitAccess.get_units_above(units).message
+    for i in units_abov:
+        # Check if the user is an officer for the iterated unit
+        if id in i.officers:
+            # Get the units below
+            temp_below = UnitAccess.get_units_below([i._id]).message
+
+            # Append to iterable_units
+            iterable_units += temp_below
+    iterable_units += units_abov
+
+    # Iterate through the user's units and get their event information
+    for i in iterable_units:
         # Get event info
         notifications = NotificationAccess.get_notification_by_unit_id(
             i._id, data["start_datetime"], data["end_datetime"]
