@@ -43,11 +43,12 @@
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
-      "delete_unit": ["id"],
       "add_members": ["id", "users"],
-      "delete_members": ["id", "users"],
       "add_officers": ["id", "users"],
-      "delete_officers": ["id", "users"]
+      "delete_unit": ["id"],
+      "delete_members": ["id", "users"],
+      "delete_officers": ["id", "users"],
+      "is_superior_officer": ["id"]
     },
     "authentication": {
       "login": ["email", "password"],

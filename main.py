@@ -39,7 +39,8 @@ from endpoints.unit import (
     delete_members,
     add_officers,
     delete_officers,
-    get_all_members
+    get_all_members,
+    is_superior_officer
 )
 from endpoints.event import (
     create_event,
@@ -155,12 +156,13 @@ app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
-app.register_blueprint(delete_unit, url_prefix="/unit/")
-app.register_blueprint(add_members, url_prefix="/unit/")
-app.register_blueprint(delete_members, url_prefix="/unit/")
-app.register_blueprint(add_officers, url_prefix="/unit/")
-app.register_blueprint(delete_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
+app.register_blueprint(add_members, url_prefix="/unit/")
+app.register_blueprint(add_officers, url_prefix="/unit/")
+app.register_blueprint(delete_unit, url_prefix="/unit/")
+app.register_blueprint(delete_members, url_prefix="/unit/")
+app.register_blueprint(delete_officers, url_prefix="/unit/")
+app.register_blueprint(is_superior_officer, url_prefix="/unit/")
 
 # Event routes
 app.register_blueprint(create_event, url_prefix="/event/")
