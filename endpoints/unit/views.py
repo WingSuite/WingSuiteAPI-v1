@@ -339,8 +339,11 @@ def add_officers_endpoint(**kwargs):
         return unit
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="officer"
@@ -384,8 +387,11 @@ def delete_members_endpoint(**kwargs):
         return unit
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
         # Return response data
         return _update_personnel_helper(
             **data, operation="delete", participation="member"
@@ -412,8 +418,11 @@ def delete_officers_endpoint(**kwargs):
         return unit
     unit = unit.message.info
 
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers:
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
         # Return response data
         return _update_personnel_helper(
             **data, operation="delete", participation="officer"
