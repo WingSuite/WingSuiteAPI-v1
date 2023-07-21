@@ -8,13 +8,15 @@
         "delete_feedback": ["id"]
       },
       "pfa": {
-        "create_pfa": ["from_user", "to_user", "name", "pushup", "situp", "run", "points"],
+        "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
+          "run", "age", "gender"],
         "update_pfa": ["id"],
         "get_pfa_info": ["id"],
         "delete_pfa": ["id"]
       },
       "warrior": {
-        "create_warrior": ["to_user", "name", "warrior"],
+        "create_warrior": ["to_user", "name", "datetime_taken",
+          "composite_score"],
         "update_warrior": ["id"],
         "get_warrior_info": ["id"],
         "delete_warrior": ["id"]
@@ -37,13 +39,17 @@
       "create_unit": ["name", "unit_type", "parent", "children", "officers",
         "members"],
       "update_unit": ["id"],
+      "update_frontpage": ["id", "frontpage"],
       "get_unit_info": ["id"],
       "get_all_units": ["page_size", "page_index"],
-      "delete_unit": ["id"],
+      "get_all_members": ["id"],
+      "get_all_officers": ["id"],
       "add_members": ["id", "users"],
-      "delete_members": ["id", "users"],
       "add_officers": ["id", "users"],
-      "delete_officers": ["id", "users"]
+      "delete_unit": ["id"],
+      "delete_members": ["id", "users"],
+      "delete_officers": ["id", "users"],
+      "is_superior_officer": ["id"]
     },
     "authentication": {
       "login": ["email", "password"],
@@ -61,7 +67,9 @@
       "get_user": ["id"],
       "get_feedback": ["page_size", "page_index", "sent"],
       "get_events": ["start_datetime", "end_datetime"],
-      "get_notifications": ["start_datetime", "end_datetime"]
+      "get_notifications": ["start_datetime", "end_datetime"],
+      "get_pfa_data": ["page_size", "page_index"],
+      "get_warrior_data": ["page_size", "page_index"]
     }
   },
   "models": {
@@ -71,10 +79,12 @@
           "feedback", "datetime_created"]
       },
       "pfa": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name", "pushup", "situp", "run", "points"]
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "datetime_taken", "subscores", "info"]
       },
       "warrior": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name", "warrior"]
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "composite_score"]
       }
     },
     "notification": {

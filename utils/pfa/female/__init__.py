@@ -1,0 +1,9 @@
+from utils.pfa.female.female_score_a import FemaleScoreA  # noqa
+from utils.pfa.female.female_score_b import FemaleScoreB  # noqa
+from utils.pfa.female.female_score_c import FemaleScoreC  # noqa
+from utils.pfa.female.female_score_d import FemaleScoreD  # noqa
+from utils.pfa.female.female_score_e import FemaleScoreE  # noqa
+from utils.pfa.female.female_score_f import FemaleScoreF  # noqa
+from utils.pfa.female.female_score_g import FemaleScoreG  # noqa
+from utils.pfa.female.female_score_h import FemaleScoreH  # noqa
+from utils.pfa.female.female_score_i import FemaleScoreI  # noqa

@@ -1,4 +1,5 @@
 # Imports
+from utils.pfa.calculator import calculate_pfa
 from utils.dict_parse import DictParse
 from config.config import arguments
 from typing import Any
@@ -20,3 +21,18 @@ class PFA:
 
         # Save info
         self.info = DictParse(kwargs)
+
+        # Add composited score to the object's attributes
+        self.info.composite_score = self.calculate_composite()
+
+    def calculate_composite(self: "PFA") -> float:
+        """Method to calculate the composite score from raw subscores"""
+
+        # Return composite score
+        return calculate_pfa(
+            self.info.info.gender,
+            self.info.info.age,
+            self.info.subscores.pushup,
+            self.info.subscores.situp,
+            self.info.subscores.run,
+        )

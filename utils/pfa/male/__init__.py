@@ -1,0 +1,9 @@
+from utils.pfa.male.male_score_a import MaleScoreA  # noqa
+from utils.pfa.male.male_score_b import MaleScoreB  # noqa
+from utils.pfa.male.male_score_c import MaleScoreC  # noqa
+from utils.pfa.male.male_score_d import MaleScoreD  # noqa
+from utils.pfa.male.male_score_e import MaleScoreE  # noqa
+from utils.pfa.male.male_score_f import MaleScoreF  # noqa
+from utils.pfa.male.male_score_g import MaleScoreG  # noqa
+from utils.pfa.male.male_score_h import MaleScoreH  # noqa
+from utils.pfa.male.male_score_i import MaleScoreI  # noqa

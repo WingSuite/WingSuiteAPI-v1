@@ -5,21 +5,45 @@ from database.user import UserAccess
 from typing import List, Any
 from functools import wraps
 from flask import request
+import traceback
 
 
-def successResponse(message: str) -> dict:
+def success_response(message: str) -> dict:
     """Returns a message with a success status"""
     return {"status": "success", "message": message}, 200
 
 
-def clientErrorResponse(message: str) -> dict:
+def client_error_response(message: str) -> dict:
     """Returns a message with a client error status"""
     return {"status": "error", "message": message}, 400
 
 
-def serverErrorResponse(message: str) -> dict:
+def server_error_response(message: str) -> dict:
     """Returns a message with a server error status"""
     return {"status": "error", "message": message}, 500
+
+
+def is_root(func: object) -> object:
+    """Wrapper to determine if the user is an admin"""
+
+    @wraps(func)
+    @jwt_required()
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        """Wrapper that checks if the user has the correct permissions"""
+
+        # Get user's permissions based on the user's given ID
+        id = get_jwt_identity()["_id"]
+        user = UserAccess.get_user(id)
+        user_permissions = set(user.message.info.permissions)
+
+        # Check if the user has root key
+        root = config.rootPermissionString in user_permissions
+
+        # Return the function with information provided
+        return func(*args, **kwargs, isRoot=root, id=id)
+
+    # Return the functionality of the wrapper
+    return wrapper
 
 
 def permissions_required(required_permissions: List[str]) -> object:
@@ -43,12 +67,13 @@ def permissions_required(required_permissions: List[str]) -> object:
 
             # IF the user does not have sufficient permissions, deny the user
             if not user_permissions.intersection(required_permissions):
-                return clientErrorResponse(
-                    "You do not have access to this feature"
+                return client_error_response(
+                    "You don't have access to this feature"
                 )
 
             # If so, continue on with the function that is being decorated
             else:
+                # Return the function with information provided
                 return func(*args, **kwargs)
 
         # Return the functionality of the wrapper
@@ -73,12 +98,12 @@ def param_check(required_params: List[str]) -> object:
 
             # Return error if the body was empty
             if data is None:
-                return clientErrorResponse("JSON body is empty")
+                return client_error_response("JSON body is empty")
 
             # Check if the given arguments has the minimum arguments
             for arg in required_params:
                 if arg not in data.keys():
-                    return clientErrorResponse(
+                    return client_error_response(
                         "Call needs the following arguments: "
                         + ", ".join(required_params)
                     )
@@ -91,6 +116,28 @@ def param_check(required_params: List[str]) -> object:
 
     # End of decorator definition
     return decorator
+
+
+def error_handler(func: object) -> object:
+    """Decorator to handle errors inside function endpoints"""
+
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        """Wrapping definition"""
+
+        # Try to execute the function
+        try:
+            return func(*args, **kwargs)
+
+        # If the exception occurs, print the error to the console and
+        # return a server error response
+        except Exception:
+            print(f"Caught an exception in {func.__name__}():")
+            traceback.print_exc()
+            return server_error_response("A server error occurred")
+
+    # Return the wrapper
+    return wrapper
 
 
 # Export an arguments config variable

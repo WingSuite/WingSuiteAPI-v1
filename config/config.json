@@ -10,7 +10,17 @@
     "accessExpiry": 8,
     "refreshExpiry": 720
   },
-  "privateInfo": ["password"],
+  "privateInfo": [
+    "password"
+  ],
   "rootPermissionString": "*",
-  "unitTypes": ["wingmen", "team", "flight", "squadron", "group", "wing"]
+  "unitTypes": [
+    "wing",
+    "group",
+    "squadron",
+    "class",
+    "flight",
+    "team",
+    "wingmen"
+  ]
 }

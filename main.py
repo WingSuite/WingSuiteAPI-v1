@@ -24,17 +24,24 @@ from endpoints.user import (
     get_feedbacks,
     get_events,
     get_notifications,
+    get_pfa_data,
+    get_warrior_data,
+    get_users_units
 )
 from endpoints.unit import (
     create_unit,
     update_unit,
+    update_frontpage,
     get_unit_info,
     get_all_units,
+    get_all_officers,
     delete_unit,
     add_members,
     delete_members,
     add_officers,
     delete_officers,
+    get_all_members,
+    is_superior_officer
 )
 from endpoints.event import (
     create_event,
@@ -140,17 +147,24 @@ app.register_blueprint(get_user, url_prefix="/user/")
 app.register_blueprint(get_feedbacks, url_prefix="/user/")
 app.register_blueprint(get_events, url_prefix="/user/")
 app.register_blueprint(get_notifications, url_prefix="/user/")
+app.register_blueprint(get_pfa_data, url_prefix="/user/")
+app.register_blueprint(get_warrior_data, url_prefix="/user/")
+app.register_blueprint(get_users_units, url_prefix="/user/")
 
 # Unit routes
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
+app.register_blueprint(update_frontpage, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
-app.register_blueprint(delete_unit, url_prefix="/unit/")
+app.register_blueprint(get_all_officers, url_prefix="/unit/")
+app.register_blueprint(get_all_members, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
-app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
+app.register_blueprint(delete_unit, url_prefix="/unit/")
+app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
+app.register_blueprint(is_superior_officer, url_prefix="/unit/")
 
 # Event routes
 app.register_blueprint(create_event, url_prefix="/event/")

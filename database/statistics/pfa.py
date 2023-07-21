@@ -4,6 +4,7 @@ from database.base import DataAccessBase
 from models.statistics.pfa import PFA
 from typing import Any
 import uuid
+import math
 
 
 class PFAAccess(DataAccessBase):
@@ -15,24 +16,47 @@ class PFAAccess(DataAccessBase):
         from_user: str,
         to_user: str,
         name: str,
-        pushup: str,
-        situp: str,
+        datetime_taken: int,
+        pushup: int,
+        situp: int,
         run: str,
-        points: str,
+        age: int,
+        gender: str,
         **kwargs: Any
     ) -> DictParse:
         """Method to create a PFA"""
 
-        # Prep data to be inserted
+        # Combine kwargs and args
         data = {
             k: v for k, v in locals().items() if k not in ["kwargs", "args"]
         }
+
+        # Add or update data
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
+        data["subscores"] = {
+            "pushup": pushup,
+            "situp": situp,
+            "run": run,
+        }
+        data["info"] = {
+            "age": age,
+            "gender": gender,
+        }
+
+        # Remove unncessary data
+        del data["pushup"]
+        del data["situp"]
+        del data["run"]
+        del data["age"]
+        del data["gender"]
+
+        # Get an object representation of the given info
+        pfa_obj = PFA(**data)
 
         # Insert into the collection
-        DataAccessBase.CURRENT_STATS_COL.insert_one(data)
+        DataAccessBase.CURRENT_STATS_COL.insert_one(pfa_obj.info)
 
         # Return a statement
         return DataAccessBase.sendSuccess("PFA created")
@@ -81,3 +105,48 @@ class PFAAccess(DataAccessBase):
 
         # Return with a PFA object
         return DataAccessBase.sendSuccess(PFA(**pfa))
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_own_pfa(id: str, page_size: int, page_index: int) -> DictParse:
+        """Method to retrieve a multiple pfa based on the receiver's ID"""
+
+        # Check if the page_size or page_index is negative
+        if page_size <= 0 or page_index < 0:
+            return DataAccessBase.sendError("Invalid pagination size or index")
+
+        # Set query
+        query = {"stat_type": "pfa", "to_user": id}
+
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            (DataAccessBase.CURRENT_STATS_COL.count_documents(query))
+            / page_size
+        )
+
+        # Check if the page_index is outside the page range
+        if page_index >= pages and pages != 0:
+            return DataAccessBase.sendError("Pagination index out of bounds")
+
+        # Calculate skip value
+        skips = page_size * (page_index)
+
+        # Search the collection based on id
+        result = (
+            DataAccessBase.CURRENT_STATS_COL.find(query)
+            .skip(skips)
+            .limit(page_size)
+        )
+
+        # Return if the given pfa is not in the database
+        if result is None:
+            return {
+                "status": "error",
+                "message": "PFA not found",
+            }
+
+        # Turn result into a list
+        result = list(result)
+
+        # Return with a PFA object
+        return DataAccessBase.sendSuccess(result, pages=pages)

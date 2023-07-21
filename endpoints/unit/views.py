@@ -1,23 +1,30 @@
 # Imports
 from endpoints.base import (
+    success_response,
+    client_error_response,
+    is_root,
     permissions_required,
     param_check,
-    clientErrorResponse,
-    serverErrorResponse,
-    successResponse,
+    error_handler,
     ARGS,
 )
 from . import (
     create_unit,
     update_unit,
+    update_frontpage,
     get_unit_info,
     get_all_units,
-    delete_unit,
+    get_all_officers,
+    get_all_members,
     add_members,
-    delete_members,
     add_officers,
+    delete_unit,
+    delete_members,
     delete_officers,
+    is_superior_officer,
 )
+from utils.permissions import isOfficerFromAbove
+from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
 from database.unit import UnitAccess
@@ -82,7 +89,7 @@ def _update_personnel_helper(id, users, operation, participation):
         results[user] = (
             f"User {past_tense}"
             if res
-            else f"User already {past_tense} as a {participation}"
+            else f"User already {past_tense} as an officer or member"
         )
 
     # Push unit changes
@@ -98,212 +105,390 @@ def _update_personnel_helper(id, users, operation, participation):
     }
 
     # Return
-    return successResponse(message)
+    return message, 200
 
 
 @create_unit.route("/create_unit/", methods=["POST"])
 @permissions_required(["unit.create_unit"])
 @param_check(ARGS.unit.create_unit)
-def create_unit_endpoint():
+@error_handler
+def create_unit_endpoint(**kwargs):
     """Method to handle the creation of a new unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
-        # Add the unit to the database
-        result = UnitAccess.create_unit(**data)
+    # Add the unit to the database
+    result = UnitAccess.create_unit(**data)
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
-
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 @update_unit.route("/update_unit/", methods=["POST"])
 @permissions_required(["unit.update_unit"])
 @param_check(ARGS.unit.update_unit)
-def update_unit_endpoint():
+@error_handler
+def update_unit_endpoint(**kwargs):
     """Method to handle the update of a unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
-        # Get the id of the target unit
-        id = data.pop("id")
+    # Get the id of the target unit
+    id = data.pop("id")
 
-        # Add the unit to the database
-        result = UnitAccess.update_unit(id, **data)
+    # Add the unit to the database
+    result = UnitAccess.update_unit(id, **data)
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+
+@update_frontpage.route("/update_frontpage/", methods=["POST"])
+@is_root
+@permissions_required(["unit.update_frontpage"])
+@param_check(ARGS.unit.update_frontpage)
+@error_handler
+def update_frontpage_endpoint(**kwargs):
+    """Endpoint to update the unit's frontpage"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
+        # Update the front page
+        res = UnitAccess.update_unit(
+            id=data["id"], frontpage=data["frontpage"]
+        )
+
+        # Return message
+        return (
+            client_error_response(res.message)
+            if res.status == "error"
+            else success_response("Frontpage Updated")
+        )
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @get_unit_info.route("/get_unit_info/", methods=["POST"])
 @param_check(ARGS.unit.get_unit_info)
-def get_unit_info_endpoint():
+@error_handler
+def get_unit_info_endpoint(**kwargs):
     """Method to get the info of a unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
-        # Get the id of the target unit
-        id = data.pop("id")
+    # Get the id of the target unit
+    id = data.pop("id")
 
-        # Get the unit's information from the database
-        result = UnitAccess.get_unit(id)
-        result.message = result.message.info
+    # Get the unit's information from the database
+    result = UnitAccess.get_unit(id)
+    result.message = result.message.info
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
-
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 @get_all_units.route("/get_all_units/", methods=["POST"])
 @param_check(ARGS.unit.get_all_units)
 @jwt_required()
-def get_all_units_endpoint():
+@error_handler
+def get_all_units_endpoint(**kwargs):
     """Method to get all unit IDs"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
-        # Get the content information based on the given page size and
-        # page index
-        results = UnitAccess.get_units(**data)
+    # Get the content information based on the given page size and
+    # page index
+    results = UnitAccess.get_all_units(**data)
 
-        # If the resulting information is in error, respond with error
-        if results.status == "error":
-            return clientErrorResponse(results.message)
+    # If the resulting information is in error, respond with error
+    if results.status == "error":
+        return client_error_response(results.message)
 
-        # Format message
-        results.message = [item.info for item in results.message]
+    # Sort and Format message
+    results.message = [item.info for item in results.message]
+    results.message = sorted(
+        results.message,
+        key=lambda x: (config.unitTypes.index(x["unit_type"]), x["name"]),
+    )
 
-        # Return the content of the information
-        return results, 200
-
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return the content of the information
+    return results, 200
 
 
-@delete_unit.route("/delete_unit/", methods=["POST"])
-@permissions_required(["user.delete_unit"])
-@param_check(ARGS.unit.delete_unit)
-def delete_unit_endpoint():
-    """Method to handle the deletion of a unit"""
+@get_all_members.route("/get_all_members/", methods=["POST"])
+@is_root
+@param_check(ARGS.unit.get_all_members)
+@error_handler
+def get_all_members_endpoint(**kwargs):
+    """Function to handle getting all the members of a unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
-        # Add the unit to the database
-        result = UnitAccess.delete_unit(**data)
+    # Get the unit object of the target unit
+    unit = UnitAccess.get_unit(data["id"])
 
-        # Return response data
-        return result, (200 if result.status == "success" else 400)
+    # Check if the unit exists
+    if unit.status == "error":
+        return unit
 
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Extract unit information
+    unit = unit.message.info
+
+    # Get the user's information from the database
+    user = UserAccess.get_user(kwargs["id"]).message.info
+
+    # Process unit information
+    units = UnitAccess.get_units_below(user.units).message
+    units = [item._id for item in units]
+
+    # Check if the user is rooted or is officer of the unit
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or kwargs["id"] in unit.members
+        or unit._id in units
+    ):
+        # Get the list of members in the unit
+        members = [
+            UserAccess.get_user(member).message.get_generic_info(
+                other_protections=["units", "permissions"]
+            )
+            for member in unit.members
+        ]
+
+        # Return information
+        return success_response(members)
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
+
+
+@get_all_officers.route("/get_all_officers/", methods=["POST"])
+@is_root
+@param_check(ARGS.unit.get_all_officers)
+@error_handler
+def get_all_officers_endpoint(**kwargs):
+    """Function to handle getting all the officers of a unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit
+    unit = UnitAccess.get_unit(data["id"])
+
+    # Check if the unit exists
+    if unit.status == "error":
+        return unit
+
+    # Extract unit information
+    unit = unit.message.info
+
+    # Get the user's information from the database
+    user = UserAccess.get_user(kwargs["id"]).message.info
+
+    # Process unit information
+    units = UnitAccess.get_units_below(user.units).message
+    units = [item._id for item in units]
+
+    # Check if the user is rooted or is officer of the unit
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or kwargs["id"] in unit.members
+        or unit._id in units
+    ):
+        # Get the list of members in the unit
+        officers = [
+            UserAccess.get_user(member).message.get_generic_info(
+                other_protections=["units", "permissions"]
+            )
+            for member in unit.officers
+        ]
+
+        # Return information
+        return success_response(officers)
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @add_members.route("/add_members/", methods=["POST"])
-@permissions_required(["user.add_members"])
+@is_root
+@permissions_required(["unit.add_members"])
 @param_check(ARGS.unit.add_members)
-def add_members_endpoint():
+@error_handler
+def add_members_endpoint(**kwargs):
     """Method to add a new members to the unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="member"
         )
 
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
-
-
-@delete_members.route("/delete_members/", methods=["POST"])
-@permissions_required(["user.delete_members"])
-@param_check(ARGS.unit.delete_members)
-def delete_members_endpoint():
-    """Method to delete members to the unit"""
-
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
-
-        # Return response data
-        return _update_personnel_helper(
-            **data, operation="delete", participation="member"
-        )
-
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @add_officers.route("/add_officers/", methods=["POST"])
-@permissions_required(["user.add_officers"])
+@is_root
+@permissions_required(["unit.add_officers"])
 @param_check(ARGS.unit.add_officers)
-def add_officers_endpoint():
+@error_handler
+def add_officers_endpoint(**kwargs):
     """Method to add a new officers to the unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="officer"
         )
 
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return error if not
+    return client_error_response("You don't have access to this information")
+
+
+@delete_unit.route("/delete_unit/", methods=["POST"])
+@permissions_required(["unit.delete_unit"])
+@param_check(ARGS.unit.delete_unit)
+@error_handler
+def delete_unit_endpoint(**kwargs):
+    """Method to handle the deletion of a unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Add the unit to the database
+    result = UnitAccess.delete_unit(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+@delete_members.route("/delete_members/", methods=["POST"])
+@is_root
+@permissions_required(["unit.delete_members"])
+@param_check(ARGS.unit.delete_members)
+@error_handler
+def delete_members_endpoint(**kwargs):
+    """Method to delete members to the unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
+        # Return response data
+        return _update_personnel_helper(
+            **data, operation="delete", participation="member"
+        )
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
 
 
 @delete_officers.route("/delete_officers/", methods=["POST"])
-@permissions_required(["user.delete_officers"])
+@is_root
+@permissions_required(["unit.delete_officers"])
 @param_check(ARGS.unit.delete_officers)
-def delete_officers_endpoint():
+@error_handler
+def delete_officers_endpoint(**kwargs):
     """Method to delete officers to the unit"""
 
-    # Try to parse information
-    try:
-        # Parse information from the call's body
-        data = request.get_json()
+    # Parse information from the call's body
+    data = request.get_json()
 
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_above = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
         # Return response data
         return _update_personnel_helper(
             **data, operation="delete", participation="officer"
         )
 
-    # Error handling
-    except Exception as e:
-        return serverErrorResponse(str(e))
+    # Return error if not
+    return client_error_response("You don't have access to this information")
+
+
+@is_superior_officer.route("/is_superior_officer/", methods=["POST"])
+@is_root
+@param_check(ARGS.unit.is_superior_officer)
+@error_handler
+def is_superior_officer_endpoint(**kwargs):
+    """Method to check if the user is a superior unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    res = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Return result
+    return success_response(True) if res else client_error_response(False)

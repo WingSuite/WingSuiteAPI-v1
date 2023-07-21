@@ -162,13 +162,16 @@ class UserAccess(DataAccessBase):
         # Hash and save the given password to kwargs
         password = sha256(password, DataAccessBase.CONFIG.database.spicer)
 
-        # Get the user's ID based on the given credentials
+        # Get the user's information based on the given credentials
         query = {"email": email, "password": password}
-        id = DataAccessBase.USER_COL.find_one(query)["_id"]
+        user = DataAccessBase.USER_COL.find_one(query)
 
         # Return with an error if no id was found
-        if id is None:
+        if user is None:
             return DataAccessBase.sendError("Incorrect email or password")
+
+        # Get the user's id
+        id = user["_id"]
 
         # Return user content
         return UserAccess.get_user(id)
