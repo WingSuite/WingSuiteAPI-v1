@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -16,6 +17,7 @@ from database.statistics.pfa import PFAAccess
 
 
 @create_pfa.route("/create_pfa/", methods=["POST"])
+@is_root
 @permissions_required(["statistic.pfa.create_pfa"])
 @param_check(ARGS.statistic.pfa.create_pfa)
 @error_handler

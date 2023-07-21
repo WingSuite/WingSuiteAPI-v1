@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -16,6 +17,7 @@ from database.statistics.feedback import FeedbackAccess
 
 
 @create_feedback.route("/create_feedback/", methods=["POST"])
+@is_root
 @permissions_required(["statistic.feedback.create_feedback"])
 @param_check(ARGS.statistic.feedback.create_feedback)
 @error_handler

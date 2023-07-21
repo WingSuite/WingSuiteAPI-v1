@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -16,6 +17,7 @@ from database.statistics.warrior import WarriorAccess
 
 
 @create_warrior.route("/create_warrior/", methods=["POST"])
+@is_root
 @permissions_required(["statistic.warrior.create_warrior"])
 @param_check(ARGS.statistic.warrior.create_warrior)
 @error_handler
