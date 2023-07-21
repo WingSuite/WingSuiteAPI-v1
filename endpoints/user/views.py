@@ -273,10 +273,22 @@ def get_events_endpoint(**kwargs):
         units = UnitAccess.get_all_units(page_size=2000, page_index=0).message
         units = [item.info._id for item in units]
 
-    # Iterate through the user's units and get their event information
+    # Setup information for iteration
     user_events = {}
-    units_above = UnitAccess.get_units_above(units).message
-    for i in units_above:
+    iterable_units = []
+    units_below = UnitAccess.get_units_above(units).message
+    for i in units_below:
+        # Check if the user is an officer for the iterated unit
+        if id in i.officers:
+            # Get the units below
+            temp_below = UnitAccess.get_units_below([i._id]).message
+
+            # Append to iterable_units
+            iterable_units += temp_below
+    iterable_units += units_below
+
+    # Iterate through the user's units and get their event information
+    for i in iterable_units:
         # Get event info
         events = EventAccess.get_event_by_unit_id(
             i._id, data["start_datetime"], data["end_datetime"]
@@ -469,16 +481,55 @@ def get_users_units_endpoint(**kwargs):
         # Return results
         return success_response(results)
 
-    # Process unit information
-    units = UnitAccess.get_units_below(user.units).message
+    # Iterate through the units that the user is in
+    units = []
+    for i in user.units:
+        # If the user is an officer in the unit, get all units beneath
+        if id in UnitAccess.get_unit(i).message.info.officers:
+            # Get the units below
+            units_below = UnitAccess.get_units_below([i]).message
+
+            # Iterate through every unit and add a tag for superiority
+            for idx, j in enumerate(units_below):
+                # Tag the unit
+                j.is_superior = True
+
+                # Apply changes
+                units_below[idx] = j
+
+            # Update units list
+            units += units_below
+        # If not, just add the unit iterated
+        else:
+            # Get the unit
+            unit = UnitAccess.get_unit(i).message.info
+
+            # Update unit's information
+            unit.is_superior = False
+
+            # Update units list
+            units.append(unit)
+
+    # Filter data
+    temp = set()
+    filtered = []
+    for i in units:
+        # Add unit ID to set if not in the set and track the unit
+        if i._id not in temp:
+            temp.add(i._id)
+            filtered.append(i)
+        # If not, continue
+        else:
+            continue
 
     # Sort and Format message
     results = sorted(
-        list(units),
+        list(filtered),
         key=lambda x: (
             config.unitTypes.index(x["unit_type"]),
             x["name"],
         ),
     )
 
+    # Return results
     return success_response(results)

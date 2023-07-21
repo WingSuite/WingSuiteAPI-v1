@@ -222,10 +222,13 @@ class UnitAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_units_below(user_units: List[str]) -> DictParse:
+    def get_units_below(
+        user_units: List[str], tracked: List[str] = []
+    ) -> DictParse:
         """Method to get the units below the user's units"""
 
         # Iterate through the user's units and get their event information
+        tracked = set(tracked)
         units = set()
         stack = list(user_units)
         while stack:
@@ -234,6 +237,11 @@ class UnitAccess(DataAccessBase):
 
             # Set ptr on start of given ID
             ptr = UnitAccess.get_unit(node).message.info
+
+            # Skip if the pointer ID has been tracked
+            if ptr._id in tracked:
+                continue
+            tracked.add(ptr._id)
 
             # Add child ID to tracker
             units.add(ptr._id)
