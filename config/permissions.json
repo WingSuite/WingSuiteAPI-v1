@@ -10,10 +10,10 @@
     "unit.create_unit",
     "unit.update_unit",
     "unit.update_frontpage",
-    "unit.delete_unit",
     "unit.add_members",
-    "unit.delete_members",
     "unit.add_officers",
+    "unit.delete_unit",
+    "unit.delete_members",
     "unit.delete_officers",
 
     "event.create_event",
