@@ -343,8 +343,8 @@ def get_notifications_endpoint(**kwargs):
     # Setup information for iteration
     user_notifications = {}
     iterable_units = []
-    units_abov = UnitAccess.get_units_above(units).message
-    for i in units_abov:
+    units_above = UnitAccess.get_units_above(units).message
+    for i in units_above:
         # Check if the user is an officer for the iterated unit
         if id in i.officers:
             # Get the units below
@@ -352,7 +352,7 @@ def get_notifications_endpoint(**kwargs):
 
             # Append to iterable_units
             iterable_units += temp_below
-    iterable_units += units_abov
+    iterable_units += units_above
 
     # Iterate through the user's units and get their event information
     for i in iterable_units:
@@ -400,14 +400,8 @@ def get_pfa_data_endpoint(**kwargs):
     # Decode the JWT Token and get the ID of the user
     id = decode_token(token)["sub"]["_id"]
 
-    # Get the user's information from the database
-    user = UserAccess.get_user(id)
-
-    # Extract user info
-    user = user.message.info
-
     # Get PFA information based on the user's id
-    result = PFAAccess.get_own_pfa(id=id, **data)
+    result = PFAAccess.get_user_pfa(id=id, **data)
 
     # Sort the user events by start datetime
     result.message = sorted(
@@ -435,12 +429,6 @@ def get_warrior_data_endpoint(**kwargs):
 
     # Decode the JWT Token and get the ID of the user
     id = decode_token(token)["sub"]["_id"]
-
-    # Get the user's information from the database
-    user = UserAccess.get_user(id)
-
-    # Extract user info
-    user = user.message.info
 
     # Get warrior knowledge information based on the user's id
     result = WarriorAccess.get_own_warrior(id=id, **data)

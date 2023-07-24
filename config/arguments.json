@@ -11,15 +11,16 @@
         "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
           "run", "age", "gender"],
         "update_pfa": ["id"],
+        "delete_pfa": ["id"],
         "get_pfa_info": ["id"],
-        "delete_pfa": ["id"]
+        "get_user_pfa_info": ["id"]
       },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
         "update_warrior": ["id"],
         "get_warrior_info": ["id"],
-        "delete_warrior": ["id"]
+        "delete_warrior": ["id", "page_size", "page_index"]
       }
     },
     "notification": {

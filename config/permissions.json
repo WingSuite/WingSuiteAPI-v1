@@ -33,8 +33,9 @@
 
     "statistic.pfa.create_pfa",
     "statistic.pfa.update_pfa",
-    "statistic.pfa.get_pfa_info",
     "statistic.pfa.delete_pfa",
+    "statistic.pfa.get_pfa_info",
+    "statistic.pfa.get_user_pfa_info",
 
     "statistic.warrior.create_warrior",
     "statistic.warrior.update_warrior",

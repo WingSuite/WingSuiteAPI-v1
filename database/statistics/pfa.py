@@ -108,7 +108,7 @@ class PFAAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_own_pfa(id: str, page_size: int, page_index: int) -> DictParse:
+    def get_user_pfa(id: str, page_size: int, page_index: int) -> DictParse:
         """Method to retrieve a multiple pfa based on the receiver's ID"""
 
         # Check if the page_size or page_index is negative

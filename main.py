@@ -64,8 +64,9 @@ from endpoints.statistics.feedback import (
 from endpoints.statistics.pfa import (
     create_pfa,
     update_pfa,
-    get_pfa_info,
     delete_pfa,
+    get_pfa_info,
+    get_user_pfa_info
 )
 from endpoints.statistics.warrior import (
     create_warrior,
@@ -189,6 +190,7 @@ app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
+app.register_blueprint(get_user_pfa_info, url_prefix="/statistic/pfa/")
 
 # Statistic Warrior routes
 app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
