@@ -9,7 +9,6 @@ from endpoints.base import (
 )
 from . import (
     add_permissions,
-    delete_permissions,
     who_am_i,
     everyone,
     get_user,
@@ -19,6 +18,7 @@ from . import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    delete_permissions,
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
@@ -30,6 +30,11 @@ from database.event import EventAccess
 from database.user import UserAccess
 from database.unit import UnitAccess
 from config.config import permissions, config
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @add_permissions.route("/add_permissions/", methods=["POST"])
@@ -82,56 +87,12 @@ def add_permissions_endpoint(**kwargs):
     return success_response(message)
 
 
-@delete_permissions.route("/delete_permissions/", methods=["POST"])
-@permissions_required(["user.delete_permissions"])
-@param_check(ARGS.user.delete_permissions)
-@error_handler
-def delete_permissions_endpoint(**kwargs):
-    """Method to handle the adding of new permissions to the user"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the target user's object
-    user = UserAccess.get_user(data["id"])
-
-    # If content is not in result of getting the user, return the
-    # error message
-    if user.status == "error":
-        return user
-
-    # Get the content from the user fetch
-    user = user.message
-
-    # Add new permission(s) and track changes
-    results = {}
-    for permission in data["permissions"]:
-        # If the iterated item is not part of the approved list of
-        # permission, track that it's not added and continue
-        if permission not in permissions:
-            results[permission] = "Not Added (Invalid Permission)"
-            continue
-
-        # Attempt add permission and track change
-        res = user.delete_permission(permission)
-        results[permission] = (
-            "Deleted" if res else "Not Deleted (Permission Missing)"
-        )
-
-    # Push changes to collection
-    UserAccess.update_user(data["id"], **user.info)
-
-    # Make response dictionary
-    message = {
-        "status": "success",
-        "message": "Permission deletion have been applied to "
-        + f"{user.get_fullname(lastNameFirst=True)}. Refer to results "
-        + "for what has been applied",
-        "results": results,
-    }
-
-    # Return response data
-    return success_response(message)
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @who_am_i.route("/who_am_i/", methods=["GET"])
@@ -364,9 +325,7 @@ def get_notifications_endpoint(**kwargs):
         # If the queried event(s) is not None add em
         if notifications.status == "success":
             for notification in notifications.message:
-                user_notifications[
-                    notification.info._id
-                ] = notification.info
+                user_notifications[notification.info._id] = notification.info
 
     # Turn user_events into a list of content
     user_notifications = [
@@ -533,3 +492,65 @@ def get_users_units_endpoint(**kwargs):
 
     # Return results
     return success_response(results)
+
+
+#   endregion
+
+#
+#   DELETE OPERATIONS
+#   region
+
+
+@delete_permissions.route("/delete_permissions/", methods=["POST"])
+@permissions_required(["user.delete_permissions"])
+@param_check(ARGS.user.delete_permissions)
+@error_handler
+def delete_permissions_endpoint(**kwargs):
+    """Method to handle the adding of new permissions to the user"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # Add new permission(s) and track changes
+    results = {}
+    for permission in data["permissions"]:
+        # If the iterated item is not part of the approved list of
+        # permission, track that it's not added and continue
+        if permission not in permissions:
+            results[permission] = "Not Added (Invalid Permission)"
+            continue
+
+        # Attempt add permission and track change
+        res = user.delete_permission(permission)
+        results[permission] = (
+            "Deleted" if res else "Not Deleted (Permission Missing)"
+        )
+
+    # Push changes to collection
+    UserAccess.update_user(data["id"], **user.info)
+
+    # Make response dictionary
+    message = {
+        "status": "success",
+        "message": "Permission deletion have been applied to "
+        + f"{user.get_fullname(lastNameFirst=True)}. Refer to results "
+        + "for what has been applied",
+        "results": results,
+    }
+
+    # Return response data
+    return success_response(message)
+
+
+#   endregion

@@ -6,12 +6,12 @@ from flask_jwt_extended import (
     jwt_required,
 )
 from . import (
+    register,
     login,
     refresh,
-    register,
     authorize,
-    reject,
     signout,
+    reject,
 )
 from endpoints.base import (
     permissions_required,
@@ -21,6 +21,35 @@ from endpoints.base import (
 )
 from database.user import UserAccess
 from flask import request
+
+#
+#   CREATE OPERATIONS
+#   region
+#
+
+
+@register.route("/register/", methods=["POST"])
+@param_check(ARGS.authentication.register)
+@error_handler
+def register_endpoint(**kwargs):
+    """Log In Handling"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the user's instance based on the given information
+    result = UserAccess.register_user(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @login.route("/login/", methods=["POST"])
@@ -55,6 +84,14 @@ def login_endpoint(**kwargs):
     }, 200
 
 
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
 @refresh.route("/refresh/", methods=["POST"])
 @jwt_required(refresh=True)
 @error_handler
@@ -71,22 +108,6 @@ def refresh_endpoint(**kwargs):
     return {"access_token": new_token}, 200
 
 
-@register.route("/register/", methods=["POST"])
-@param_check(ARGS.authentication.register)
-@error_handler
-def register_endpoint(**kwargs):
-    """Log In Handling"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the user's instance based on the given information
-    result = UserAccess.register_user(**data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
-
-
 @authorize.route("/authorize_user/", methods=["POST"])
 @permissions_required(["auth.authorize_user"])
 @param_check(ARGS.authentication.authorize_user)
@@ -99,23 +120,6 @@ def authorize_user_endpoint(**kwargs):
 
     # Get the user's instance based on the given information
     result = UserAccess.add_user(data["id"])
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
-
-
-@reject.route("/reject_user/", methods=["POST"])
-@permissions_required(["auth.reject_user"])
-@param_check(ARGS.authentication.reject_user)
-@error_handler
-def reject_user_endpoint(**kwargs):
-    """Log In Handling"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the user's instance based on the given information
-    result = UserAccess.reject_user(data["id"])
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -137,3 +141,31 @@ def signout_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   DELETE OPERATIONS
+#   region
+#
+
+
+@reject.route("/reject_user/", methods=["POST"])
+@permissions_required(["auth.reject_user"])
+@param_check(ARGS.authentication.reject_user)
+@error_handler
+def reject_user_endpoint(**kwargs):
+    """Log In Handling"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the user's instance based on the given information
+    result = UserAccess.reject_user(data["id"])
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion

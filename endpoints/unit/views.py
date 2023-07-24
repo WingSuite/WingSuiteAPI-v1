@@ -10,18 +10,18 @@ from endpoints.base import (
 )
 from . import (
     create_unit,
+    add_members,
+    add_officers,
     update_unit,
     update_frontpage,
     get_unit_info,
     get_all_units,
     get_all_officers,
     get_all_members,
-    add_members,
-    add_officers,
+    is_superior_officer,
     delete_unit,
     delete_members,
     delete_officers,
-    is_superior_officer,
 )
 from utils.permissions import isOfficerFromAbove
 from config.config import config
@@ -108,6 +108,12 @@ def _update_personnel_helper(id, users, operation, participation):
     return message, 200
 
 
+#
+#   CREATE OPERATIONS
+#   region
+#
+
+
 @create_unit.route("/create_unit/", methods=["POST"])
 @permissions_required(["unit.create_unit"])
 @param_check(ARGS.unit.create_unit)
@@ -125,33 +131,13 @@ def create_unit_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
-@update_unit.route("/update_unit/", methods=["POST"])
-@permissions_required(["unit.update_unit"])
-@param_check(ARGS.unit.update_unit)
-@error_handler
-def update_unit_endpoint(**kwargs):
-    """Method to handle the update of a unit"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target unit
-    id = data.pop("id")
-
-    # Add the unit to the database
-    result = UnitAccess.update_unit(id, **data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
-
-
-@update_frontpage.route("/update_frontpage/", methods=["POST"])
+@add_members.route("/add_members/", methods=["POST"])
 @is_root
-@permissions_required(["unit.update_frontpage"])
-@param_check(ARGS.unit.update_frontpage)
+@permissions_required(["unit.add_members"])
+@param_check(ARGS.unit.add_members)
 @error_handler
-def update_frontpage_endpoint(**kwargs):
-    """Endpoint to update the unit's frontpage"""
+def add_members_endpoint(**kwargs):
+    """Method to add a new members to the unit"""
 
     # Parse information from the call's body
     data = request.get_json()
@@ -167,20 +153,52 @@ def update_frontpage_endpoint(**kwargs):
 
     # Check if the user is rooted or is officer of the unit
     if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
-        # Update the front page
-        res = UnitAccess.update_unit(
-            id=data["id"], frontpage=data["frontpage"]
-        )
-
-        # Return message
-        return (
-            client_error_response(res.message)
-            if res.status == "error"
-            else success_response("Frontpage Updated")
+        # Return response data
+        return _update_personnel_helper(
+            **data, operation="add", participation="member"
         )
 
     # Return error if not
     return client_error_response("You don't have access to this information")
+
+
+@add_officers.route("/add_officers/", methods=["POST"])
+@is_root
+@permissions_required(["unit.add_officers"])
+@param_check(ARGS.unit.add_officers)
+@error_handler
+def add_officers_endpoint(**kwargs):
+    """Method to add a new officers to the unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Check if the user is rooted or is officer of the unit
+    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
+        # Return response data
+        return _update_personnel_helper(
+            **data, operation="add", participation="officer"
+        )
+
+    # Return error if not
+    return client_error_response("You don't have access to this information")
+
+
+#   endregion
+
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @get_unit_info.route("/get_unit_info/", methods=["POST"])
@@ -336,13 +354,64 @@ def get_all_officers_endpoint(**kwargs):
     return client_error_response("You don't have access to this information")
 
 
-@add_members.route("/add_members/", methods=["POST"])
+@is_superior_officer.route("/is_superior_officer/", methods=["POST"])
 @is_root
-@permissions_required(["unit.add_members"])
-@param_check(ARGS.unit.add_members)
+@param_check(ARGS.unit.is_superior_officer)
 @error_handler
-def add_members_endpoint(**kwargs):
-    """Method to add a new members to the unit"""
+def is_superior_officer_endpoint(**kwargs):
+    """Method to check if the user is a superior unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    res = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # Return result
+    return success_response(True) if res else client_error_response(False)
+
+
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
+@update_unit.route("/update_unit/", methods=["POST"])
+@permissions_required(["unit.update_unit"])
+@param_check(ARGS.unit.update_unit)
+@error_handler
+def update_unit_endpoint(**kwargs):
+    """Method to handle the update of a unit"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target unit
+    id = data.pop("id")
+
+    # Add the unit to the database
+    result = UnitAccess.update_unit(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+@update_frontpage.route("/update_frontpage/", methods=["POST"])
+@is_root
+@permissions_required(["unit.update_frontpage"])
+@param_check(ARGS.unit.update_frontpage)
+@error_handler
+def update_frontpage_endpoint(**kwargs):
+    """Endpoint to update the unit's frontpage"""
 
     # Parse information from the call's body
     data = request.get_json()
@@ -358,44 +427,28 @@ def add_members_endpoint(**kwargs):
 
     # Check if the user is rooted or is officer of the unit
     if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
-        # Return response data
-        return _update_personnel_helper(
-            **data, operation="add", participation="member"
+        # Update the front page
+        res = UnitAccess.update_unit(
+            id=data["id"], frontpage=data["frontpage"]
+        )
+
+        # Return message
+        return (
+            client_error_response(res.message)
+            if res.status == "error"
+            else success_response("Frontpage Updated")
         )
 
     # Return error if not
     return client_error_response("You don't have access to this information")
 
 
-@add_officers.route("/add_officers/", methods=["POST"])
-@is_root
-@permissions_required(["unit.add_officers"])
-@param_check(ARGS.unit.add_officers)
-@error_handler
-def add_officers_endpoint(**kwargs):
-    """Method to add a new officers to the unit"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the unit object of the target unit and return if error
-    unit = UnitAccess.get_unit(data["id"])
-    if unit.status == "error":
-        return unit
-    unit = unit.message.info
-
-    # Check if the user is an officer of a superior unit
-    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
-
-    # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer:
-        # Return response data
-        return _update_personnel_helper(
-            **data, operation="add", participation="officer"
-        )
-
-    # Return error if not
-    return client_error_response("You don't have access to this information")
+#
+#   DELETE OPERATIONS
+#   region
+#
 
 
 @delete_unit.route("/delete_unit/", methods=["POST"])
@@ -477,24 +530,4 @@ def delete_officers_endpoint(**kwargs):
     return client_error_response("You don't have access to this information")
 
 
-@is_superior_officer.route("/is_superior_officer/", methods=["POST"])
-@is_root
-@param_check(ARGS.unit.is_superior_officer)
-@error_handler
-def is_superior_officer_endpoint(**kwargs):
-    """Method to check if the user is a superior unit"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the unit object of the target unit and return if error
-    unit = UnitAccess.get_unit(data["id"])
-    if unit.status == "error":
-        return unit
-    unit = unit.message.info
-
-    # Check if the user is an officer of a superior unit
-    res = isOfficerFromAbove(data["id"], kwargs["id"])
-
-    # Return result
-    return success_response(True) if res else client_error_response(False)
+#   endregion

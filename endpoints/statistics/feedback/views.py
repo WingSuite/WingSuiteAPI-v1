@@ -8,12 +8,18 @@ from endpoints.base import (
 )
 from . import (
     create_feedback,
-    update_feedback,
     get_feedback_info,
+    update_feedback,
     delete_feedback,
 )
 from flask import request
 from database.statistics.feedback import FeedbackAccess
+
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @create_feedback.route("/create_feedback/", methods=["POST"])
@@ -34,24 +40,12 @@ def create_feedback_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
-@update_feedback.route("/update_feedback/", methods=["POST"])
-@permissions_required(["statistic.feedback.update_feedback"])
-@param_check(ARGS.statistic.feedback.update_feedback)
-@error_handler
-def update_feedback_endpoint(**kwargs):
-    """Method to handle the update of a feedback"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target feedback
-    id = data.pop("id")
-
-    # Add the feedback to the database
-    result = FeedbackAccess.update_feedback(id, **data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @get_feedback_info.route("/get_feedback_info/", methods=["GET"])
@@ -81,6 +75,42 @@ def get_feedback_info_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
+@update_feedback.route("/update_feedback/", methods=["POST"])
+@permissions_required(["statistic.feedback.update_feedback"])
+@param_check(ARGS.statistic.feedback.update_feedback)
+@error_handler
+def update_feedback_endpoint(**kwargs):
+    """Method to handle the update of a feedback"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target feedback
+    id = data.pop("id")
+
+    # Add the feedback to the database
+    result = FeedbackAccess.update_feedback(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   DELETE OPERATIONS
+#   region
+#
+
+
 @delete_feedback.route("/delete_feedback/", methods=["POST"])
 @permissions_required(["statistic.feedback.delete_feedback"])
 @param_check(ARGS.statistic.feedback.delete_feedback)
@@ -96,3 +126,6 @@ def delete_feedback_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+#   endregion

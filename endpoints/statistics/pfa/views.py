@@ -8,14 +8,20 @@ from endpoints.base import (
 )
 from . import (
     create_pfa,
-    update_pfa,
-    delete_pfa,
     get_pfa_info,
     get_user_pfa_info,
+    update_pfa,
+    delete_pfa,
 )
 from flask import request
 from database.statistics.pfa import PFAAccess
 from database.user import UserAccess
+
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @create_pfa.route("/create_pfa/", methods=["POST"])
@@ -36,41 +42,13 @@ def create_pfa_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
-@update_pfa.route("/update_pfa/", methods=["POST"])
-@permissions_required(["statistic.pfa.update_pfa"])
-@param_check(ARGS.statistic.pfa.update_pfa)
-@error_handler
-def update_pfa_endpoint(**kwargs):
-    """Method to handle the update of a PFA"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target PFA
-    id = data.pop("id")
-
-    # Add the PFA to the database
-    result = PFAAccess.update_pfa(id, **data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#   endregion
 
 
-@delete_pfa.route("/delete_pfa/", methods=["POST"])
-@permissions_required(["statistic.pfa.delete_pfa"])
-@param_check(ARGS.statistic.pfa.delete_pfa)
-@error_handler
-def delete_pfa_endpoint(**kwargs):
-    """Method to handle the deletion of a PFA"""
-
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Add the event to the database
-    result = PFAAccess.delete_pfa(**data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @get_pfa_info.route("/get_pfa_info/", methods=["GET"])
@@ -135,3 +113,61 @@ def get_user_pfa_info_endpoint(**kwargs):
 
     # Return the information
     return result, 200
+
+
+#   endregion
+
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
+@update_pfa.route("/update_pfa/", methods=["POST"])
+@permissions_required(["statistic.pfa.update_pfa"])
+@param_check(ARGS.statistic.pfa.update_pfa)
+@error_handler
+def update_pfa_endpoint(**kwargs):
+    """Method to handle the update of a PFA"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target PFA
+    id = data.pop("id")
+
+    # Add the PFA to the database
+    result = PFAAccess.update_pfa(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+
+#
+#   DELETE OPERATIONS
+#   region
+#
+
+
+@delete_pfa.route("/delete_pfa/", methods=["POST"])
+@permissions_required(["statistic.pfa.delete_pfa"])
+@param_check(ARGS.statistic.pfa.delete_pfa)
+@error_handler
+def delete_pfa_endpoint(**kwargs):
+    """Method to handle the deletion of a PFA"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Add the event to the database
+    result = PFAAccess.delete_pfa(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion

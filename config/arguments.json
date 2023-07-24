@@ -3,66 +3,65 @@
     "statistic": {
       "feedback": {
         "create_feedback": ["to_user", "name", "feedback"],
-        "update_feedback": ["id"],
         "get_feedback_info": ["id"],
+        "update_feedback": ["id"],
         "delete_feedback": ["id"]
       },
       "pfa": {
         "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
           "run", "age", "gender"],
-        "update_pfa": ["id"],
-        "delete_pfa": ["id"],
         "get_pfa_info": ["id"],
-        "get_user_pfa_info": ["id"]
+        "get_user_pfa_info": ["id"],
+        "update_pfa": ["id"],
+        "delete_pfa": ["id"]
       },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
-        "update_warrior": ["id"],
         "get_warrior_info": ["id"],
+        "update_warrior": ["id"],
         "delete_warrior": ["id", "page_size", "page_index"]
       }
     },
     "notification": {
       "create_notification": ["name", "unit", "notification"],
-      "update_notification": ["id"],
       "get_notification_info": ["id"],
+      "update_notification": ["id"],
       "delete_notification": ["id"]
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
         "end_datetime", "description"],
-      "update_event": ["id"],
       "get_event_info": ["id"],
+      "update_event": ["id"],
       "delete_event": ["id"]
     },
     "unit": {
       "create_unit": ["name", "unit_type", "parent", "children", "officers",
         "members"],
-      "update_unit": ["id"],
-      "update_frontpage": ["id", "frontpage"],
+      "add_members": ["id", "users"],
+      "add_officers": ["id", "users"],
       "get_unit_info": ["id"],
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
-      "add_members": ["id", "users"],
-      "add_officers": ["id", "users"],
+      "is_superior_officer": ["id"],
+      "update_unit": ["id"],
+      "update_frontpage": ["id", "frontpage"],
       "delete_unit": ["id"],
       "delete_members": ["id", "users"],
-      "delete_officers": ["id", "users"],
-      "is_superior_officer": ["id"]
+      "delete_officers": ["id", "users"]
     },
     "authentication": {
-      "login": ["email", "password"],
       "register": ["first_name", "last_name", "email", "phone_number",
         "password"],
+      "login": ["email", "password"],
       "authorize_user": ["id"],
-      "reject_user": ["id"],
-      "signout": ["access", "refresh"]
+      "signout": ["access", "refresh"],
+      "reject_user": ["id"]
     },
     "user": {
       "add_permissions": ["id", "permissions"],
-      "delete_permissions": ["id", "permissions"],
       "who_am_i": [],
       "everyone": ["page_size", "page_index"],
       "get_user": ["id"],
@@ -70,7 +69,8 @@
       "get_events": ["start_datetime", "end_datetime"],
       "get_notifications": ["start_datetime", "end_datetime"],
       "get_pfa_data": ["page_size", "page_index"],
-      "get_warrior_data": ["page_size", "page_index"]
+      "get_warrior_data": ["page_size", "page_index"],
+      "delete_permissions": ["id", "permissions"]
     }
   },
   "models": {

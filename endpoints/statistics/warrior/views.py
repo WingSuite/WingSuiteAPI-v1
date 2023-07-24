@@ -8,12 +8,18 @@ from endpoints.base import (
 )
 from . import (
     create_warrior,
-    update_warrior,
     get_warrior_info,
+    update_warrior,
     delete_warrior,
 )
 from flask import request
 from database.statistics.warrior import WarriorAccess
+
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @create_warrior.route("/create_warrior/", methods=["POST"])
@@ -34,24 +40,12 @@ def create_warrior_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
-@update_warrior.route("/update_warrior/", methods=["POST"])
-@permissions_required(["statistic.warrior.update_warrior"])
-@param_check(ARGS.statistic.warrior.update_warrior)
-@error_handler
-def update_warrior_endpoint(**kwargs):
-    """Method to handle the update of a warrior"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target warrior
-    id = data.pop("id")
-
-    # Add the warrior to the database
-    result = WarriorAccess.update_warrior(id, **data)
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#
+#   READ OPERATIONS
+#   region
+#
 
 
 @get_warrior_info.route("/get_warrior_info/", methods=["GET"])
@@ -81,6 +75,42 @@ def get_warrior_info_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
+@update_warrior.route("/update_warrior/", methods=["POST"])
+@permissions_required(["statistic.warrior.update_warrior"])
+@param_check(ARGS.statistic.warrior.update_warrior)
+@error_handler
+def update_warrior_endpoint(**kwargs):
+    """Method to handle the update of a warrior"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target warrior
+    id = data.pop("id")
+
+    # Add the warrior to the database
+    result = WarriorAccess.update_warrior(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   DELETE OPERATIONS
+#   region
+#
+
+
 @delete_warrior.route("/delete_warrior/", methods=["POST"])
 @permissions_required(["statistic.warrior.delete_warrior"])
 @param_check(ARGS.statistic.warrior.delete_warrior)
@@ -96,3 +126,6 @@ def delete_warrior_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
