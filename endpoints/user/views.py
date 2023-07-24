@@ -390,7 +390,7 @@ def get_warrior_data_endpoint(**kwargs):
     id = decode_token(token)["sub"]["_id"]
 
     # Get warrior knowledge information based on the user's id
-    result = WarriorAccess.get_own_warrior(id=id, **data)
+    result = WarriorAccess.get_user_warrior(id=id, **data)
 
     # Sort the user events by start datetime
     result.message = sorted(

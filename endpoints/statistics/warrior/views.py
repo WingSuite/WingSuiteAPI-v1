@@ -9,12 +9,13 @@ from endpoints.base import (
 from . import (
     create_warrior,
     get_warrior_info,
+    get_user_warrior_info,
     update_warrior,
     delete_warrior,
 )
 from flask import request
 from database.statistics.warrior import WarriorAccess
-
+from database.user import UserAccess
 
 #
 #   CREATE OPERATIONS
@@ -73,6 +74,43 @@ def get_warrior_info_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@get_user_warrior_info.route("/get_user_warrior_info/", methods=["POST"])
+@permissions_required(["statistic.pfa.get_user_warrior_info"])
+@param_check(ARGS.statistic.warrior.get_user_warrior_info)
+@error_handler
+def get_user_warrior_info_endpoint(**kwargs):
+    """Method to get the info of an PFA"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target PFA
+    id = data.pop("id")
+
+    # Get the user's information from the database
+    user = UserAccess.get_user(id)
+
+    # Return error if the given ID is not found
+    if user.status == "error":
+        return user, 200
+
+    # Extract user info
+    user = user.message.info
+
+    # Get PFA information based on the user's id
+    result = WarriorAccess.get_user_warrior(id=id, **data)
+
+    # Sort the user events by start datetime
+    result.message = sorted(
+        result.message,
+        key=lambda x: x["datetime_taken"],
+        reverse=True,
+    )
+
+    # Return the information
+    return result, 200
 
 
 #   endregion

@@ -11,7 +11,7 @@
         "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
           "run", "age", "gender"],
         "get_pfa_info": ["id"],
-        "get_user_pfa_info": ["id"],
+        "get_user_pfa_info": ["id", "page_size", "page_index"],
         "update_pfa": ["id"],
         "delete_pfa": ["id"]
       },
@@ -19,6 +19,7 @@
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
         "get_warrior_info": ["id"],
+        "get_user_warrior_info": ["id", "page_size", "page_index"],
         "update_warrior": ["id"],
         "delete_warrior": ["id", "page_size", "page_index"]
       }
