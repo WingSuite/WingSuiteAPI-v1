@@ -75,6 +75,7 @@ def get_pfa_info_endpoint(**kwargs):
     # Format message
     result.message = result.message.info
     result.values = PFA.get_metrics()
+    result.values_type = PFA.get_metrics_type()
     result.values_formatted = PFA.get_metrics_formatted()
 
     # Return response data
@@ -116,6 +117,7 @@ def get_user_pfa_info_endpoint(**kwargs):
 
     # Add more info before response
     result.values = PFA.get_metrics()
+    result.values_type = PFA.get_metrics_type()
     result.values_formatted = PFA.get_metrics_formatted()
 
     # Return the information

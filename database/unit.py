@@ -258,6 +258,14 @@ class UnitAccess(DataAccessBase):
 
         # Process unit information
         units = [UnitAccess.get_unit(unit).message.info for unit in units]
+        units = sorted(
+            units,
+            key=lambda x: (
+                config.unitTypes.index(x["unit_type"]),
+                x["name"],
+            ),
+            reverse=True
+        )
 
         # Return the units
         return DataAccessBase.sendSuccess(units)

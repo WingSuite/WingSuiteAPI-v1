@@ -163,23 +163,23 @@ def calculate_pfa(
     #   PUSHUP CALCULATIONS
     #
 
-    if pushups < pushup_keys[-1]:
+    if pushups < int(pushup_keys[-1]):
         pass
-    elif pushups >= pushup_keys[0]:
+    elif pushups >= int(pushup_keys[0]):
         composite += 20
     else:
-        composite += pushup_map[pushups]
+        composite += pushup_map[str(pushups)]
 
     #
     #   SITUP CALCULATIONS
     #
 
-    if situps < situp_keys[-1]:
+    if situps < int(situp_keys[-1]):
         pass
-    elif situps >= situp_keys[0]:
+    elif situps >= int(situp_keys[0]):
         composite += 20
     else:
-        composite += situp_map[situps]
+        composite += situp_map[str(situps)]
 
     #
     #   RUN CALCULATIONS

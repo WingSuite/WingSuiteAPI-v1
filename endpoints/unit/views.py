@@ -417,19 +417,24 @@ def get_all_pfa_data_endpoint(**kwargs):
 
     # Get all of the users' PFA info and the mapping for the unit they are in
     mapper = {}
+    memoize = set()
     for item in below:
         for user in item.members + item.officers:
+            if user in memoize:
+                continue
             res = PFAAccess.get_user_pfa(user, 10000, 0).message
             for i in res:
                 i["full_name"] = UserAccess.get_user(
                     i["to_user"]
                 ).message.info.full_name
             mapper[item.name] = res
+            memoize.add(user)
 
     # Success return
     return success_response(
         mapper,
         values=PFA.get_metrics(),
+        values_type=PFA.get_metrics_type(),
         values_formatted=PFA.get_metrics_formatted(),
     )
 
@@ -468,19 +473,24 @@ def get_all_warrior_data_endpoint(**kwargs):
 
     # Get all of the users' WK info and the mapping for the unit they are in
     mapper = {}
+    memoize = set()
     for item in below:
         for user in item.members + item.officers:
+            if user in memoize:
+                continue
             res = WarriorAccess.get_user_warrior(user, 10000, 0).message
             for i in res:
                 i["full_name"] = UserAccess.get_user(
                     i["to_user"]
                 ).message.info.full_name
             mapper[item.name] = res
+            memoize.add(user)
 
     # Success return
     return success_response(
         mapper,
         values=Warrior.get_metrics(),
+        values_type=Warrior.get_metrics_type(),
         values_formatted=Warrior.get_metrics_formatted(),
     )
 

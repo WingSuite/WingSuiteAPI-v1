@@ -375,6 +375,7 @@ def get_pfa_data_endpoint(**kwargs):
     return success_response(
         result,
         values=PFA.get_metrics(),
+        values_type=PFA.get_metrics_type(),
         values_formatted=PFA.get_metrics_formatted(),
     )
 
@@ -409,6 +410,7 @@ def get_warrior_data_endpoint(**kwargs):
     return success_response(
         result,
         values=Warrior.get_metrics(),
+        values_type=Warrior.get_metrics_type(),
         values_formatted=Warrior.get_metrics_formatted(),
     )
 

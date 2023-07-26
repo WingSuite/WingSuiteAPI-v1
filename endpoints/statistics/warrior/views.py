@@ -73,6 +73,7 @@ def get_warrior_info_endpoint(**kwargs):
     # Format message
     result.message = result.message.info
     result.values = Warrior.get_metrics()
+    result.values_type = Warrior.get_metrics_type()
     result.values_formatted = Warrior.get_metrics_formatted()
 
     # Return response data
@@ -114,6 +115,7 @@ def get_user_warrior_info_endpoint(**kwargs):
 
     # Add additional information
     result.values = Warrior.get_metrics()
+    result.values_type = Warrior.get_metrics_type()
     result.values_formatted = Warrior.get_metrics_formatted()
 
     # Return the information
