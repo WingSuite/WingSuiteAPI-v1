@@ -23,8 +23,14 @@ class Warrior:
 
     @staticmethod
     def get_metrics() -> List:
-        return ["composite_score"]
+        """
+        Static method to return composite score and subscore ids with datatype
+        """
+        return {"composite_score": "number"}
 
     @staticmethod
     def get_metrics_formatted() -> List:
+        """
+        Static method to return composite score and subscore ids, formatted
+        """
         return ["Composite Score"]

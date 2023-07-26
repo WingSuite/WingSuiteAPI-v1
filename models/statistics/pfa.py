@@ -27,10 +27,21 @@ class PFA:
 
     @staticmethod
     def get_metrics() -> List:
-        return ["composite_score", "pushup", "situp", "run"]
+        """
+        Static method to return composite score and subscore ids with datatype
+        """
+        return {
+            "composite_score": "number",
+            "pushup": "number",
+            "situp": "number",
+            "run": "time",
+        }
 
     @staticmethod
     def get_metrics_formatted() -> List:
+        """
+        Static method to return composite score and subscore ids, formatted
+        """
         return ["Composite Score", "Push-Ups", "Sit-Ups", "1.5 Mile Run"]
 
     def calculate_composite(self: "PFA") -> float:
