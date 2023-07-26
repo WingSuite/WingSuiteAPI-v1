@@ -2,7 +2,7 @@
 from utils.pfa.calculator import calculate_pfa
 from utils.dict_parse import DictParse
 from config.config import arguments
-from typing import Any
+from typing import Any, List
 
 
 class PFA:
@@ -24,6 +24,14 @@ class PFA:
 
         # Add composited score to the object's attributes
         self.info.composite_score = self.calculate_composite()
+
+    @staticmethod
+    def get_metrics() -> List:
+        return ["composite_score", "pushup", "situp", "run"]
+
+    @staticmethod
+    def get_metrics_formatted() -> List:
+        return ["Composite Score", "Push-Ups", "Sit-Ups", "1.5 Mile Run"]
 
     def calculate_composite(self: "PFA") -> float:
         """Method to calculate the composite score from raw subscores"""

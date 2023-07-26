@@ -16,6 +16,7 @@ from . import (
 from flask import request
 from database.statistics.warrior import WarriorAccess
 from database.user import UserAccess
+from models.statistics.warrior import Warrior
 
 #
 #   CREATE OPERATIONS
@@ -71,6 +72,8 @@ def get_warrior_info_endpoint(**kwargs):
 
     # Format message
     result.message = result.message.info
+    result.values = Warrior.get_metrics()
+    result.values_formatted = Warrior.get_metrics_formatted()
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -108,6 +111,10 @@ def get_user_warrior_info_endpoint(**kwargs):
         key=lambda x: x["datetime_taken"],
         reverse=True,
     )
+
+    # Add additional information
+    result.values = Warrior.get_metrics()
+    result.values_formatted = Warrior.get_metrics_formatted()
 
     # Return the information
     return result, 200

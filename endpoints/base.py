@@ -8,19 +8,36 @@ from flask import request
 import traceback
 
 
-def success_response(message: str) -> dict:
+def success_response(message: str, **kwargs: Any) -> dict:
     """Returns a message with a success status"""
-    return {"status": "success", "message": message}, 200
+
+    # Prep the message
+    message = {"status": "success", "message": message}
+    message.update(kwargs)
+
+    # Return response
+    return message, 200
 
 
-def client_error_response(message: str) -> dict:
+def client_error_response(message: str, **kwargs: Any) -> dict:
     """Returns a message with a client error status"""
-    return {"status": "error", "message": message}, 400
+
+    # Prep the message
+    message = {"status": "error", "message": message}
+    message.update(kwargs)
+
+    # Return response
+    return message, 400
 
 
-def server_error_response(message: str) -> dict:
+def server_error_response(message: str, **kwargs: Any) -> dict:
     """Returns a message with a server error status"""
-    return {"status": "error", "message": message}, 500
+    # Prep the message
+    message = {"status": "error", "message": message}
+    message.update(kwargs)
+
+    # Return response
+    return message, 500
 
 
 def is_root(func: object) -> object:

@@ -1,7 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from config.config import arguments
-from typing import Any
+from typing import Any, List
 
 
 class Warrior:
@@ -20,3 +20,11 @@ class Warrior:
 
         # Save info
         self.info = DictParse(kwargs)
+
+    @staticmethod
+    def get_metrics() -> List:
+        return ["composite_score"]
+
+    @staticmethod
+    def get_metrics_formatted() -> List:
+        return ["Composite Score"]

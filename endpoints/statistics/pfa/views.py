@@ -16,6 +16,7 @@ from . import (
 from flask import request
 from database.statistics.pfa import PFAAccess
 from database.user import UserAccess
+from models.statistics.pfa import PFA
 
 
 #
@@ -73,6 +74,8 @@ def get_pfa_info_endpoint(**kwargs):
 
     # Format message
     result.message = result.message.info
+    result.values = PFA.get_metrics()
+    result.values_formatted = PFA.get_metrics_formatted()
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -110,6 +113,10 @@ def get_user_pfa_info_endpoint(**kwargs):
         key=lambda x: x["datetime_taken"],
         reverse=True,
     )
+
+    # Add more info before response
+    result.values = PFA.get_metrics()
+    result.values_formatted = PFA.get_metrics_formatted()
 
     # Return the information
     return result, 200
