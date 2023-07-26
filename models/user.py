@@ -21,6 +21,9 @@ class User:
         # Save info
         self.info = DictParse(kwargs)
 
+        # Calculate user's full name
+        self.info.full_name = self.get_fullname(True)
+
     def get_generic_info(
         self: "User",
         includeFullName: bool = True,

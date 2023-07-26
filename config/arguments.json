@@ -47,6 +47,8 @@
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
       "is_superior_officer": ["id"],
+      "get_all_pfa_data": ["id"],
+      "get_all_warrior_data": ["id"],
       "update_unit": ["id"],
       "update_frontpage": ["id", "frontpage"],
       "delete_unit": ["id"],

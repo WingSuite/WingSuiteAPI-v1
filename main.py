@@ -39,6 +39,8 @@ from endpoints.unit import (
     get_all_officers,
     get_all_members,
     is_superior_officer,
+    get_all_pfa_data,
+    get_all_warrior_data,
     delete_unit,
     delete_members,
     delete_officers,
@@ -161,9 +163,11 @@ app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
+app.register_blueprint(is_superior_officer, url_prefix="/unit/")
+app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")
+app.register_blueprint(get_all_warrior_data, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(update_frontpage, url_prefix="/unit/")
-app.register_blueprint(is_superior_officer, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")

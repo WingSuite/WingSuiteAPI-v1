@@ -19,6 +19,8 @@ from . import (
     get_all_officers,
     get_all_members,
     is_superior_officer,
+    get_all_pfa_data,
+    get_all_warrior_data,
     delete_unit,
     delete_members,
     delete_officers,
@@ -27,6 +29,8 @@ from utils.permissions import isOfficerFromAbove
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
+from database.statistics.warrior import WarriorAccess
+from database.statistics.pfa import PFAAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
 
@@ -375,6 +379,100 @@ def is_superior_officer_endpoint(**kwargs):
 
     # Return result
     return success_response(True) if res else client_error_response(False)
+
+
+@get_all_pfa_data.route("/get_all_pfa_data/", methods=["POST"])
+@is_root
+@permissions_required(["unit.get_all_pfa_data"])
+@param_check(ARGS.unit.get_all_pfa_data)
+@error_handler
+def get_all_pfa_data_endpoint(**kwargs):
+    """Endpoint to return a unit's PFA data for all its members and officers"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
+
+    # Get a list of all units and their members below
+    below = UnitAccess.get_units_below([unit._id]).message
+
+    # Get all of the users' PFA info and the mapping for the unit they are in
+    mapper = {}
+    for item in below:
+        for user in item.members + item.officers:
+            res = PFAAccess.get_user_pfa(user, 10000, 0).message
+            for i in res:
+                i["full_name"] = UserAccess.get_user(
+                    i["to_user"]
+                ).message.info.full_name
+            mapper[item.name] = res
+
+    # Success return
+    return success_response(mapper)
+
+
+@get_all_warrior_data.route("/get_all_warrior_data/", methods=["POST"])
+@is_root
+@permissions_required(["unit.get_all_warrior_data"])
+@param_check(ARGS.unit.get_all_warrior_data)
+@error_handler
+def get_all_warrior_data_endpoint(**kwargs):
+    """Endpoint to return a unit's WK data for all its members and officers"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    isSuperiorOfficer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"] or kwargs["id"] in unit.officers or isSuperiorOfficer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
+
+    # Get a list of all units and their members below
+    below = UnitAccess.get_units_below([unit._id]).message
+
+    # Get all of the users' WK info and the mapping for the unit they are in
+    mapper = {}
+    for item in below:
+        for user in item.members + item.officers:
+            res = WarriorAccess.get_user_warrior(user, 10000, 0).message
+            for i in res:
+                i["full_name"] = UserAccess.get_user(
+                    i["to_user"]
+                ).message.info.full_name
+            mapper[item.name] = res
+
+    # Success return
+    return success_response(mapper)
 
 
 #   endregion
