@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    client_error_response,
     is_root,
     permissions_required,
     param_check,
@@ -13,6 +14,7 @@ from . import (
     update_pfa,
     delete_pfa,
 )
+from utils.permissions import isOfficerFromAbove
 from flask import request
 from database.statistics.pfa import PFAAccess
 from database.user import UserAccess
@@ -134,6 +136,7 @@ def get_user_pfa_info_endpoint(**kwargs):
 
 
 @update_pfa.route("/update_pfa/", methods=["POST"])
+@is_root
 @permissions_required(["statistic.pfa.update_pfa"])
 @param_check(ARGS.statistic.pfa.update_pfa)
 @error_handler
@@ -142,6 +145,27 @@ def update_pfa_endpoint(**kwargs):
 
     # Parse information from the call's body
     data = request.get_json()
+
+    # Check if the pfa is legit
+    pfa = PFAAccess.get_pfa(data["id"])
+    if pfa.status == "error":
+        return client_error_response(pfa.message)
+    pfa = pfa.message.info
+
+    # Get to user's info
+    user = UserAccess.get_user(pfa.to_user).message.info
+
+    # Check if the user is an officer of a superior unit
+    is_superior_officer = isOfficerFromAbove(user.units, kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"] or is_superior_officer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
 
     # Get the id of the target PFA
     id = data.pop("id")

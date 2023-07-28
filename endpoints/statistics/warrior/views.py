@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    client_error_response,
     is_root,
     permissions_required,
     param_check,
@@ -13,6 +14,7 @@ from . import (
     update_warrior,
     delete_warrior,
 )
+from utils.permissions import isOfficerFromAbove
 from flask import request
 from database.statistics.warrior import WarriorAccess
 from database.user import UserAccess
@@ -139,6 +141,27 @@ def update_warrior_endpoint(**kwargs):
 
     # Parse information from the call's body
     data = request.get_json()
+
+    # Check if the pfa is legit
+    warrior = WarriorAccess.get_warrior(data["id"])
+    if warrior.status == "error":
+        return client_error_response(warrior.message)
+    warrior = warrior.message.info
+
+    # Get to user's info
+    user = UserAccess.get_user(warrior.to_user).message.info
+
+    # Check if the user is an officer of a superior unit
+    is_superior_officer = isOfficerFromAbove(user.units, kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"] or is_superior_officer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
 
     # Get the id of the target warrior
     id = data.pop("id")
