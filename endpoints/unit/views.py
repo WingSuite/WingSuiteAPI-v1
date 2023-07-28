@@ -429,6 +429,7 @@ def get_all_pfa_data_endpoint(**kwargs):
     mapper = {}
     memoize = set()
     for item in below:
+        track = []
         for user in item.members + item.officers:
             if user in memoize:
                 continue
@@ -437,8 +438,14 @@ def get_all_pfa_data_endpoint(**kwargs):
                 i["full_name"] = UserAccess.get_user(
                     i["to_user"]
                 ).message.info.full_name
-            mapper[item.name] = res
             memoize.add(user)
+            track += res
+        track = sorted(
+            track,
+            key=lambda x: x["composite_score"],
+            reverse=True,
+        )
+        mapper[item.name] = track
 
     # Success return
     return success_response(
@@ -487,6 +494,7 @@ def get_all_warrior_data_endpoint(**kwargs):
     mapper = {}
     memoize = set()
     for item in below:
+        track = []
         for user in item.members + item.officers:
             if user in memoize:
                 continue
@@ -495,8 +503,14 @@ def get_all_warrior_data_endpoint(**kwargs):
                 i["full_name"] = UserAccess.get_user(
                     i["to_user"]
                 ).message.info.full_name
-            mapper[item.name] = res
             memoize.add(user)
+            track += res
+        track = sorted(
+            track,
+            key=lambda x: x["composite_score"],
+            reverse=True,
+        )
+        mapper[item.name] = track
 
     # Success return
     return success_response(
