@@ -158,7 +158,11 @@ def add_members_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer:
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="member"
@@ -189,7 +193,11 @@ def add_officers_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer:
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
         # Return response data
         return _update_personnel_helper(
             **data, operation="add", participation="officer"
@@ -405,7 +413,9 @@ def get_all_pfa_data_endpoint(**kwargs):
 
     # If the user is not rooted nor is officer of the unit, return error
     if not (
-        kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
     ):
         # Return error if not
         return client_error_response(
@@ -461,7 +471,9 @@ def get_all_warrior_data_endpoint(**kwargs):
 
     # If the user is not rooted nor is officer of the unit, return error
     if not (
-        kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
     ):
         # Return error if not
         return client_error_response(
@@ -544,7 +556,11 @@ def update_frontpage_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer:
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
         # Update the front page
         res = UnitAccess.update_unit(
             id=data["id"], frontpage=data["frontpage"]
@@ -607,7 +623,11 @@ def delete_members_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer:
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
         # Return response data
         return _update_personnel_helper(
             **data, operation="delete", participation="member"
@@ -638,7 +658,11 @@ def delete_officers_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_superior_officer:
+    if (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
         # Return response data
         return _update_personnel_helper(
             **data, operation="delete", participation="officer"
