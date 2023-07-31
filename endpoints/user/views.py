@@ -29,8 +29,6 @@ from database.notification import NotificationAccess
 from database.event import EventAccess
 from database.user import UserAccess
 from database.unit import UnitAccess
-from models.statistics.warrior import Warrior
-from models.statistics.pfa import PFA
 from config.config import permissions, config
 
 #
@@ -372,12 +370,7 @@ def get_pfa_data_endpoint(**kwargs):
     )
 
     # Return the information
-    return success_response(
-        result,
-        values=PFA.get_metrics(),
-        values_type=PFA.get_metrics_type(),
-        values_formatted=PFA.get_metrics_formatted(),
-    )
+    return success_response(result)
 
 
 @get_warrior_data.route("/get_warrior_data/", methods=["POST"])
@@ -407,12 +400,7 @@ def get_warrior_data_endpoint(**kwargs):
     )
 
     # Return the information
-    return success_response(
-        result,
-        values=Warrior.get_metrics(),
-        values_type=Warrior.get_metrics_type(),
-        values_formatted=Warrior.get_metrics_formatted(),
-    )
+    return success_response(result)
 
 
 @get_users_units.route("/get_users_units/", methods=["GET"])

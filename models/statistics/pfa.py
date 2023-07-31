@@ -26,35 +26,39 @@ class PFA:
         self.info.composite_score = self.calculate_composite()
 
     @staticmethod
-    def get_metrics() -> List:
-        """
-        Static method to return composite score and subscore ids
-        """
+    def get_scoring_ids() -> List:
+        """Return composite score and subscore ids"""
         return ["composite_score", "pushup", "situp", "run"]
 
     @staticmethod
-    def get_metrics_type() -> List:
-        """
-        Static method to return composite score and subscore datatypes
-        """
+    def get_scoring_type() -> List:
+        """Return composite score and subscore datatypes"""
         return ["number", "number", "number", "time"]
 
     @staticmethod
-    def get_metrics_formatted() -> List:
-        """
-        Static method to return composite score and subscore ids, formatted
-        """
+    def get_scoring_options() -> dict:
+        """Return a list of option for the composite and subscore"""
+        return {}
+
+    @staticmethod
+    def get_scoring_formatted() -> List:
+        """Return composite score and subscore ids, formatted"""
         return ["Composite Score", "Push-Ups", "Sit-Ups", "1.5 Mile Run"]
 
     @staticmethod
-    def get_info() -> List:
+    def get_info_ids() -> List:
         """Static method to return info ids"""
         return ["age", "gender"]
 
     @staticmethod
     def get_info_type() -> List:
         """Static method to return info datatypes"""
-        return ["number", "string"]
+        return ["number", "selection"]
+
+    @staticmethod
+    def get_info_options() -> dict:
+        """Return a list of option for infos"""
+        return {"gender": ["Male", "Female"]}
 
     @staticmethod
     def get_info_formatted() -> List:

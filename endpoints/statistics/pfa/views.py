@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    success_response,
     client_error_response,
     is_root,
     permissions_required,
@@ -11,6 +12,7 @@ from . import (
     create_pfa,
     get_pfa_info,
     get_user_pfa_info,
+    get_pfa_format_info,
     update_pfa,
     delete_pfa,
 )
@@ -76,9 +78,6 @@ def get_pfa_info_endpoint(**kwargs):
 
     # Format message
     result.message = result.message.info
-    result.values = PFA.get_metrics()
-    result.values_type = PFA.get_metrics_type()
-    result.values_formatted = PFA.get_metrics_formatted()
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -117,13 +116,30 @@ def get_user_pfa_info_endpoint(**kwargs):
         reverse=True,
     )
 
-    # Add more info before response
-    result.values = PFA.get_metrics()
-    result.values_type = PFA.get_metrics_type()
-    result.values_formatted = PFA.get_metrics_formatted()
-
     # Return the information
     return result, 200
+
+
+@get_pfa_format_info.route("/get_pfa_format_info/", methods=["GET"])
+@permissions_required(["statistic.pfa.get_pfa_format_info"])
+@error_handler
+def get_pfa_format_info_endpoint(**kwargs):
+    """Endpoint to get the PFA format structure"""
+
+    # Develop message
+    message = {
+        "scoring_ids": PFA.get_scoring_ids(),
+        "scoring_type": PFA.get_scoring_type(),
+        "scoring_options": PFA.get_scoring_options(),
+        "scoring_formatted": PFA.get_scoring_formatted(),
+        "info_ids": PFA.get_info_ids(),
+        "info_type": PFA.get_info_type(),
+        "info_options": PFA.get_info_options(),
+        "info_formatted": PFA.get_info_formatted(),
+    }
+
+    # Return message
+    return success_response(message)
 
 
 #   endregion
@@ -166,9 +182,9 @@ def update_pfa_endpoint(**kwargs):
         )
 
     # Check if subscores is in the body contents and ensure it is OK
-    types = PFA.get_metrics_type()[1:]
+    types = PFA.get_scoring_type()[1:]
     if "subscores" in data:
-        for idx, i in enumerate(PFA.get_metrics()[1:]):
+        for idx, i in enumerate(PFA.get_scoring_ids()()[1:]):
             if i in data["subscores"]:
                 if types[idx] == "number":
                     pfa.subscores[i] = float(data["subscores"][i])

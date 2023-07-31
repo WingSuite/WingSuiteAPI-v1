@@ -67,6 +67,7 @@ from endpoints.statistics.pfa import (
     create_pfa,
     get_pfa_info,
     get_user_pfa_info,
+    get_pfa_format_info,
     update_pfa,
     delete_pfa,
 )
@@ -74,6 +75,7 @@ from endpoints.statistics.warrior import (
     create_warrior,
     get_warrior_info,
     get_user_warrior_info,
+    get_warrior_format_info,
     update_warrior,
     delete_warrior,
 )
@@ -194,6 +196,7 @@ app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_user_pfa_info, url_prefix="/statistic/pfa/")
+app.register_blueprint(get_pfa_format_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 
@@ -201,6 +204,9 @@ app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_warrior_info, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_user_warrior_info, url_prefix="/statistic/warrior/")
+app.register_blueprint(
+    get_warrior_format_info, url_prefix="/statistic/warrior/"
+)
 app.register_blueprint(update_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")
 

@@ -36,6 +36,7 @@
     "statistic.pfa.create_pfa",
     "statistic.pfa.get_pfa_info",
     "statistic.pfa.get_user_pfa_info",
+    "statistic.pfa.get_pfa_format_info",
     "statistic.pfa.update_pfa",
     "statistic.pfa.delete_pfa",
 

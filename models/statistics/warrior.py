@@ -22,22 +22,41 @@ class Warrior:
         self.info = DictParse(kwargs)
 
     @staticmethod
-    def get_metrics() -> List:
-        """
-        Static method to return composite score and subscore ids with datatype
-        """
+    def get_scoring_ids() -> List:
+        """Return composite score and subscore ids"""
         return ["composite_score"]
 
     @staticmethod
-    def get_metrics_type() -> List:
-        """
-        Static method to return composite score and subscore datatypes
-        """
+    def get_scoring_type() -> List:
+        """Return composite score and subscore datatypes"""
         return ["number"]
 
     @staticmethod
-    def get_metrics_formatted() -> List:
-        """
-        Static method to return composite score and subscore ids, formatted
-        """
+    def get_scoring_options() -> dict:
+        """Return a list of option for the composite and subscore"""
+        return {}
+
+    @staticmethod
+    def get_scoring_formatted() -> List:
+        """Return composite score and subscore ids, formatted"""
         return ["Composite Score"]
+
+    @staticmethod
+    def get_info_ids() -> List:
+        """Static method to return info ids"""
+        return []
+
+    @staticmethod
+    def get_info_type() -> List:
+        """Static method to return info datatypes"""
+        return []
+
+    @staticmethod
+    def get_info_options() -> dict:
+        """Return a list of option for infos"""
+        return {}
+
+    @staticmethod
+    def get_info_formatted() -> List:
+        """Static method to return infos, formatted"""
+        return []

@@ -33,8 +33,6 @@ from database.statistics.warrior import WarriorAccess
 from database.statistics.pfa import PFAAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
-from models.statistics.warrior import Warrior
-from models.statistics.pfa import PFA
 
 
 def _update_personnel_helper(id, users, operation, participation):
@@ -448,12 +446,7 @@ def get_all_pfa_data_endpoint(**kwargs):
         mapper[item.name] = track
 
     # Success return
-    return success_response(
-        mapper,
-        values=PFA.get_metrics(),
-        values_type=PFA.get_metrics_type(),
-        values_formatted=PFA.get_metrics_formatted(),
-    )
+    return success_response(mapper)
 
 
 @get_all_warrior_data.route("/get_all_warrior_data/", methods=["POST"])
@@ -513,12 +506,7 @@ def get_all_warrior_data_endpoint(**kwargs):
         mapper[item.name] = track
 
     # Success return
-    return success_response(
-        mapper,
-        values=Warrior.get_metrics(),
-        values_type=Warrior.get_metrics_type(),
-        values_formatted=Warrior.get_metrics_formatted(),
-    )
+    return success_response(mapper)
 
 
 #   endregion

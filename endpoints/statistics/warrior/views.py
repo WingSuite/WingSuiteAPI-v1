@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    success_response,
     client_error_response,
     is_root,
     permissions_required,
@@ -11,6 +12,7 @@ from . import (
     create_warrior,
     get_warrior_info,
     get_user_warrior_info,
+    get_warrior_format_info,
     update_warrior,
     delete_warrior,
 )
@@ -74,9 +76,6 @@ def get_warrior_info_endpoint(**kwargs):
 
     # Format message
     result.message = result.message.info
-    result.values = Warrior.get_metrics()
-    result.values_type = Warrior.get_metrics_type()
-    result.values_formatted = Warrior.get_metrics_formatted()
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -115,13 +114,30 @@ def get_user_warrior_info_endpoint(**kwargs):
         reverse=True,
     )
 
-    # Add additional information
-    result.values = Warrior.get_metrics()
-    result.values_type = Warrior.get_metrics_type()
-    result.values_formatted = Warrior.get_metrics_formatted()
-
     # Return the information
     return result, 200
+
+
+@get_warrior_format_info.route("/get_warrior_format_info/", methods=["GET"])
+@permissions_required(["statistic.warrior.get_warrior_format_info"])
+@error_handler
+def get_pfa_format_info_endpoint(**kwargs):
+    """Endpoint to get the warrior format structure"""
+
+    # Develop message
+    message = {
+        "scoring_ids": Warrior.get_scoring_ids(),
+        "scoring_type": Warrior.get_scoring_type(),
+        "scoring_options": Warrior.get_scoring_options(),
+        "scoring_formatted": Warrior.get_scoring_formatted(),
+        "info_ids": Warrior.get_info_ids(),
+        "info_type": Warrior.get_info_type(),
+        "info_options": Warrior.get_info_options(),
+        "info_formatted": Warrior.get_info_formatted(),
+    }
+
+    # Return message
+    return success_response(message)
 
 
 #   endregion
