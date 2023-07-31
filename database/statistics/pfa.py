@@ -31,6 +31,10 @@ class PFAAccess(DataAccessBase):
             k: v for k, v in locals().items() if k not in ["kwargs", "args"]
         }
 
+        # Ensure that the gender is either male or female
+        if gender != "male" and gender != "female":
+            return DataAccessBase.sendError("Incorrect gender")
+
         # Add or update data
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
@@ -83,6 +87,13 @@ class PFAAccess(DataAccessBase):
         # Check if the PFA based on its id does exist
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("PFA does not exist")
+
+        # Ensure that the gender is either male or female
+        if (
+            kwargs["info"]["gender"] != "male"
+            and kwargs["info"]["gender"] != "female"
+        ):
+            return DataAccessBase.sendError("Incorrect gender")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(

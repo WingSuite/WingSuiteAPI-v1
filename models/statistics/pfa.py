@@ -46,6 +46,21 @@ class PFA:
         """
         return ["Composite Score", "Push-Ups", "Sit-Ups", "1.5 Mile Run"]
 
+    @staticmethod
+    def get_info() -> List:
+        """Static method to return info ids"""
+        return ["age", "gender"]
+
+    @staticmethod
+    def get_info_type() -> List:
+        """Static method to return info datatypes"""
+        return ["number", "string"]
+
+    @staticmethod
+    def get_info_formatted() -> List:
+        """Static method to return infos, formatted"""
+        return ["Age", "Gender"]
+
     def calculate_composite(self: "PFA") -> float:
         """Method to calculate the composite score from raw subscores"""
 

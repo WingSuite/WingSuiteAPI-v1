@@ -159,19 +159,35 @@ def update_pfa_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(user.units, kwargs["id"])
 
     # If the user is not rooted nor is officer of the unit, return error
-    if not (
-        kwargs["isRoot"] or is_superior_officer
-    ):
+    if not (kwargs["isRoot"] or is_superior_officer):
         # Return error if not
         return client_error_response(
             "You don't have access to this information"
         )
 
-    # Get the id of the target PFA
-    id = data.pop("id")
+    # Check if subscores is in the body contents and ensure it is OK
+    types = PFA.get_metrics_type()[1:]
+    if "subscores" in data:
+        for idx, i in enumerate(PFA.get_metrics()[1:]):
+            if i in data["subscores"]:
+                if types[idx] == "number":
+                    pfa.subscores[i] = float(data["subscores"][i])
+                elif types[idx] == "time":
+                    pfa.subscores[i] = str(data["subscores"][i])
 
-    # Add the PFA to the database
-    result = PFAAccess.update_pfa(id, **data)
+    # Check if info is in the body contents and ensure it is OK
+    types = PFA.get_info_type()[1:]
+    if "info" in data:
+        for idx, i in enumerate(PFA.get_info()[1:]):
+            if i in data["info"]:
+                if types[idx] == "number":
+                    pfa.info[i] = float(data["info"][i])
+                elif types[idx] == "string":
+                    pfa.info[i] = str(data["info"][i])
+
+    # Regenerate the pfa object and update PFA
+    pfa = PFA(**pfa)
+    result = PFAAccess.update_pfa(data["id"], **pfa.info)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)

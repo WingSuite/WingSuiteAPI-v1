@@ -133,6 +133,7 @@ def get_user_warrior_info_endpoint(**kwargs):
 
 
 @update_warrior.route("/update_warrior/", methods=["POST"])
+@is_root
 @permissions_required(["statistic.warrior.update_warrior"])
 @param_check(ARGS.statistic.warrior.update_warrior)
 @error_handler
@@ -155,19 +156,19 @@ def update_warrior_endpoint(**kwargs):
     is_superior_officer = isOfficerFromAbove(user.units, kwargs["id"])
 
     # If the user is not rooted nor is officer of the unit, return error
-    if not (
-        kwargs["isRoot"] or is_superior_officer
-    ):
+    if not (kwargs["isRoot"] or is_superior_officer):
         # Return error if not
         return client_error_response(
             "You don't have access to this information"
         )
 
-    # Get the id of the target warrior
-    id = data.pop("id")
+    # If composite score is provided, change it
+    if "composite_score" in data:
+        warrior.composite_score = data["composite_score"]
 
-    # Add the warrior to the database
-    result = WarriorAccess.update_warrior(id, **data)
+    # Regenerate the warrior object and update warrior knowledge
+    warrior = Warrior(**warrior)
+    result = WarriorAccess.update_warrior(data["id"], **warrior.info)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
