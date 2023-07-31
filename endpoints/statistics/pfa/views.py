@@ -184,7 +184,7 @@ def update_pfa_endpoint(**kwargs):
     # Check if subscores is in the body contents and ensure it is OK
     types = PFA.get_scoring_type()[1:]
     if "subscores" in data:
-        for idx, i in enumerate(PFA.get_scoring_ids()()[1:]):
+        for idx, i in enumerate(PFA.get_scoring_ids()[1:]):
             if i in data["subscores"]:
                 if types[idx] == "number":
                     pfa.subscores[i] = float(data["subscores"][i])
