@@ -43,7 +43,7 @@ def create_pfa_endpoint(**kwargs):
     data = request.get_json()
 
     # Add the PFA to the database
-    result = PFAAccess.create_pfa(**data)
+    result = PFAAccess.create_pfa(**data, from_user=kwargs["id"])
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
