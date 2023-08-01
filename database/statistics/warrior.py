@@ -108,17 +108,27 @@ class WarriorAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def delete_warrior(id: str) -> DictParse:
-        """Method to delete an Warrior"""
+    def get_test_warrior(composite_score: float, **kwargs: Any):
+        """Calculate the user's test PFA information"""
+        # Combine kwargs and args
+        data = {
+            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
+        }
 
-        # Check if the Warrior based on its id does not exist
-        warrior = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
-        if warrior is None:
-            return DataAccessBase.sendError("Warrior knowledge does not exist")
+        # Prep data to be inserted
+        data.update(locals()["kwargs"])
+        data["_id"] = uuid.uuid4().hex
+        data["stat_type"] = "warrior"
+        data["subscores"] = {}
+        data["info"] = {}
 
-        # Delete the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Warrior knowledge deleted")
+        # Get an object representation of the given info
+        warrior_obj = Warrior(
+            **data, from_user=0, to_user=0, name=0, datetime_taken=0
+        )
+
+        # Return results
+        return DataAccessBase.sendSuccess(warrior_obj.info.composite_score)
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -134,3 +144,17 @@ class WarriorAccess(DataAccessBase):
             {"_id": id}, {"$set": kwargs}
         )
         return DataAccessBase.sendSuccess("Warrior knowledge updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_warrior(id: str) -> DictParse:
+        """Method to delete an Warrior"""
+
+        # Check if the Warrior based on its id does not exist
+        warrior = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
+        if warrior is None:
+            return DataAccessBase.sendError("Warrior knowledge does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("Warrior knowledge deleted")

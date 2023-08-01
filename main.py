@@ -77,6 +77,7 @@ from endpoints.statistics.warrior import (
     get_warrior_info,
     get_user_warrior_info,
     get_warrior_format_info,
+    get_test_warrior_score,
     update_warrior,
     delete_warrior,
 )
@@ -208,6 +209,9 @@ app.register_blueprint(get_warrior_info, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_user_warrior_info, url_prefix="/statistic/warrior/")
 app.register_blueprint(
     get_warrior_format_info, url_prefix="/statistic/warrior/"
+)
+app.register_blueprint(
+    get_test_warrior_score, url_prefix="/statistic/warrior/"
 )
 app.register_blueprint(update_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")

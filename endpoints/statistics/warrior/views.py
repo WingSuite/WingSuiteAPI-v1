@@ -13,10 +13,12 @@ from . import (
     get_warrior_info,
     get_user_warrior_info,
     get_warrior_format_info,
+    get_test_warrior_score,
     update_warrior,
     delete_warrior,
 )
 from utils.permissions import isOfficerFromAbove
+from flask_jwt_extended import jwt_required
 from flask import request
 from database.statistics.warrior import WarriorAccess
 from database.user import UserAccess
@@ -82,16 +84,16 @@ def get_warrior_info_endpoint(**kwargs):
 
 
 @get_user_warrior_info.route("/get_user_warrior_info/", methods=["POST"])
-@permissions_required(["statistic.pfa.get_user_warrior_info"])
+@permissions_required(["statistic.warrior.get_user_warrior_info"])
 @param_check(ARGS.statistic.warrior.get_user_warrior_info)
 @error_handler
 def get_user_warrior_info_endpoint(**kwargs):
-    """Method to get the info of an PFA"""
+    """Method to get the info of an Warrior Knowledge"""
 
     # Parse information from the call's body
     data = request.get_json()
 
-    # Get the id of the target PFA
+    # Get the id of the target Warrior Knowledge
     id = data.pop("id")
 
     # Get the user's information from the database
@@ -104,7 +106,7 @@ def get_user_warrior_info_endpoint(**kwargs):
     # Extract user info
     user = user.message.info
 
-    # Get PFA information based on the user's id
+    # Get Warrior Knowledge information based on the user's id
     result = WarriorAccess.get_user_warrior(id=id, **data)
 
     # Sort the user events by start datetime
@@ -140,6 +142,23 @@ def get_pfa_format_info_endpoint(**kwargs):
     return success_response(message)
 
 
+@get_test_warrior_score.route("/get_test_warrior_score/", methods=["POST"])
+@jwt_required()
+@param_check(ARGS.statistic.warrior.get_test_warrior_score)
+@error_handler
+def get_test_pfa_score_endpoint(**kwargs):
+    """Return a test result of a set of given inputs"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Calculate the Warrior Knowledge scoring
+    result = WarriorAccess.get_test_warrior(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
 #   endregion
 
 #
@@ -159,7 +178,7 @@ def update_warrior_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
-    # Check if the pfa is legit
+    # Check if the warrior knowledge is legit
     warrior = WarriorAccess.get_warrior(data["id"])
     if warrior.status == "error":
         return client_error_response(warrior.message)
