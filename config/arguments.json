@@ -23,7 +23,7 @@
         "get_user_warrior_info": ["id", "page_size", "page_index"],
         "get_test_warrior_score": ["composite_score"],
         "update_warrior": ["id"],
-        "delete_warrior": ["id", "page_size", "page_index"]
+        "delete_warrior": ["id"]
       }
     },
     "notification": {
