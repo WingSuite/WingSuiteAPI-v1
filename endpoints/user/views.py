@@ -370,7 +370,7 @@ def get_pfa_data_endpoint(**kwargs):
     )
 
     # Return the information
-    return success_response(result)
+    return result, 200
 
 
 @get_warrior_data.route("/get_warrior_data/", methods=["POST"])
@@ -400,7 +400,7 @@ def get_warrior_data_endpoint(**kwargs):
     )
 
     # Return the information
-    return success_response(result)
+    return result, 200
 
 
 @get_users_units.route("/get_users_units/", methods=["GET"])
