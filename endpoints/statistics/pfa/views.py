@@ -13,10 +13,12 @@ from . import (
     get_pfa_info,
     get_user_pfa_info,
     get_pfa_format_info,
+    get_test_pfa_score,
     update_pfa,
     delete_pfa,
 )
 from utils.permissions import isOfficerFromAbove
+from flask_jwt_extended import jwt_required
 from flask import request
 from database.statistics.pfa import PFAAccess
 from database.user import UserAccess
@@ -41,7 +43,7 @@ def create_pfa_endpoint(**kwargs):
     data = request.get_json()
 
     # Add the PFA to the database
-    result = PFAAccess.create_pfa(**data, from_user=kwargs["id"])
+    result = PFAAccess.create_pfa(**data)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -140,6 +142,23 @@ def get_pfa_format_info_endpoint(**kwargs):
 
     # Return message
     return success_response(message)
+
+
+@get_test_pfa_score.route("/get_test_pfa_score/", methods=["POST"])
+@jwt_required()
+@param_check(ARGS.statistic.pfa.get_test_pfa_score)
+@error_handler
+def get_test_pfa_score_endpoint(**kwargs):
+    """Return a test result of a set of given inputs"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Calculate the PFA scoring
+    result = PFAAccess.get_test_pfa(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

@@ -68,6 +68,7 @@ from endpoints.statistics.pfa import (
     get_pfa_info,
     get_user_pfa_info,
     get_pfa_format_info,
+    get_test_pfa_score,
     update_pfa,
     delete_pfa,
 )
@@ -197,6 +198,7 @@ app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_user_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_format_info, url_prefix="/statistic/pfa/")
+app.register_blueprint(get_test_pfa_score, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 

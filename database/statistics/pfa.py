@@ -32,7 +32,7 @@ class PFAAccess(DataAccessBase):
         }
 
         # Ensure that the gender is either male or female
-        if gender != "male" and gender != "female":
+        if gender.lower() != "male" and gender.lower() != "female":
             return DataAccessBase.sendError("Incorrect gender")
 
         # Add or update data
@@ -46,7 +46,7 @@ class PFAAccess(DataAccessBase):
         }
         data["info"] = {
             "age": age,
-            "gender": gender,
+            "gender": gender.lower(),
         }
 
         # Remove unncessary data
@@ -64,42 +64,6 @@ class PFAAccess(DataAccessBase):
 
         # Return a statement
         return DataAccessBase.sendSuccess("PFA created")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def delete_pfa(id: str) -> DictParse:
-        """Method to delete an PFA"""
-
-        # Check if the PFA based on its id does not exist
-        pfa = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
-        if pfa is None:
-            return DataAccessBase.sendError("PFA does not exist")
-
-        # Delete the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("PFA deleted")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def update_pfa(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a PFA"""
-
-        # Check if the PFA based on its id does exist
-        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
-            return DataAccessBase.sendError("PFA does not exist")
-
-        # Ensure that the gender is either male or female
-        if (
-            kwargs["info"]["gender"] != "male"
-            and kwargs["info"]["gender"] != "female"
-        ):
-            return DataAccessBase.sendError("Incorrect gender")
-
-        # Update the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.update_one(
-            {"_id": id}, {"$set": kwargs}
-        )
-        return DataAccessBase.sendSuccess("PFA updated")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -161,3 +125,81 @@ class PFAAccess(DataAccessBase):
 
         # Return with a PFA object
         return DataAccessBase.sendSuccess(result, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_test_pfa(
+        pushup: int, situp: int, run: str, age: int, gender: str, **kwargs: Any
+    ):
+        """Calculate the user's test PFA information"""
+        # Combine kwargs and args
+        data = {
+            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
+        }
+
+        # Ensure that the gender is either male or female
+        if gender.lower() != "male" and gender.lower() != "female":
+            return DataAccessBase.sendError("Incorrect gender")
+
+        # Add or update data
+        data.update(locals()["kwargs"])
+        data["_id"] = uuid.uuid4().hex
+        data["stat_type"] = "pfa"
+        data["subscores"] = {
+            "pushup": pushup,
+            "situp": situp,
+            "run": run,
+        }
+        data["info"] = {
+            "age": age,
+            "gender": gender.lower(),
+        }
+
+        # Remove unncessary data
+        del data["pushup"]
+        del data["situp"]
+        del data["run"]
+        del data["age"]
+        del data["gender"]
+
+        # Get an object representation of the given info
+        pfa_obj = PFA(**data, from_user=0, to_user=0, name=0, datetime_taken=0)
+
+        # Return results
+        return DataAccessBase.sendSuccess(pfa_obj.info.composite_score)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def update_pfa(id: str, **kwargs: Any) -> DictParse:
+        """Method to delete a PFA"""
+
+        # Check if the PFA based on its id does exist
+        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
+            return DataAccessBase.sendError("PFA does not exist")
+
+        # Ensure that the gender is either male or female
+        if (
+            kwargs["info"]["gender"] != "male"
+            and kwargs["info"]["gender"] != "female"
+        ):
+            return DataAccessBase.sendError("Incorrect gender")
+
+        # Update the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.update_one(
+            {"_id": id}, {"$set": kwargs}
+        )
+        return DataAccessBase.sendSuccess("PFA updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_pfa(id: str) -> DictParse:
+        """Method to delete an PFA"""
+
+        # Check if the PFA based on its id does not exist
+        pfa = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
+        if pfa is None:
+            return DataAccessBase.sendError("PFA does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("PFA deleted")

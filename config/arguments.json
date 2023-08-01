@@ -12,6 +12,7 @@
           "run", "age", "gender"],
         "get_pfa_info": ["id"],
         "get_user_pfa_info": ["id", "page_size", "page_index"],
+        "get_test_pfa_score": ["pushup", "situp", "run", "age", "gender"],
         "update_pfa": ["id"],
         "delete_pfa": ["id"]
       },

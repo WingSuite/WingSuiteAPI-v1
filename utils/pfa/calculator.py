@@ -185,7 +185,7 @@ def calculate_pfa(
     #   RUN CALCULATIONS
     #
 
-    if run_time <= _seconds(run_keys[0]):
+    if run_time <= _seconds(run_keys[0]) and run_time != 0:
         composite += 60
     else:
         composite += _in_range(run_map, run_time)
