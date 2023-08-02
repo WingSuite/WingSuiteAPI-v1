@@ -7,11 +7,16 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import create_event, update_event, get_event_info, delete_event
+from . import create_event, get_event_info, update_event, delete_event
 from utils.permissions import isOfficerFromAbove
 from database.unit import UnitAccess
 from database.event import EventAccess
 from flask import request
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @create_event.route("/create_event/", methods=["POST"])
@@ -44,6 +49,49 @@ def create_event_endpoint(**kwargs):
 
     # Return error if not
     return client_error_response("You don't have access to this feature")
+
+
+#   endregion
+
+#
+#   READ OPERATIONS
+#   region
+#
+
+
+@get_event_info.route("/get_event_info/", methods=["GET"])
+@permissions_required(["event.get_event_info"])
+@param_check(ARGS.event.get_event_info)
+@error_handler
+def get_event_info_endpoint(**kwargs):
+    """Method to get the info of an event"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target event
+    id = data.pop("id")
+
+    # Get the event's information from the database
+    result = EventAccess.get_event_by_id(id)
+
+    # Return error if no feedback was provided
+    if result.status == "error":
+        return result, 200
+
+    # Format message
+    result.message = result.message.info
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
 
 
 @update_event.route("/update_event/", methods=["POST"])
@@ -86,31 +134,12 @@ def update_event_endpoint(**kwargs):
     return client_error_response("You don't have access to this feature")
 
 
-@get_event_info.route("/get_event_info/", methods=["GET"])
-@permissions_required(["event.get_event_info"])
-@param_check(ARGS.event.get_event_info)
-@error_handler
-def get_event_info_endpoint(**kwargs):
-    """Method to get the info of an event"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target event
-    id = data.pop("id")
-
-    # Get the event's information from the database
-    result = EventAccess.get_event_by_id(id)
-
-    # Return error if no feedback was provided
-    if result.status == "error":
-        return result, 200
-
-    # Format message
-    result.message = result.message.info
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#
+#   DELETE OPERATIONS
+#   region
+#
 
 
 @delete_event.route("/delete_event/", methods=["POST"])
@@ -150,3 +179,6 @@ def delete_event_endpoint(**kwargs):
 
     # Return error if not
     return client_error_response("You don't have access to this feature")
+
+
+#   endregion

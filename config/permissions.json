@@ -8,36 +8,40 @@
     "user.delete_permissions",
 
     "unit.create_unit",
+    "unit.add_members",
+    "unit.add_officers",
+    "unit.get_all_pfa_data",
+    "unit.get_all_warrior_data",
     "unit.update_unit",
     "unit.update_frontpage",
     "unit.delete_unit",
-    "unit.add_members",
     "unit.delete_members",
-    "unit.add_officers",
     "unit.delete_officers",
 
     "event.create_event",
-    "event.update_event",
     "event.get_event_info",
+    "event.update_event",
     "event.delete_event",
 
     "notification.create_notification",
-    "notification.update_notification",
     "notification.get_notification_info",
+    "notification.update_notification",
     "notification.delete_notification",
 
     "statistic.feedback.create_feedback",
-    "statistic.feedback.update_feedback",
     "statistic.feedback.get_feedback_info",
+    "statistic.feedback.update_feedback",
     "statistic.feedback.delete_feedback",
 
     "statistic.pfa.create_pfa",
-    "statistic.pfa.update_pfa",
     "statistic.pfa.get_pfa_info",
+    "statistic.pfa.get_user_pfa_info",
+    "statistic.pfa.update_pfa",
     "statistic.pfa.delete_pfa",
 
     "statistic.warrior.create_warrior",
-    "statistic.warrior.update_warrior",
     "statistic.warrior.get_warrior_info",
+    "statistic.warrior.get_user_warrior_info",
+    "statistic.warrior.update_warrior",
     "statistic.warrior.delete_warrior"
 ]

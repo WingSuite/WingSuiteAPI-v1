@@ -9,14 +9,20 @@ from endpoints.base import (
 )
 from . import (
     create_notification,
-    update_notification,
     get_notification_info,
+    update_notification,
     delete_notification,
 )
 from utils.permissions import isOfficerFromAbove
 from database.notification import NotificationAccess
 from database.unit import UnitAccess
 from flask import request
+
+
+#
+#   CREATE OPERATIONS
+#   region
+#
 
 
 @create_notification.route("/create_notification/", methods=["POST"])
@@ -51,6 +57,49 @@ def create_notification_endpoint(**kwargs):
 
     # Return error if not
     return client_error_response("You don't have access to this feature")
+
+
+#   endregion
+
+#
+#   READ OPERATIONS
+#   region
+#
+
+
+@get_notification_info.route("/get_notification_info/", methods=["GET"])
+@permissions_required(["notification.get_notification_info"])
+@param_check(ARGS.notification.get_notification_info)
+@error_handler
+def get_notification_info_endpoint(**kwargs):
+    """Method to get the info of a notification"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target notification
+    id = data.pop("id")
+
+    # Get the notification's information from the database
+    result = NotificationAccess.get_notification(id)
+
+    # Return error if no notification was provided
+    if result.status == "error":
+        return result, 200
+
+    # Format message
+    result.message = result.message.info
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+#   endregion
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
 
 
 @update_notification.route("/update_notification/", methods=["POST"])
@@ -93,31 +142,12 @@ def update_notification_endpoint(**kwargs):
     return client_error_response("You don't have access to this feature")
 
 
-@get_notification_info.route("/get_notification_info/", methods=["GET"])
-@permissions_required(["notification.get_notification_info"])
-@param_check(ARGS.notification.get_notification_info)
-@error_handler
-def get_notification_info_endpoint(**kwargs):
-    """Method to get the info of a notification"""
+#   endregion
 
-    # Parse information from the call's body
-    data = request.get_json()
-
-    # Get the id of the target notification
-    id = data.pop("id")
-
-    # Get the notification's information from the database
-    result = NotificationAccess.get_notification(id)
-
-    # Return error if no notification was provided
-    if result.status == "error":
-        return result, 200
-
-    # Format message
-    result.message = result.message.info
-
-    # Return response data
-    return result, (200 if result.status == "success" else 400)
+#
+#   DELETE OPERATIONS
+#   region
+#
 
 
 @delete_notification.route("/delete_notification/", methods=["POST"])
@@ -154,3 +184,6 @@ def delete_notification_endpoint(**kwargs):
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
+
+
+#   endregion

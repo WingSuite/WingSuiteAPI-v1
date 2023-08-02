@@ -42,35 +42,6 @@ class WarriorAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def delete_warrior(id: str) -> DictParse:
-        """Method to delete an Warrior"""
-
-        # Check if the Warrior based on its id does not exist
-        warrior = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
-        if warrior is None:
-            return DataAccessBase.sendError("Warrior knowledge does not exist")
-
-        # Delete the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Warrior knowledge deleted")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def update_warrior(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a warrior"""
-
-        # Check if the warrior based on its id does exist
-        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
-            return DataAccessBase.sendError("Warrior knowledge does not exist")
-
-        # Update the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.update_one(
-            {"_id": id}, {"$set": kwargs}
-        )
-        return DataAccessBase.sendSuccess("Warrior knowledge updated")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
     def get_warrior(id: str) -> DictParse:
         # Search the collection based on id
         warrior = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
@@ -87,7 +58,9 @@ class WarriorAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_own_warrior(id: str, page_size: int, page_index: int) -> DictParse:
+    def get_user_warrior(
+        id: str, page_size: int, page_index: int
+    ) -> DictParse:
         """
         Method to retrieve a multiple warrior knowledge based on the
         receiver's ID
@@ -132,3 +105,56 @@ class WarriorAccess(DataAccessBase):
 
         # Return with a warrior knowledge object
         return DataAccessBase.sendSuccess(result, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_test_warrior(composite_score: float, **kwargs: Any):
+        """Calculate the user's test PFA information"""
+        # Combine kwargs and args
+        data = {
+            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
+        }
+
+        # Prep data to be inserted
+        data.update(locals()["kwargs"])
+        data["_id"] = uuid.uuid4().hex
+        data["stat_type"] = "warrior"
+        data["subscores"] = {}
+        data["info"] = {}
+
+        # Get an object representation of the given info
+        warrior_obj = Warrior(
+            **data, from_user=0, to_user=0, name=0, datetime_taken=0
+        )
+
+        # Return results
+        return DataAccessBase.sendSuccess(warrior_obj.info.composite_score)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def update_warrior(id: str, **kwargs: Any) -> DictParse:
+        """Method to delete a warrior"""
+
+        # Check if the warrior based on its id does exist
+        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
+            return DataAccessBase.sendError("Warrior knowledge does not exist")
+
+        # Update the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.update_one(
+            {"_id": id}, {"$set": kwargs}
+        )
+        return DataAccessBase.sendSuccess("Warrior knowledge updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_warrior(id: str) -> DictParse:
+        """Method to delete an Warrior"""
+
+        # Check if the Warrior based on its id does not exist
+        warrior = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
+        if warrior is None:
+            return DataAccessBase.sendError("Warrior knowledge does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("Warrior knowledge deleted")

@@ -168,7 +168,7 @@ def calculate_pfa(
     elif pushups >= pushup_keys[0]:
         composite += 20
     else:
-        composite += pushup_map[pushups]
+        composite += pushup_map[int(pushups)]
 
     #
     #   SITUP CALCULATIONS
@@ -179,13 +179,13 @@ def calculate_pfa(
     elif situps >= situp_keys[0]:
         composite += 20
     else:
-        composite += situp_map[situps]
+        composite += situp_map[int(situps)]
 
     #
     #   RUN CALCULATIONS
     #
 
-    if run_time <= _seconds(run_keys[0]):
+    if run_time <= _seconds(run_keys[0]) and run_time != 0:
         composite += 60
     else:
         composite += _in_range(run_map, run_time)
