@@ -123,7 +123,7 @@ def get_user_pfa_info_endpoint(**kwargs):
 
 
 @get_pfa_format_info.route("/get_pfa_format_info/", methods=["GET"])
-@permissions_required(["statistic.pfa.get_pfa_format_info"])
+@jwt_required()
 @error_handler
 def get_pfa_format_info_endpoint(**kwargs):
     """Endpoint to get the PFA format structure"""

@@ -121,7 +121,7 @@ def get_user_warrior_info_endpoint(**kwargs):
 
 
 @get_warrior_format_info.route("/get_warrior_format_info/", methods=["GET"])
-@permissions_required(["statistic.warrior.get_warrior_format_info"])
+@jwt_required()
 @error_handler
 def get_pfa_format_info_endpoint(**kwargs):
     """Endpoint to get the warrior format structure"""
