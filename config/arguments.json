@@ -75,6 +75,7 @@
       "get_notifications": ["start_datetime", "end_datetime"],
       "get_pfa_data": ["page_size", "page_index"],
       "get_warrior_data": ["page_size", "page_index"],
+      "update_permissions": ["id", "permissions"],
       "delete_permissions": ["id", "permissions"]
     }
   },

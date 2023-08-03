@@ -12,6 +12,7 @@ get_notifications = Blueprint("get_notifications", __name__)
 get_pfa_data = Blueprint("get_pfa_data", __name__)
 get_warrior_data = Blueprint("get_warrior_data", __name__)
 get_users_units = Blueprint("get_users_units", __name__)
+update_permissions = Blueprint("update_permissions", __name__)
 delete_permissions = Blueprint("delete_permissions", __name__)
 
 # Import views

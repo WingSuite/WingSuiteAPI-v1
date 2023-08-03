@@ -27,6 +27,7 @@ from endpoints.user import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    update_permissions,
     delete_permissions,
 )
 from endpoints.unit import (
@@ -159,6 +160,7 @@ app.register_blueprint(get_notifications, url_prefix="/user/")
 app.register_blueprint(get_pfa_data, url_prefix="/user/")
 app.register_blueprint(get_warrior_data, url_prefix="/user/")
 app.register_blueprint(get_users_units, url_prefix="/user/")
+app.register_blueprint(update_permissions, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 
 # Unit routes

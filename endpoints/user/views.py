@@ -18,6 +18,7 @@ from . import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    update_permissions,
     delete_permissions,
 )
 from flask_jwt_extended import jwt_required, decode_token
@@ -493,6 +494,44 @@ def get_users_units_endpoint(**kwargs):
     # Return results
     return success_response(results)
 
+
+#   endregion
+
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+@update_permissions.route("/update_permissions/", methods=["POST"])
+@permissions_required(["user.update_permissions"])
+@param_check(ARGS.user.update_permissions)
+@error_handler
+def update_permissions_endpoint(**kwargs):
+    """Method to handle the updating of permissions to the user"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # Overwrite permission list
+    user.info.permissions = data["permissions"]
+
+    # Push changes to collection
+    result = UserAccess.update_user(data["id"], **user.info)
+
+    # Return result
+    return result, (200 if result.status == "success" else 400)
 
 #   endregion
 
