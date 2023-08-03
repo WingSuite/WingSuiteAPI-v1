@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    is_root,
     success_response,
     client_error_response,
     permissions_required,
@@ -117,6 +118,7 @@ def who_am_i_endpoint(**kwargs):
 
 
 @everyone.route("/everyone/", methods=["POST"])
+@is_root
 @param_check(ARGS.user.everyone)
 @jwt_required()
 @error_handler
@@ -126,10 +128,20 @@ def everyone_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Get the user and their permissions
+    perms = UserAccess.get_user(id=kwargs["id"]).message.info.permissions
+
     # Create protections for the result
     protections = ["phone_number", "permissions"]
-    if "allow_permissions" in data:
+
+    # If the user has the right perms, remove the permissions protection
+    if (
+        kwargs["isRoot"]
+        or "user.everyone.permission_view" in perms
+        and "allow_permissions" in data
+    ):
         del protections[1]
+    if "allow_permissions" in data:
         del data["allow_permissions"]
 
     # Get the content information based on the given page size and
@@ -142,9 +154,7 @@ def everyone_endpoint(**kwargs):
 
     # Format message
     results.message = [
-        item.get_generic_info(
-            other_protections=protections
-        )
+        item.get_generic_info(other_protections=protections)
         for item in results.message
     ]
 
@@ -509,6 +519,7 @@ def get_users_units_endpoint(**kwargs):
 #   region
 #
 
+
 @update_permissions.route("/update_permissions/", methods=["POST"])
 @permissions_required(["user.update_permissions"])
 @param_check(ARGS.user.update_permissions)
@@ -538,6 +549,7 @@ def update_permissions_endpoint(**kwargs):
 
     # Return result
     return result, (200 if result.status == "success" else 400)
+
 
 #   endregion
 
