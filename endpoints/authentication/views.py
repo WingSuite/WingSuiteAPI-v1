@@ -13,6 +13,7 @@ from . import (
     authorize,
     signout,
     reject,
+    kick_user,
 )
 from endpoints.base import (
     is_root,
@@ -103,6 +104,7 @@ def get_register_requests_endpoint(**kwargs):
     # Return success
     return result, 200
 
+
 #   endregion
 
 #
@@ -184,6 +186,35 @@ def reject_user_endpoint(**kwargs):
 
     # Get the user's instance based on the given information
     result = UserAccess.reject_user(data["id"])
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+@kick_user.route("/kick_user/", methods=["POST"])
+@is_root
+@permissions_required(["auth.kick_user"])
+@param_check(ARGS.authentication.kick_user)
+@error_handler
+def kick_user_endpoint(**kwargs):
+    """Endpoint to kick a user"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message.info
+
+    # Kick the user out
+    result = UserAccess.kick_user(user._id)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)

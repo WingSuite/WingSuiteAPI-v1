@@ -63,7 +63,8 @@
       "login": ["email", "password"],
       "authorize_user": ["id"],
       "signout": ["access", "refresh"],
-      "reject_user": ["id"]
+      "reject_user": ["id"],
+      "kick_user": ["id"]
     },
     "user": {
       "add_permissions": ["id", "permissions"],

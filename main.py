@@ -15,6 +15,7 @@ from endpoints.authentication import (
     authorize,
     signout,
     reject,
+    kick_user
 )
 from endpoints.user import (
     add_permissions,
@@ -150,6 +151,7 @@ app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
+app.register_blueprint(kick_user, url_prefix="/auth/")
 
 # User routes
 app.register_blueprint(add_permissions, url_prefix="/user/")

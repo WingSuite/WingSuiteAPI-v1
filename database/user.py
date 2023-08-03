@@ -40,6 +40,7 @@ class UserAccess(DataAccessBase):
             data.update(locals()["kwargs"])
             data["_id"] = uuid.uuid4().hex
             data["permissions"] = []
+            data["units"] = []
             del data["query"]
 
             # Hash and save the given password
@@ -209,6 +210,44 @@ class UserAccess(DataAccessBase):
 
             # Return
             return DataAccessBase.sendSuccess("User denied")
+
+        # Return an error if else
+        return DataAccessBase.sendError("User not found")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def kick_user(id: str) -> DictParse:
+        """Kick the user from the organization"""
+
+        # Check if user is in the REGISTER_COL
+        user = DataAccessBase.USER_COL.find_one({"_id": id})
+        if user is not None:
+            # Add user to the former user collection
+            DataAccessBase.FORMER_USERS_COL.insert_one(user)
+
+            # Get the user's id
+            id = user["_id"]
+
+            # Iterate through all the units the user is in
+            for i in user["units"]:
+                # Get the unit info
+                unit = DataAccessBase.UNIT_COL.find_one({"_id": i})
+
+                # Remove user from the officers list, if so
+                if id in unit["officers"]:
+                    unit["officers"].remove(id)
+                # Remove user from the members list, if so
+                if id in unit["members"]:
+                    unit["members"].remove(id)
+
+                # Replace the unit information
+                DataAccessBase.UNIT_COL.replace_one({"_id": unit["_id"]}, unit)
+
+            # If the user exists delete their record
+            DataAccessBase.USER_COL.delete_one({"_id": id})
+
+            # Return
+            return DataAccessBase.sendSuccess("User kicked out")
 
         # Return an error if else
         return DataAccessBase.sendError("User not found")
