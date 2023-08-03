@@ -9,6 +9,7 @@
     "user.everyone.permission_view",
     "user.get_permissions_list",
     "user.update_permissions",
+    "user.update_rank",
     "user.delete_permissions",
 
     "unit.create_unit",

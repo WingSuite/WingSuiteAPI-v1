@@ -76,6 +76,7 @@
       "get_pfa_data": ["page_size", "page_index"],
       "get_warrior_data": ["page_size", "page_index"],
       "update_permissions": ["id", "permissions"],
+      "update_rank": ["id", "rank"],
       "delete_permissions": ["id", "permissions"]
     }
   },

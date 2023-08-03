@@ -21,6 +21,7 @@ from . import (
     get_users_units,
     get_permissions_list,
     update_permissions,
+    update_rank,
     delete_permissions,
 )
 from flask_jwt_extended import jwt_required, decode_token
@@ -522,6 +523,7 @@ def get_permissions_list_endpoint(**kwargs):
     # Get the permissions list
     return success_response(json.load(open("./config/permissions.json")))
 
+
 #   endregion
 
 
@@ -557,6 +559,34 @@ def update_permissions_endpoint(**kwargs):
 
     # Push changes to collection
     result = UserAccess.update_user(data["id"], **user.info)
+
+    # Return result
+    return result, (200 if result.status == "success" else 400)
+
+
+@update_rank.route("/update_rank/", methods=["POST"])
+@permissions_required(["user.update_rank"])
+@param_check(ARGS.user.update_rank)
+@error_handler
+def update_rank_endpoint(**kwargs):
+    """Update a selected user's rank"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # Update the user's info
+    result = UserAccess.update_user(id=data["id"], rank=data["rank"])
 
     # Return result
     return result, (200 if result.status == "success" else 400)

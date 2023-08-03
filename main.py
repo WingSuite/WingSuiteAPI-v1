@@ -29,6 +29,7 @@ from endpoints.user import (
     get_users_units,
     get_permissions_list,
     update_permissions,
+    update_rank,
     delete_permissions,
 )
 from endpoints.unit import (
@@ -163,6 +164,7 @@ app.register_blueprint(get_warrior_data, url_prefix="/user/")
 app.register_blueprint(get_users_units, url_prefix="/user/")
 app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
+app.register_blueprint(update_rank, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 
 # Unit routes

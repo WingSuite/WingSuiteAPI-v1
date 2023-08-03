@@ -161,7 +161,10 @@ class UserAccess(DataAccessBase):
         """Update the specified user's information"""
 
         # Delete the id in the kwargs
-        del kwargs["_id"]
+        if "_id" in kwargs:
+            del kwargs["_id"]
+        if "id" in kwargs:
+            del kwargs["id"]
 
         # Check if the unit based on its id does exist
         if DataAccessBase.USER_COL.find_one({"_id": id}) is None:
