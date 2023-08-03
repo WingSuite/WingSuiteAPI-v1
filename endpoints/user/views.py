@@ -19,6 +19,7 @@ from . import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    get_permissions_list,
     update_permissions,
     delete_permissions,
 )
@@ -32,6 +33,7 @@ from database.event import EventAccess
 from database.user import UserAccess
 from database.unit import UnitAccess
 from config.config import permissions, config
+import json
 
 #
 #   CREATE OPERATIONS
@@ -510,6 +512,15 @@ def get_users_units_endpoint(**kwargs):
     # Return results
     return success_response(results)
 
+
+@get_permissions_list.route("/get_permissions_list/", methods=["GET"])
+@permissions_required(["user.get_permissions_list"])
+@error_handler
+def get_permissions_list_endpoint(**kwargs):
+    """Returns the full list of permissions"""
+
+    # Get the permissions list
+    return success_response(json.load(open("./config/permissions.json")))
 
 #   endregion
 
