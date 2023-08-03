@@ -126,6 +126,12 @@ def everyone_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Create protections for the result
+    protections = ["phone_number", "permissions"]
+    if "allow_permissions" in data:
+        del protections[1]
+        del data["allow_permissions"]
+
     # Get the content information based on the given page size and
     # page index
     results = UserAccess.get_users(**data)
@@ -137,7 +143,7 @@ def everyone_endpoint(**kwargs):
     # Format message
     results.message = [
         item.get_generic_info(
-            other_protections=["phone_number", "permissions"]
+            other_protections=protections
         )
         for item in results.message
     ]
