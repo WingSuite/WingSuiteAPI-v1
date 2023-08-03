@@ -1,6 +1,7 @@
 [
     "*",
 
+    "auth.get_register_requests",
     "auth.authorize_user",
     "auth.reject_user",
 

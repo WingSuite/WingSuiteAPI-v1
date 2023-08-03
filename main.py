@@ -10,6 +10,7 @@ from database.base import DataAccessBase
 from endpoints.authentication import (
     register,
     login,
+    get_register_requests,
     refresh,
     authorize,
     signout,
@@ -141,6 +142,7 @@ ROUTE HANDLING
 # Authentication routes
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(login, url_prefix="/auth/")
+app.register_blueprint(get_register_requests, url_prefix="/auth/")
 app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")

@@ -8,12 +8,14 @@ from flask_jwt_extended import (
 from . import (
     register,
     login,
+    get_register_requests,
     refresh,
     authorize,
     signout,
     reject,
 )
 from endpoints.base import (
+    is_root,
     permissions_required,
     param_check,
     error_handler,
@@ -84,6 +86,23 @@ def login_endpoint(**kwargs):
     }, 200
 
 
+@get_register_requests.route("/get_register_requests/", methods=["GET"])
+@permissions_required(["auth.get_register_requests"])
+@error_handler
+def get_register_requests_endpoint(**kwargs):
+    """Get list of requests"""
+
+    # Get the list of register information
+    result = UserAccess.get_register_list()
+
+    # If the response data results in an error, return 400
+    # and error message
+    if result.status != "success":
+        return result, 400
+
+    # Return success
+    return result, 200
+
 #   endregion
 
 #
@@ -109,6 +128,7 @@ def refresh_endpoint(**kwargs):
 
 
 @authorize.route("/authorize_user/", methods=["POST"])
+@is_root
 @permissions_required(["auth.authorize_user"])
 @param_check(ARGS.authentication.authorize_user)
 @error_handler
@@ -152,6 +172,7 @@ def signout_endpoint(**kwargs):
 
 
 @reject.route("/reject_user/", methods=["POST"])
+@is_root
 @permissions_required(["auth.reject_user"])
 @param_check(ARGS.authentication.reject_user)
 @error_handler
