@@ -7,6 +7,7 @@
 
     "user.add_permissions",
     "user.everyone.permission_view",
+    "user.everyone.phone_number_view",
     "user.get_permissions_list",
     "user.update_permissions",
     "user.update_rank",

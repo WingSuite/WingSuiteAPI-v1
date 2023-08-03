@@ -147,6 +147,16 @@ def everyone_endpoint(**kwargs):
     if "allow_permissions" in data:
         del data["allow_permissions"]
 
+    # If the user has the right perms, remove the phone protection
+    if (
+        kwargs["isRoot"]
+        or "user.everyone.phone_number_view" in perms
+        and "allow_phone_number" in data
+    ):
+        del protections[0]
+    if "allow_phone_number" in data:
+        del data["allow_phone_number"]
+
     # Get the content information based on the given page size and
     # page index
     results = UserAccess.get_users(**data)
