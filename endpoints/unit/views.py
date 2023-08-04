@@ -286,17 +286,17 @@ def get_all_units_endpoint(**kwargs):
             node["children"] = []
 
         # connect parent nodes with their children and find the root
-        root = None
+        roots = []
         for node in nodes:
             if node.info.parent:
-                parent_id = node.info["parent"]
+                parent_id = node.info['parent']
                 parent_node = id_to_node_dict[parent_id]
-                parent_node["children"].append(node.info)
+                parent_node['children'].append(node.info)
             else:
-                root = node.info
+                roots.append(node.info)
 
         # Return processed tree
-        return success_response(root)
+        return success_response(roots)
 
     # Sort and Format message
     results.message = [item.info for item in results.message]
