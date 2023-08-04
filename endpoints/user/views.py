@@ -256,7 +256,7 @@ def get_events_endpoint(**kwargs):
     result = result.message.info
 
     # Check if the user is admin
-    isAdmin = config.rootPermissionString in result.permissions
+    isAdmin = config.root_permission_string in result.permissions
 
     # If the user is an admin, get all of the unit IDs
     units = result.units
@@ -323,7 +323,7 @@ def get_notifications_endpoint(**kwargs):
     result = result.message.info
 
     # Check if the user is admin
-    isAdmin = config.rootPermissionString in result.permissions
+    isAdmin = config.root_permission_string in result.permissions
 
     # If the user is an admin, get all of the unit IDs
     units = result.units
@@ -449,7 +449,7 @@ def get_users_units_endpoint(**kwargs):
     user = UserAccess.get_user(id).message.info
 
     # Check if the user is a root user
-    if config.rootPermissionString in user.permissions:
+    if config.root_permission_string in user.permissions:
         # Get all of the units
         results = UnitAccess.get_all_units(page_size=3000, page_index=0)
 
@@ -462,7 +462,7 @@ def get_users_units_endpoint(**kwargs):
         results = sorted(
             results,
             key=lambda x: (
-                config.unitTypes.index(x["unit_type"]),
+                config.unit_types.index(x["unit_type"]),
                 x["name"],
             ),
         )
@@ -515,7 +515,7 @@ def get_users_units_endpoint(**kwargs):
     results = sorted(
         list(filtered),
         key=lambda x: (
-            config.unitTypes.index(x["unit_type"]),
+            config.unit_types.index(x["unit_type"]),
             x["name"],
         ),
     )

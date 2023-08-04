@@ -15,6 +15,7 @@ from . import (
     update_unit,
     update_frontpage,
     get_unit_info,
+    get_unit_types,
     get_all_units,
     get_all_officers,
     get_all_members,
@@ -239,6 +240,15 @@ def get_unit_info_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
+@get_unit_types.route("/get_unit_types/", methods=["GET"])
+@jwt_required()
+@error_handler
+def get_unit_types_endpoint(**kwargs):
+    """Return the unit types"""
+    # Return content
+    return success_response(config.unit_types)
+
+
 @get_all_units.route("/get_all_units/", methods=["POST"])
 @param_check(ARGS.unit.get_all_units)
 @jwt_required()
@@ -292,7 +302,7 @@ def get_all_units_endpoint(**kwargs):
     results.message = [item.info for item in results.message]
     results.message = sorted(
         results.message,
-        key=lambda x: (config.unitTypes.index(x["unit_type"]), x["name"]),
+        key=lambda x: (config.unit_types.index(x["unit_type"]), x["name"]),
     )
 
     # Return the content of the information

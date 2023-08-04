@@ -40,6 +40,7 @@ from endpoints.unit import (
     update_unit,
     update_frontpage,
     get_unit_info,
+    get_unit_types,
     get_all_units,
     get_all_officers,
     get_all_members,
@@ -104,10 +105,10 @@ CORS(app, methods=["POST", "GET"])
 # Initialize JWT functionalities
 app.config["JWT_SECRET_KEY"] = config.JWT.secret
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
-    hours=config.JWT.accessExpiry
+    hours=config.JWT.access_expiry
 )
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
-    hours=config.JWT.refreshExpiry
+    hours=config.JWT.refresh_expiry
 )
 jwt = JWTManager(app)
 
@@ -174,6 +175,7 @@ app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
+app.register_blueprint(get_unit_types, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")

@@ -54,7 +54,7 @@ def is_root(func: object) -> object:
         user_permissions = set(user.message.info.permissions)
 
         # Check if the user has root key
-        root = config.rootPermissionString in user_permissions
+        root = config.root_permission_string in user_permissions
 
         # Return the function with information provided
         return func(*args, **kwargs, isRoot=root, id=id)
@@ -67,7 +67,7 @@ def permissions_required(required_permissions: List[str]) -> object:
     """Function to decorate endpoints with needed permissions"""
 
     # Modify required_permission so that the root permission key is included
-    required_permissions.insert(0, config.rootPermissionString)
+    required_permissions.insert(0, config.root_permission_string)
 
     def decorator(func: object) -> object:
         """Decorator definition for this functionality"""
