@@ -249,6 +249,12 @@ def get_all_units_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Check if the body also has a tree attribute format
+    tree_format = False
+    if "tree_format" in data:
+        tree_format = data["tree_format"]
+        del data["tree_format"]
+
     # Get the content information based on the given page size and
     # page index
     results = UnitAccess.get_all_units(**data)
@@ -256,6 +262,31 @@ def get_all_units_endpoint(**kwargs):
     # If the resulting information is in error, respond with error
     if results.status == "error":
         return client_error_response(results.message)
+
+    # Respond with a tree format if the tree_format was wanted
+    if tree_format:
+        # Extract result
+        nodes = results.message
+
+        # Sort the nodes
+        id_to_node_dict = {node.info._id: node.info for node in nodes}
+
+        # set children key for all nodes
+        for node in id_to_node_dict.values():
+            node["children"] = []
+
+        # connect parent nodes with their children and find the root
+        root = None
+        for node in nodes:
+            if node.info.parent:
+                parent_id = node.info["parent"]
+                parent_node = id_to_node_dict[parent_id]
+                parent_node["children"].append(node.info)
+            else:
+                root = node.info
+
+        # Return processed tree
+        return success_response(root)
 
     # Sort and Format message
     results.message = [item.info for item in results.message]
