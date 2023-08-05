@@ -28,10 +28,10 @@ class UnitAccess(DataAccessBase):
 
         # If the inputted type is an approved type, return with an
         # error message
-        if unit_type not in config.unitTypes:
+        if unit_type not in config.unit_types:
             return DataAccessBase.sendError(
                 "Unit type is not a valid type. \nSelect from: "
-                + ", ".join(config.unitTypes)
+                + ", ".join(config.unit_types)
             )
 
         # Prep data to be inserted
@@ -41,7 +41,6 @@ class UnitAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["frontpage"] = ""
-        data["events"] = []
 
         # Insert into the collection
         DataAccessBase.UNIT_COL.insert_one(data)
@@ -161,11 +160,11 @@ class UnitAccess(DataAccessBase):
         # validity
         if (
             "unit_type" in kwargs
-            and kwargs["unit_type"] not in config.unitTypes
+            and kwargs["unit_type"] not in config.unit_types
         ):
             return DataAccessBase.sendError(
                 "Unit type is not a valid type. \nSelect from: "
-                + ", ".join(config.unitTypes)
+                + ", ".join(config.unit_types)
             )
 
         # Update the document and return a success message
@@ -261,7 +260,7 @@ class UnitAccess(DataAccessBase):
         units = sorted(
             units,
             key=lambda x: (
-                config.unitTypes.index(x["unit_type"]),
+                config.unit_types.index(x["unit_type"]),
                 x["name"],
             ),
             reverse=True

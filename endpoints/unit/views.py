@@ -15,6 +15,7 @@ from . import (
     update_unit,
     update_frontpage,
     get_unit_info,
+    get_unit_types,
     get_all_units,
     get_all_officers,
     get_all_members,
@@ -239,6 +240,15 @@ def get_unit_info_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
+@get_unit_types.route("/get_unit_types/", methods=["GET"])
+@jwt_required()
+@error_handler
+def get_unit_types_endpoint(**kwargs):
+    """Return the unit types"""
+    # Return content
+    return success_response(config.unit_types)
+
+
 @get_all_units.route("/get_all_units/", methods=["POST"])
 @param_check(ARGS.unit.get_all_units)
 @jwt_required()
@@ -249,6 +259,12 @@ def get_all_units_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Check if the body also has a tree attribute format
+    tree_format = False
+    if "tree_format" in data:
+        tree_format = data["tree_format"]
+        del data["tree_format"]
+
     # Get the content information based on the given page size and
     # page index
     results = UnitAccess.get_all_units(**data)
@@ -257,11 +273,36 @@ def get_all_units_endpoint(**kwargs):
     if results.status == "error":
         return client_error_response(results.message)
 
+    # Respond with a tree format if the tree_format was wanted
+    if tree_format:
+        # Extract result
+        nodes = results.message
+
+        # Sort the nodes
+        id_to_node_dict = {node.info._id: node.info for node in nodes}
+
+        # set children key for all nodes
+        for node in id_to_node_dict.values():
+            node["children"] = []
+
+        # connect parent nodes with their children and find the root
+        roots = []
+        for node in nodes:
+            if node.info.parent:
+                parent_id = node.info["parent"]
+                parent_node = id_to_node_dict[parent_id]
+                parent_node["children"].append(node.info)
+            else:
+                roots.append(node.info)
+
+        # Return processed tree
+        return success_response(roots)
+
     # Sort and Format message
     results.message = [item.info for item in results.message]
     results.message = sorted(
         results.message,
-        key=lambda x: (config.unitTypes.index(x["unit_type"]), x["name"]),
+        key=lambda x: (config.unit_types.index(x["unit_type"]), x["name"]),
     )
 
     # Return the content of the information
@@ -295,26 +336,34 @@ def get_all_members_endpoint(**kwargs):
     units = UnitAccess.get_units_below(user.units).message
     units = [item._id for item in units]
 
-    # Check if the user is rooted or is officer of the unit
-    if (
-        kwargs["isRoot"]
-        or kwargs["id"] in unit.officers
-        or kwargs["id"] in unit.members
-        or unit._id in units
-    ):
-        # Get the list of members in the unit
-        members = [
-            UserAccess.get_user(member).message.get_generic_info(
-                other_protections=["units", "permissions"]
-            )
-            for member in unit.members
-        ]
+    # # Check if the user is rooted or is officer of the unit
+    # if (
+    #     kwargs["isRoot"]
+    #     or kwargs["id"] in unit.officers
+    #     or kwargs["id"] in unit.members
+    #     or unit._id in units
+    # ):
+    #     # Get the list of members in the unit
+    #     members = [
+    #         UserAccess.get_user(member).message.get_generic_info(
+    #             other_protections=["units", "permissions"]
+    #         )
+    #         for member in unit.members
+    #     ]
 
-        # Return information
-        return success_response(members)
+    #     # Return information
+    #     return success_response(members)
 
-    # Return error if not
-    return client_error_response("You don't have access to this information")
+    # Get the list of members in the unit
+    members = [
+        UserAccess.get_user(member).message.get_generic_info(
+            other_protections=["units", "permissions"]
+        )
+        for member in unit.members
+    ]
+
+    # Return information
+    return success_response(members)
 
 
 @get_all_officers.route("/get_all_officers/", methods=["POST"])
@@ -344,26 +393,34 @@ def get_all_officers_endpoint(**kwargs):
     units = UnitAccess.get_units_below(user.units).message
     units = [item._id for item in units]
 
-    # Check if the user is rooted or is officer of the unit
-    if (
-        kwargs["isRoot"]
-        or kwargs["id"] in unit.officers
-        or kwargs["id"] in unit.members
-        or unit._id in units
-    ):
-        # Get the list of members in the unit
-        officers = [
-            UserAccess.get_user(member).message.get_generic_info(
-                other_protections=["units", "permissions"]
-            )
-            for member in unit.officers
-        ]
+    # # Check if the user is rooted or is officer of the unit
+    # if (
+    #     kwargs["isRoot"]
+    #     or kwargs["id"] in unit.officers
+    #     or kwargs["id"] in unit.members
+    #     or unit._id in units
+    # ):
+    #     # Get the list of members in the unit
+    #     officers = [
+    #         UserAccess.get_user(member).message.get_generic_info(
+    #             other_protections=["units", "permissions"]
+    #         )
+    #         for member in unit.officers
+    #     ]
 
-        # Return information
-        return success_response(officers)
+    #     # Return information
+    #     return success_response(officers)
 
-    # Return error if not
-    return client_error_response("You don't have access to this information")
+    # Get the list of members in the unit
+    officers = [
+        UserAccess.get_user(member).message.get_generic_info(
+            other_protections=["units", "permissions"]
+        )
+        for member in unit.officers
+    ]
+
+    # Return information
+    return success_response(officers)
 
 
 @is_superior_officer.route("/is_superior_officer/", methods=["POST"])
@@ -526,6 +583,38 @@ def update_unit_endpoint(**kwargs):
 
     # Parse information from the call's body
     data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user specified the parent class
+    if "parent" in data:
+        # Get the unit in question
+        new_unit = UnitAccess.get_unit(data["parent"])
+        if new_unit.status == "error":
+            return client_error_response("The new parent unit doesn't exist")
+        new_unit = new_unit.message
+
+        # Get the old parent unit and update it
+        old_unit = UnitAccess.get_unit(unit.parent)
+        if old_unit.status == "success":
+            old_unit = old_unit.message
+            old_unit.delete_child(unit._id)
+            UnitAccess.update_unit(old_unit.info._id, **old_unit.info)
+
+        # Update the new parent unit
+        new_unit.add_child(unit._id)
+        UnitAccess.update_unit(new_unit.info._id, **new_unit.info)
+
+    # Prevent certain attributes
+    if "children" in data or "members" in data or "officers" in data:
+        return client_error_response(
+            'You cannot change the "children", '
+            + '"members", or "officers" attributes'
+        )
 
     # Get the id of the target unit
     id = data.pop("id")

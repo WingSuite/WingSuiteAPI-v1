@@ -1,5 +1,6 @@
 # Import the test blueprint
 from endpoints.base import (
+    is_root,
     success_response,
     client_error_response,
     permissions_required,
@@ -18,6 +19,9 @@ from . import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    get_permissions_list,
+    update_permissions,
+    update_rank,
     delete_permissions,
 )
 from flask_jwt_extended import jwt_required, decode_token
@@ -30,6 +34,7 @@ from database.event import EventAccess
 from database.user import UserAccess
 from database.unit import UnitAccess
 from config.config import permissions, config
+import json
 
 #
 #   CREATE OPERATIONS
@@ -116,6 +121,7 @@ def who_am_i_endpoint(**kwargs):
 
 
 @everyone.route("/everyone/", methods=["POST"])
+@is_root
 @param_check(ARGS.user.everyone)
 @jwt_required()
 @error_handler
@@ -124,6 +130,32 @@ def everyone_endpoint(**kwargs):
 
     # Parse information from the call's body
     data = request.get_json()
+
+    # Get the user and their permissions
+    perms = UserAccess.get_user(id=kwargs["id"]).message.info.permissions
+
+    # Create protections for the result
+    protections = ["phone_number", "permissions"]
+
+    # If the user has the right perms, remove the permissions protection
+    if (
+        kwargs["isRoot"]
+        or "user.everyone.permission_view" in perms
+        and "allow_permissions" in data
+    ):
+        del protections[1]
+    if "allow_permissions" in data:
+        del data["allow_permissions"]
+
+    # If the user has the right perms, remove the phone protection
+    if (
+        kwargs["isRoot"]
+        or "user.everyone.phone_number_view" in perms
+        and "allow_phone_number" in data
+    ):
+        del protections[0]
+    if "allow_phone_number" in data:
+        del data["allow_phone_number"]
 
     # Get the content information based on the given page size and
     # page index
@@ -135,9 +167,7 @@ def everyone_endpoint(**kwargs):
 
     # Format message
     results.message = [
-        item.get_generic_info(
-            other_protections=["phone_number", "permissions"]
-        )
+        item.get_generic_info(other_protections=protections)
         for item in results.message
     ]
 
@@ -226,7 +256,7 @@ def get_events_endpoint(**kwargs):
     result = result.message.info
 
     # Check if the user is admin
-    isAdmin = config.rootPermissionString in result.permissions
+    isAdmin = config.root_permission_string in result.permissions
 
     # If the user is an admin, get all of the unit IDs
     units = result.units
@@ -293,7 +323,7 @@ def get_notifications_endpoint(**kwargs):
     result = result.message.info
 
     # Check if the user is admin
-    isAdmin = config.rootPermissionString in result.permissions
+    isAdmin = config.root_permission_string in result.permissions
 
     # If the user is an admin, get all of the unit IDs
     units = result.units
@@ -419,7 +449,7 @@ def get_users_units_endpoint(**kwargs):
     user = UserAccess.get_user(id).message.info
 
     # Check if the user is a root user
-    if config.rootPermissionString in user.permissions:
+    if config.root_permission_string in user.permissions:
         # Get all of the units
         results = UnitAccess.get_all_units(page_size=3000, page_index=0)
 
@@ -432,7 +462,7 @@ def get_users_units_endpoint(**kwargs):
         results = sorted(
             results,
             key=lambda x: (
-                config.unitTypes.index(x["unit_type"]),
+                config.unit_types.index(x["unit_type"]),
                 x["name"],
             ),
         )
@@ -485,13 +515,91 @@ def get_users_units_endpoint(**kwargs):
     results = sorted(
         list(filtered),
         key=lambda x: (
-            config.unitTypes.index(x["unit_type"]),
+            config.unit_types.index(x["unit_type"]),
             x["name"],
         ),
     )
 
     # Return results
     return success_response(results)
+
+
+@get_permissions_list.route("/get_permissions_list/", methods=["GET"])
+@permissions_required(["user.get_permissions_list"])
+@error_handler
+def get_permissions_list_endpoint(**kwargs):
+    """Returns the full list of permissions"""
+
+    # Get the permissions list
+    return success_response(json.load(open("./config/permissions.json")))
+
+
+#   endregion
+
+
+#
+#   UPDATE OPERATIONS
+#   region
+#
+
+
+@update_permissions.route("/update_permissions/", methods=["POST"])
+@permissions_required(["user.update_permissions"])
+@param_check(ARGS.user.update_permissions)
+@error_handler
+def update_permissions_endpoint(**kwargs):
+    """Method to handle the updating of permissions to the user"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # Overwrite permission list
+    user.info.permissions = data["permissions"]
+
+    # Push changes to collection
+    result = UserAccess.update_user(data["id"], **user.info)
+
+    # Return result
+    return result, (200 if result.status == "success" else 400)
+
+
+@update_rank.route("/update_rank/", methods=["POST"])
+@permissions_required(["user.update_rank"])
+@param_check(ARGS.user.update_rank)
+@error_handler
+def update_rank_endpoint(**kwargs):
+    """Update a selected user's rank"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(data["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # Update the user's info
+    result = UserAccess.update_user(id=data["id"], rank=data["rank"])
+
+    # Return result
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

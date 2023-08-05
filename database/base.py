@@ -23,6 +23,7 @@ class DataAccessBase:
     BLACKLIST_COL = DB["jwtBlacklist"]
     CURRENT_STATS_COL = DB["currentStats"]
     NOTIFICATION_COL = DB["notifications"]
+    FORMER_USERS_COL = DB["formerUsers"]
 
     # Set config constants
     CONFIG = config

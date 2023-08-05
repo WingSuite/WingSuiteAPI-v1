@@ -1,10 +1,17 @@
 [
     "*",
 
+    "auth.get_register_requests",
     "auth.authorize_user",
     "auth.reject_user",
+    "auth.kick_user",
 
     "user.add_permissions",
+    "user.everyone.permission_view",
+    "user.everyone.phone_number_view",
+    "user.get_permissions_list",
+    "user.update_permissions",
+    "user.update_rank",
     "user.delete_permissions",
 
     "unit.create_unit",

@@ -10,10 +10,12 @@ from database.base import DataAccessBase
 from endpoints.authentication import (
     register,
     login,
+    get_register_requests,
     refresh,
     authorize,
     signout,
     reject,
+    kick_user
 )
 from endpoints.user import (
     add_permissions,
@@ -26,6 +28,9 @@ from endpoints.user import (
     get_pfa_data,
     get_warrior_data,
     get_users_units,
+    get_permissions_list,
+    update_permissions,
+    update_rank,
     delete_permissions,
 )
 from endpoints.unit import (
@@ -35,6 +40,7 @@ from endpoints.unit import (
     update_unit,
     update_frontpage,
     get_unit_info,
+    get_unit_types,
     get_all_units,
     get_all_officers,
     get_all_members,
@@ -99,10 +105,10 @@ CORS(app, methods=["POST", "GET"])
 # Initialize JWT functionalities
 app.config["JWT_SECRET_KEY"] = config.JWT.secret
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
-    hours=config.JWT.accessExpiry
+    hours=config.JWT.access_expiry
 )
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
-    hours=config.JWT.refreshExpiry
+    hours=config.JWT.refresh_expiry
 )
 jwt = JWTManager(app)
 
@@ -141,10 +147,12 @@ ROUTE HANDLING
 # Authentication routes
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(login, url_prefix="/auth/")
+app.register_blueprint(get_register_requests, url_prefix="/auth/")
 app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
+app.register_blueprint(kick_user, url_prefix="/auth/")
 
 # User routes
 app.register_blueprint(add_permissions, url_prefix="/user/")
@@ -157,6 +165,9 @@ app.register_blueprint(get_notifications, url_prefix="/user/")
 app.register_blueprint(get_pfa_data, url_prefix="/user/")
 app.register_blueprint(get_warrior_data, url_prefix="/user/")
 app.register_blueprint(get_users_units, url_prefix="/user/")
+app.register_blueprint(get_permissions_list, url_prefix="/user/")
+app.register_blueprint(update_permissions, url_prefix="/user/")
+app.register_blueprint(update_rank, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 
 # Unit routes
@@ -164,6 +175,7 @@ app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
+app.register_blueprint(get_unit_types, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
