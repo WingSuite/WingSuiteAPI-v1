@@ -584,6 +584,38 @@ def update_unit_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return unit
+    unit = unit.message.info
+
+    # Check if the user specified the parent class
+    if "parent" in data:
+        # Get the unit in question
+        new_unit = UnitAccess.get_unit(data["parent"])
+        if new_unit.status == "error":
+            return client_error_response("The new parent unit doesn't exist")
+        new_unit = new_unit.message
+
+        # Get the old parent unit and update it
+        old_unit = UnitAccess.get_unit(unit.parent)
+        if old_unit.status == "success":
+            old_unit = old_unit.message
+            old_unit.delete_child(unit._id)
+            UnitAccess.update_unit(old_unit.info._id, **old_unit.info)
+
+        # Update the new parent unit
+        new_unit.add_child(unit._id)
+        UnitAccess.update_unit(new_unit.info._id, **new_unit.info)
+
+    # Prevent certain attributes
+    if "children" in data or "members" in data or "officers" in data:
+        return client_error_response(
+            'You cannot change the "children", '
+            + '"members", or "officers" attributes'
+        )
+
     # Get the id of the target unit
     id = data.pop("id")
 

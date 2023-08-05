@@ -41,7 +41,6 @@ class UnitAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["frontpage"] = ""
-        data["events"] = []
 
         # Insert into the collection
         DataAccessBase.UNIT_COL.insert_one(data)
