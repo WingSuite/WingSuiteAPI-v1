@@ -251,7 +251,7 @@ if __name__ == "__main__":
     mode_type = int(args.mode)
     if mode_type == 0:
         print("Running API Server in DEVELOPMENT MODE")
-        app.run()
+        app.run(host="0.0.0.0", port=5000)
     # Check if the server is in production mode
     elif mode_type == 1:
         print("Running API Server in PRODUCTION MODE")
