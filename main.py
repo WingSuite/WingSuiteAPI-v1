@@ -141,6 +141,23 @@ def my_expired_token_callback(*kwargs):
     }, 401
 
 
+# Dry landing page
+@app.route("/")
+def home():
+    """Dry landing page"""
+    return """<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>DET 025 API</title>
+    </head>
+    <body>
+        <h1 style="font-size: 50px; text-align: center;">DET 025 API</h1>
+        <p style="text-align: center;">Contact Developer at b10@asu.edu</p>
+    </body>
+    </html>"""
+
+
 """
 ROUTE HANDLING
 """
