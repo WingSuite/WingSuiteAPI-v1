@@ -44,7 +44,7 @@ class UserAccess(DataAccessBase):
             del data["query"]
 
             # Hash and save the given password
-            password = sha256(password, DataAccessBase.CONFIG.database.spicer)
+            password = sha256(password, DataAccessBase.DB_SPECS.spicer)
             data["password"] = password
 
             # Insert user into the database and return success
@@ -84,7 +84,7 @@ class UserAccess(DataAccessBase):
         """
 
         # Hash and save the given password to kwargs
-        password = sha256(password, DataAccessBase.CONFIG.database.spicer)
+        password = sha256(password, DataAccessBase.DB_SPECS.spicer)
 
         # Get the user's information based on the given credentials
         query = {"email": email, "password": password}

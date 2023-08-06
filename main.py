@@ -6,9 +6,6 @@ from flask import Flask
 # Data Import
 from database.base import DataAccessBase
 
-# Argparse import
-import argparse
-
 # Endpoint Imports
 from endpoints.authentication import (
     register,
@@ -94,6 +91,7 @@ from endpoints.statistics.warrior import (
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
+import argparse
 
 """
 FLASK APP CONFIGURATION
