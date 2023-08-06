@@ -6,6 +6,9 @@ from flask import Flask
 # Data Import
 from database.base import DataAccessBase
 
+# Argparse import
+import argparse
+
 # Endpoint Imports
 from endpoints.authentication import (
     register,
@@ -15,7 +18,7 @@ from endpoints.authentication import (
     authorize,
     signout,
     reject,
-    kick_user
+    kick_user,
 )
 from endpoints.user import (
     add_permissions,
@@ -234,4 +237,26 @@ APP RUNTIME HANDLING
 
 # Main run thread
 if __name__ == "__main__":
-    app.run()
+    # Import waitress
+    from waitress import serve
+
+    # Get arguments from run line
+    parser = argparse.ArgumentParser(description="WingSuite API run script")
+    parser.add_argument(
+        "--mode", help="Run mode (0: Development, 1: Production)", default=0
+    )
+    args = parser.parse_args()
+
+    # Check if the server is in development mode
+    mode_type = int(args.mode)
+    if mode_type == 0:
+        print("Running API Server in DEVELOPMENT MODE")
+        app.run()
+    # Check if the server is in production mode
+    elif mode_type == 1:
+        print("Running API Server in PRODUCTION MODE")
+        serve(app, host="0.0.0.0", port=5000)
+    # If the mode value was not provided, exit with a message
+    else:
+        print("Invalid mode specification. Exiting...")
+        exit()
