@@ -3,22 +3,15 @@ from utils.dict_parse import DictParse
 from config.config import config
 from functools import wraps
 from typing import Any
-import argparse
 import pymongo
+import os
 
 
 class DataAccessBase:
     """Encapsulation of all database actions"""
 
-    # Get arguments from run line
-    parser = argparse.ArgumentParser(description="WingSuite API run script")
-    parser.add_argument(
-        "--mode", help="Run mode (0: Development, 1: Production)", default=0
-    )
-    args = parser.parse_args()
-
     # Get the different database configurations based on the run type
-    if int(args.mode) == 1:
+    if int(os.environ.get("RUN_MODE")) == 1:
         db_spec = config.database.production
     else:
         db_spec = config.database.development
@@ -26,8 +19,8 @@ class DataAccessBase:
     # Set MongoDB information based on the database specifications
     if db_spec.user != "" and db_spec.password != "":
         CLIENT = pymongo.MongoClient(
-            f"mongodb://{db_spec.user}:{db_spec.password}@{db_spec.domain}" +
-            f":{db_spec.port}/{db_spec.db}"
+            f"mongodb://{db_spec.user}:{db_spec.password}@{db_spec.domain}"
+            + f":{db_spec.port}/{db_spec.db}"
         )
         DB = CLIENT[db_spec.db]
     else:

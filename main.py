@@ -91,7 +91,7 @@ from endpoints.statistics.warrior import (
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
-import argparse
+import os
 
 """
 FLASK APP CONFIGURATION
@@ -255,15 +255,8 @@ if __name__ == "__main__":
     # Import waitress
     from waitress import serve
 
-    # Get arguments from run line
-    parser = argparse.ArgumentParser(description="WingSuite API run script")
-    parser.add_argument(
-        "--mode", help="Run mode (0: Development, 1: Production)", default=0
-    )
-    args = parser.parse_args()
-
     # Check if the server is in development mode
-    mode_type = int(args.mode)
+    mode_type = int(os.environ.get("RUN_MODE"))
     if mode_type == 0:
         print("Running API Server in DEVELOPMENT MODE")
         app.run(host="0.0.0.0", port=5000)
