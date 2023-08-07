@@ -152,8 +152,13 @@ def home():
         <title>DET 025 API</title>
     </head>
     <body>
-        <h1 style="font-size: 50px; text-align: center;">DET 025 API</h1>
-        <p style="text-align: center;">Contact Developer at b10@asu.edu</p>
+        <h1 style="font-size: 50px; text-align: center;">
+            Detachment 025 WingSuite API Server
+        </h1>
+        <p style="text-align: center;">
+            For any issues, please contact Benjamin Herrera via email at
+            b10@asu.edu
+        </p>
     </body>
     </html>"""
 
