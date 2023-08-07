@@ -592,12 +592,6 @@ def update_unit_endpoint(**kwargs):
 
     # Check if the user specified the parent class
     if "parent" in data:
-        # Get the unit in question
-        new_unit = UnitAccess.get_unit(data["parent"])
-        if new_unit.status == "error":
-            return client_error_response("The new parent unit doesn't exist")
-        new_unit = new_unit.message
-
         # Get the old parent unit and update it
         old_unit = UnitAccess.get_unit(unit.parent)
         if old_unit.status == "success":
@@ -605,9 +599,23 @@ def update_unit_endpoint(**kwargs):
             old_unit.delete_child(unit._id)
             UnitAccess.update_unit(old_unit.info._id, **old_unit.info)
 
-        # Update the new parent unit
-        new_unit.add_child(unit._id)
-        UnitAccess.update_unit(new_unit.info._id, **new_unit.info)
+        # If parent is empty, keep going forward
+        if data["parent"] == "":
+            pass
+
+        # If not, proceed
+        else:
+            # Get the unit in question
+            new_unit = UnitAccess.get_unit(data["parent"])
+            if new_unit.status == "error":
+                return client_error_response(
+                    "The new parent unit doesn't exist"
+                )
+            new_unit = new_unit.message
+
+            # Update the new parent unit
+            new_unit.add_child(unit._id)
+            UnitAccess.update_unit(new_unit.info._id, **new_unit.info)
 
     # Prevent certain attributes
     if "children" in data or "members" in data or "officers" in data:
