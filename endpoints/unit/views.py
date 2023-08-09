@@ -20,6 +20,7 @@ from . import (
     get_all_officers,
     get_all_members,
     is_superior_officer,
+    get_all_five_point_data,
     get_all_pfa_data,
     get_all_warrior_data,
     delete_unit,
@@ -30,6 +31,7 @@ from utils.permissions import isOfficerFromAbove
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
+from database.statistics.five_point import FivePointAccess
 from database.statistics.warrior import WarriorAccess
 from database.statistics.pfa import PFAAccess
 from database.unit import UnitAccess
@@ -444,6 +446,70 @@ def is_superior_officer_endpoint(**kwargs):
 
     # Return result
     return success_response(True) if res else client_error_response(False)
+
+
+@get_all_five_point_data.route("/get_all_five_point_data/", methods=["POST"])
+@is_root
+@permissions_required(["unit.get_all_five_point_data"])
+@param_check(ARGS.unit.get_all_five_point_data)
+@error_handler
+def get_all_five_point_data_endpoint(**kwargs):
+    """
+    Respond with a given unit's five point data for all its members and
+    officers
+    """
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return client_error_response(unit.message)
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
+
+    # Get a list of all units and their members below
+    below = UnitAccess.get_units_below([unit._id]).message
+
+    # Get all of the users' five point info and the mapping for the unit they
+    # are in
+    mapper = {}
+    memoize = set()
+    for item in below:
+        track = []
+        for user in item.members + item.officers:
+            if user in memoize:
+                continue
+            res = FivePointAccess.get_user_five_point(user, 10000, 0).message
+            for i in res:
+                i["full_name"] = UserAccess.get_user(
+                    i["to_user"]
+                ).message.info.full_name
+            memoize.add(user)
+            track += res
+        track = sorted(
+            track,
+            key=lambda x: x["composite_score"],
+            reverse=True,
+        )
+        mapper[item.name] = track
+
+    # Success return
+    return success_response(mapper)
 
 
 @get_all_pfa_data.route("/get_all_pfa_data/", methods=["POST"])
