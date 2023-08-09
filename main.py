@@ -15,7 +15,7 @@ from endpoints.authentication import (
     authorize,
     signout,
     reject,
-    kick_user
+    kick_user,
 )
 from endpoints.user import (
     add_permissions,
@@ -91,6 +91,7 @@ from endpoints.statistics.warrior import (
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
+import os
 
 """
 FLASK APP CONFIGURATION
@@ -138,6 +139,28 @@ def my_expired_token_callback(*kwargs):
         "status": "expired",
         "message": "Your access is expired",
     }, 401
+
+
+# Dry landing page
+@app.route("/")
+def home():
+    """Dry landing page"""
+    return """<!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>DET 025 API</title>
+    </head>
+    <body>
+        <h1 style="font-size: 50px; text-align: center;">
+            Detachment 025 WingSuite API Server
+        </h1>
+        <p style="text-align: center;">
+            For any issues, please contact Benjamin Herrera via email at
+            b10@asu.edu
+        </p>
+    </body>
+    </html>"""
 
 
 """
@@ -234,4 +257,19 @@ APP RUNTIME HANDLING
 
 # Main run thread
 if __name__ == "__main__":
-    app.run()
+    # Import waitress
+    from waitress import serve
+
+    # Check if the server is in development mode
+    mode_type = int(os.environ.get("RUN_MODE"))
+    if mode_type == 0:
+        print("Running API Server in DEVELOPMENT MODE")
+        app.run(host="0.0.0.0", port=5000)
+    # Check if the server is in production mode
+    elif mode_type == 1:
+        print("Running API Server in PRODUCTION MODE")
+        serve(app, host="0.0.0.0", port=5000)
+    # If the mode value was not provided, exit with a message
+    else:
+        print("Invalid mode specification. Exiting...")
+        exit()

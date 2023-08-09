@@ -4,16 +4,30 @@ from config.config import config
 from functools import wraps
 from typing import Any
 import pymongo
+import os
 
 
 class DataAccessBase:
     """Encapsulation of all database actions"""
 
-    # Get MongoDB information
-    CLIENT = pymongo.MongoClient(
-        f"mongodb://{config.database.domain}:{config.database.port}/"
-    )
-    DB = CLIENT[config.database.db]
+    # Get the different database configurations based on the run type
+    if int(os.environ.get("RUN_MODE")) == 1:
+        db_spec = config.database.production
+    else:
+        db_spec = config.database.development
+
+    # Set MongoDB information based on the database specifications
+    if db_spec.user != "" and db_spec.password != "":
+        CLIENT = pymongo.MongoClient(
+            f"mongodb://{db_spec.user}:{db_spec.password}@{db_spec.domain}"
+            + f":{db_spec.port}/{db_spec.db}"
+        )
+        DB = CLIENT[db_spec.db]
+    else:
+        CLIENT = pymongo.MongoClient(
+            f"mongodb://{db_spec.domain}:{db_spec.port}/"
+        )
+        DB = CLIENT[db_spec.db]
 
     # Collection constant definition
     USER_COL = DB["users"]
@@ -26,6 +40,7 @@ class DataAccessBase:
     FORMER_USERS_COL = DB["formerUsers"]
 
     # Set config constants
+    DB_SPECS = db_spec
     CONFIG = config
 
     def sendError(message: str, **kwargs: Any) -> dict:

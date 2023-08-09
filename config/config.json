@@ -1,9 +1,21 @@
 {
   "database": {
-    "spicer": "Bruh",
-    "domain": "localhost",
-    "port": "27018",
-    "db": "Det025"
+    "development": {
+      "spicer": "Bruh",
+      "user": "",
+      "password": "",
+      "domain": "localhost",
+      "port": "27018",
+      "db": "Det025"
+    },
+    "production": {
+      "spicer": "Bruh",
+      "user": "APIServer",
+      "password": "!*KaedeharaKazuha$2",
+      "domain": "158.69.154.151",
+      "port": "27018",
+      "db": "Det025"
+    }
   },
   "JWT": {
     "secret": "C4nW3G3tMuchH1gh3rS0H1gh",
