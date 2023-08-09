@@ -17,7 +17,10 @@ from endpoints.authentication import (
     reject,
     kick_user,
 )
-from endpoints.communications import send_unit_discord_message
+from endpoints.communications import (
+    send_user_email_message,
+    send_unit_discord_message,
+)
 from endpoints.user import (
     add_permissions,
     who_am_i,
@@ -179,6 +182,7 @@ app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(kick_user, url_prefix="/auth/")
 
 # Communication routes
+app.register_blueprint(send_user_email_message, url_prefix="/communications/")
 app.register_blueprint(
     send_unit_discord_message, url_prefix="/communications/"
 )

@@ -8,9 +8,11 @@ from endpoints.base import (  # noqa
     error_handler,
     ARGS,
 )
-from . import send_email, send_unit_discord_message  # noqa
+from . import send_user_email_message, send_unit_discord_message
 from utils.communications.discord import send_discord_message_to_channel
+from utils.communications.email import send_email
 from database.unit import UnitAccess
+from database.user import UserAccess
 from flask_jwt_extended import jwt_required, decode_token  # noqa
 from flask import request
 from config.config import permissions, config  # noqa
@@ -19,6 +21,35 @@ from config.config import permissions, config  # noqa
 #   CREATE OPERATIONS
 #   region
 #
+
+
+@send_user_email_message.route("/send_user_email_message/", methods=["POST"])
+@permissions_required(["communications.send_user_email_message"])
+@param_check(ARGS.communications.send_user_email_message)
+@error_handler
+def send_user_email_message_endpoint(**kwargs):
+    """Send email to a user based on given title and message"""
+
+    # Extract body data
+    data = request.get_json()
+
+    # Get the user's email
+    user = UserAccess.get_user(data["id"])
+    if user.status == "error":
+        return user, 400
+    email = user.message.info.email
+
+    # Send email
+    result = send_email(
+        receiver=email, subject=data["title"], content=data["message"]
+    )
+
+    # Return response information
+    return (
+        success_response("Email sent")
+        if result
+        else client_error_response("Email was unable to be sent")
+    )
 
 
 @send_unit_discord_message.route(
@@ -55,7 +86,7 @@ def send_unit_discord_message_endpoint(**kwargs):
     return (
         success_response("Message sent")
         if result
-        else client_error_response("Message unable to be sent")
+        else client_error_response("Message was unable to be sent")
     )
 
 

@@ -35,6 +35,7 @@
     "notification.update_notification",
     "notification.delete_notification",
 
+    "communications.send_user_email_message",
     "communications.send_unit_discord_message",
 
     "statistic.feedback.create_feedback",

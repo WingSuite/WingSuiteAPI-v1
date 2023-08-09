@@ -1,5 +1,4 @@
 # Imports
-from config.config import config
 import requests
 
 
@@ -22,7 +21,7 @@ def send_discord_message_to_channel(
 
         # Set a custom username and avatar for the webhook
         data = {
-            "username": f"{config.organization_name} Messaging System",
+            "username": "WingSuite Messaging System",
             "avatar_url": image,
             "embeds": [embed],
         }

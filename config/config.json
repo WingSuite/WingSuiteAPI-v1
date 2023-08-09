@@ -37,5 +37,12 @@
     "team",
     "wingmen"
   ],
-  "organization_name": "Detachment 025"
+  "organization_name": "Detachment 025",
+  "discord_embed_color": "0x54C0FF",
+  "email": {
+    "sender_email": "system@det025.us",
+    "smtp_server": "mail.privateemail.com",
+    "smtp_port": 465,
+    "password": "?>Arataki!Itto?*2"
+  }
 }

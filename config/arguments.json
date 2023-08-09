@@ -27,6 +27,7 @@
       }
     },
     "communications": {
+      "send_user_email_message": ["id", "title", "message"],
       "send_unit_discord_message": ["id", "title", "message"]
     },
     "notification": {
