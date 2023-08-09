@@ -26,6 +26,11 @@ class PFA:
         self.info.composite_score = self.calculate_composite()
 
     @staticmethod
+    def get_metric_name() -> str:
+        """Return metric name"""
+        return "PFA"
+
+    @staticmethod
     def get_scoring_ids() -> List:
         """Return composite score and subscore ids"""
         return ["composite_score", "pushup", "situp", "run"]
@@ -44,6 +49,16 @@ class PFA:
     def get_scoring_formatted() -> List:
         """Return composite score and subscore ids, formatted"""
         return ["Composite Score", "Push-Ups", "Sit-Ups", "1.5 Mile Run"]
+
+    @staticmethod
+    def get_scoring_domains() -> dict:
+        """Return composite score and subscore ids' domain range"""
+        return {
+            "composite_score": [0, 100],
+            "pushup": [0, 80],
+            "situp": [0, 80],
+            "run": [480, 900],
+        }
 
     @staticmethod
     def get_info_ids() -> List:

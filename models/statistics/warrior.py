@@ -22,6 +22,11 @@ class Warrior:
         self.info = DictParse(kwargs)
 
     @staticmethod
+    def get_metric_name() -> str:
+        """Return metric name"""
+        return "Warrior Knowledge"
+
+    @staticmethod
     def get_scoring_ids() -> List:
         """Return composite score and subscore ids"""
         return ["composite_score"]
@@ -40,6 +45,11 @@ class Warrior:
     def get_scoring_formatted() -> List:
         """Return composite score and subscore ids, formatted"""
         return ["Composite Score"]
+
+    @staticmethod
+    def get_scoring_domains() -> dict:
+        """Return composite score and subscore ids' domain range"""
+        return {"composite_score": [0, 100]}
 
     @staticmethod
     def get_info_ids() -> List:

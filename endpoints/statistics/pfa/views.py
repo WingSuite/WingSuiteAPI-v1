@@ -130,10 +130,12 @@ def get_pfa_format_info_endpoint(**kwargs):
 
     # Develop message
     message = {
+        "metric_name": PFA.get_metric_name(),
         "scoring_ids": PFA.get_scoring_ids(),
         "scoring_type": PFA.get_scoring_type(),
         "scoring_options": PFA.get_scoring_options(),
         "scoring_formatted": PFA.get_scoring_formatted(),
+        "scoring_domains": PFA.get_scoring_domains(),
         "info_ids": PFA.get_info_ids(),
         "info_type": PFA.get_info_type(),
         "info_options": PFA.get_info_options(),

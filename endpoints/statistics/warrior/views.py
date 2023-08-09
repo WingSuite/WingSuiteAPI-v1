@@ -128,10 +128,12 @@ def get_pfa_format_info_endpoint(**kwargs):
 
     # Develop message
     message = {
+        "metric_name": Warrior.get_metric_name(),
         "scoring_ids": Warrior.get_scoring_ids(),
         "scoring_type": Warrior.get_scoring_type(),
         "scoring_options": Warrior.get_scoring_options(),
         "scoring_formatted": Warrior.get_scoring_formatted(),
+        "scoring_domains": Warrior.get_scoring_domains(),
         "info_ids": Warrior.get_info_ids(),
         "info_type": Warrior.get_info_type(),
         "info_options": Warrior.get_info_options(),

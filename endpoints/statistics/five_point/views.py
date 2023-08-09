@@ -132,10 +132,12 @@ def get_five_point_format_info_endpoint(**kwargs):
 
     # Develop message
     message = {
+        "metric_name": FivePoint.get_metric_name(),
         "scoring_ids": FivePoint.get_scoring_ids(),
         "scoring_type": FivePoint.get_scoring_type(),
         "scoring_options": FivePoint.get_scoring_options(),
         "scoring_formatted": FivePoint.get_scoring_formatted(),
+        "scoring_domains": FivePoint.get_scoring_domains(),
         "info_ids": FivePoint.get_info_ids(),
         "info_type": FivePoint.get_info_type(),
         "info_options": FivePoint.get_info_options(),

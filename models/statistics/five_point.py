@@ -26,6 +26,11 @@ class FivePoint:
         self.info.composite_score = sum(subscores.values()) / len(subscores)
 
     @staticmethod
+    def get_metric_name() -> str:
+        """Return metric name"""
+        return "Five Point Evaluation"
+
+    @staticmethod
     def get_scoring_ids() -> List:
         """Return composite score and subscore ids"""
         return [
@@ -71,6 +76,18 @@ class FivePoint:
             "Category 4",
             "Category 5",
         ]
+
+    @staticmethod
+    def get_scoring_domains() -> dict:
+        """Return composite score and subscore ids' domain range"""
+        return {
+            "composite_score": [0, 5],
+            "category_1": [0, 5],
+            "category_2": [0, 5],
+            "category_3": [0, 5],
+            "category_4": [0, 5],
+            "category_5": [0, 5],
+        }
 
     @staticmethod
     def get_info_ids() -> List:
