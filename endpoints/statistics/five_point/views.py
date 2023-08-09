@@ -211,6 +211,8 @@ def update_five_point_endpoint(**kwargs):
             if i in data["subscores"]:
                 if types[idx] == "number":
                     five_point.subscores[i] = float(data["subscores"][i])
+                elif types[idx] == "selection":
+                    five_point.subscores[i] = data["subscores"][i]
                 elif types[idx] == "time":
                     five_point.subscores[i] = str(data["subscores"][i])
 

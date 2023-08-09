@@ -36,11 +36,11 @@ class FivePointAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
         data["subscores"] = {
-            "category_1": category_1,
-            "category_2": category_2,
-            "category_3": category_3,
-            "category_4": category_4,
-            "category_5": category_5,
+            "category_1": int(category_1),
+            "category_2": int(category_2),
+            "category_3": int(category_3),
+            "category_4": int(category_4),
+            "category_5": int(category_5),
         }
         data["info"] = {}
 

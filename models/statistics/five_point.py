@@ -40,12 +40,25 @@ class FivePoint:
     @staticmethod
     def get_scoring_type() -> List:
         """Return composite score and subscore datatypes"""
-        return ["number", "number", "number", "number", "number", "number"]
+        return [
+            "number",
+            "selection",
+            "selection",
+            "selection",
+            "selection",
+            "selection",
+        ]
 
     @staticmethod
     def get_scoring_options() -> dict:
         """Return a list of option for the composite and subscore"""
-        return {}
+        return {
+            "category_1": [0, 1, 2, 3, 4, 5],
+            "category_2": [0, 1, 2, 3, 4, 5],
+            "category_3": [0, 1, 2, 3, 4, 5],
+            "category_4": [0, 1, 2, 3, 4, 5],
+            "category_5": [0, 1, 2, 3, 4, 5],
+        }
 
     @staticmethod
     def get_scoring_formatted() -> List:
