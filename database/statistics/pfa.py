@@ -68,6 +68,8 @@ class PFAAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def get_pfa(id: str) -> DictParse:
+        """Get PFA based on PFA ID"""
+
         # Search the collection based on id
         pfa = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
 
@@ -171,7 +173,7 @@ class PFAAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def update_pfa(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a PFA"""
+        """Method to update a PFA"""
 
         # Check if the PFA based on its id does exist
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:

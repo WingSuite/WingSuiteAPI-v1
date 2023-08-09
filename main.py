@@ -73,6 +73,15 @@ from endpoints.statistics.feedback import (
     update_feedback,
     delete_feedback,
 )
+from endpoints.statistics.five_point import (
+    create_five_point,
+    get_five_point_info,
+    get_user_five_point_info,
+    get_five_point_format_info,
+    get_test_five_point_score,
+    update_five_point,
+    delete_five_point,
+)
 from endpoints.statistics.pfa import (
     create_pfa,
     get_pfa_info,
@@ -238,6 +247,23 @@ app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
+
+# Statistic Five Point Evaluation routes
+app.register_blueprint(create_five_point, url_prefix="/statistic/five_point/")
+app.register_blueprint(
+    get_five_point_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_user_five_point_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_five_point_format_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_test_five_point_score, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(update_five_point, url_prefix="/statistic/five_point/")
+app.register_blueprint(delete_five_point, url_prefix="/statistic/five_point/")
 
 # Statistic PFA routes
 app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")

@@ -43,6 +43,12 @@
     "statistic.feedback.update_feedback",
     "statistic.feedback.delete_feedback",
 
+    "statistic.five_point.create_five_point",
+    "statistic.five_point.get_five_point_info",
+    "statistic.five_point.get_user_five_point_info",
+    "statistic.five_point.update_five_point",
+    "statistic.five_point.delete_five_point",
+
     "statistic.pfa.create_pfa",
     "statistic.pfa.get_pfa_info",
     "statistic.pfa.get_user_pfa_info",
