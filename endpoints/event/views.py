@@ -33,7 +33,7 @@ def create_event_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["unit"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -163,7 +163,7 @@ def delete_event_endpoint(**kwargs):
     # Get the unit object of the target unit
     unit = UnitAccess.get_unit(event.message.info.unit)
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit

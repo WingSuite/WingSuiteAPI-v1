@@ -49,7 +49,7 @@ def _update_personnel_helper(id, users, operation, participation):
     # If content is not in result of getting the unit, return the
     # error message
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Get the content from the unit fetch
     unit = unit.message
@@ -150,7 +150,7 @@ def add_members_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -185,7 +185,7 @@ def add_officers_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -324,7 +324,7 @@ def get_all_members_endpoint(**kwargs):
 
     # Check if the unit exists
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Extract unit information
     unit = unit.message.info
@@ -381,7 +381,7 @@ def get_all_officers_endpoint(**kwargs):
 
     # Check if the unit exists
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Extract unit information
     unit = unit.message.info
@@ -436,7 +436,7 @@ def is_superior_officer_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -587,7 +587,7 @@ def update_unit_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user specified the parent class
@@ -648,7 +648,7 @@ def update_frontpage_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -715,7 +715,7 @@ def delete_members_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -750,7 +750,7 @@ def delete_officers_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit

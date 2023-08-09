@@ -58,7 +58,7 @@ def add_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -559,7 +559,7 @@ def update_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -590,7 +590,7 @@ def update_rank_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -625,7 +625,7 @@ def delete_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message

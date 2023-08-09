@@ -26,6 +26,9 @@
         "delete_warrior": ["id"]
       }
     },
+    "communications": {
+      "send_unit_discord_message": ["id", "title", "message"]
+    },
     "notification": {
       "create_notification": ["name", "unit", "notification"],
       "get_notification_info": ["id"],

@@ -208,7 +208,7 @@ def kick_user_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message.info
