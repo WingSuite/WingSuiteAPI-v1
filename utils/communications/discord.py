@@ -3,7 +3,7 @@ import requests
 
 
 def send_discord_message_to_channel(
-    url: str, title: str, message: str
+    url: str, title: str, message: str, emoji: str = "🔔"
 ) -> bool:
     """Sends a Discord embedded message with org name and icon"""
 
@@ -11,6 +11,9 @@ def send_discord_message_to_channel(
     try:
         # Define image url
         image = "https://avatars.githubusercontent.com/u/134102646?s=200&v=4"
+
+        # Define bot name
+        emoji = emoji + ' ' if emoji else ''
 
         # Define the content of the embedded message
         embed = {
@@ -21,7 +24,7 @@ def send_discord_message_to_channel(
 
         # Set a custom username and avatar for the webhook
         data = {
-            "username": "WingSuite Messaging System",
+            "username": f"{emoji}WingSuite",
             "avatar_url": image,
             "embeds": [embed],
         }
