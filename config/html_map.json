@@ -1,5 +1,3 @@
 {
-    "statistic": {
-        "feedback": "./messages/html/statistic/feedback.html"
-    }
+    "statistic.feedback": "./messages/html/statistic/feedback.html"
 }

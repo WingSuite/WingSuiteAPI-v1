@@ -16,10 +16,12 @@ def send_email(
     # Try
     try:
         # Create the message
-        emoji = emoji + ' ' if emoji else ''
+        emoji = emoji + " " if emoji else ""
         message = EmailMessage()
-        message["Subject"] = subject
-        message["From"] = f"{emoji}WingSuite <{config.email.sender_email}>"
+        message["Subject"] = "NOTIFICATION // " + subject
+        message["From"] = (
+            f"{emoji}‎ WingSuite" + f" <{config.email.sender_email}>"
+        )
         message["To"] = receiver
         message.set_content(content)
 
