@@ -13,11 +13,15 @@ from . import (
     update_notification,
     delete_notification,
 )
+from utils.communications.email import send_email
 from utils.permissions import isOfficerFromAbove
+from utils.dict_parse import DictParse
+from utils.html import read_html_file
 from database.notification import NotificationAccess
 from database.unit import UnitAccess
+from database.user import UserAccess
+from config.config import config
 from flask import request
-
 
 #
 #   CREATE OPERATIONS
@@ -42,6 +46,14 @@ def create_notification_endpoint(**kwargs):
         return unit, 400
     unit = unit.message.info
 
+    # Get the sender's user info
+    from_user = UserAccess.get_user(kwargs["id"]).message.info
+    from_user_name = (
+        from_user.rank + " " + from_user.full_name
+        if "rank" in from_user
+        else from_user.first_name
+    )
+
     # Check if the user is an officer of a superior unit
     is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
 
@@ -51,6 +63,54 @@ def create_notification_endpoint(**kwargs):
         result = NotificationAccess.create_notification(
             **data, author=kwargs["id"]
         )
+
+        # Check if the user wants to notify the people under this unit
+        if result.status == "success" and data["notify"]:
+            # Get the units below
+            units = UnitAccess.get_units_below([unit._id]).message
+
+            # Iterate through the units and add the members and officers into
+            # a set for message dispatch
+            personnel = set()
+            for i in units:
+                personnel = personnel.union(i.members)
+                personnel = personnel.union(i.officers)
+            personnel = [
+                UserAccess.get_user(i).message.info for i in personnel
+            ]
+            personnel = [
+                DictParse(
+                    {
+                        "email": i.email,
+                        "full_name": (
+                            i.rank + " " + i.full_name
+                            if "rank" in i
+                            else i.first_name
+                        ),
+                    }
+                )
+                for i in personnel
+            ]
+
+            # Iterate through the email list and send the emails
+            for i in personnel:
+                # Get feedback HTML content
+                content = read_html_file(
+                    "notification",
+                    to_user=i.full_name,
+                    from_user=from_user_name,
+                    message=data["notification"],
+                    target_unit=unit.name,
+                    notification_link=f"{config.wingsuite_link}/notifications",
+                )
+
+                # Send an email with the HTML content
+                send_email(
+                    receiver=i.email,
+                    subject="New Notification",
+                    content=content,
+                    emoji=config.message_emoji.notification,
+                )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

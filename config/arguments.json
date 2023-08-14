@@ -42,7 +42,7 @@
       "send_unit_discord_message": ["id", "title", "message"]
     },
     "notification": {
-      "create_notification": ["name", "unit", "notification"],
+      "create_notification": ["name", "unit", "notification", "notify"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
