@@ -20,9 +20,9 @@ from . import (
 from utils.permissions import isOfficerFromAbove
 from flask_jwt_extended import jwt_required
 from flask import request
-from database.statistics.five_point import FivePointAccess
+from database.statistic.five_point import FivePointAccess
 from database.user import UserAccess
-from models.statistics.five_point import FivePoint
+from models.statistic.five_point import FivePoint
 
 
 #

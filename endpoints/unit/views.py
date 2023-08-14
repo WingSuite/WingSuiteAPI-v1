@@ -31,9 +31,9 @@ from utils.permissions import isOfficerFromAbove
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
-from database.statistics.five_point import FivePointAccess
-from database.statistics.warrior import WarriorAccess
-from database.statistics.pfa import PFAAccess
+from database.statistic.five_point import FivePointAccess
+from database.statistic.warrior import WarriorAccess
+from database.statistic.pfa import PFAAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
 

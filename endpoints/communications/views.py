@@ -13,9 +13,7 @@ from utils.communications.discord import send_discord_message_to_channel
 from utils.communications.email import send_email
 from database.unit import UnitAccess
 from database.user import UserAccess
-from flask_jwt_extended import jwt_required, decode_token  # noqa
 from flask import request
-from config.config import permissions, config  # noqa
 
 #
 #   CREATE OPERATIONS

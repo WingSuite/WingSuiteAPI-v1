@@ -1,7 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-from models.statistics.feedback import Feedback
+from models.statistic.feedback import Feedback
 from typing import Any
 import uuid
 import math

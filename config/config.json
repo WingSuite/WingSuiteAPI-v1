@@ -44,5 +44,10 @@
     "smtp_server": "mail.privateemail.com",
     "smtp_port": 465,
     "password": "?>Arataki!Itto?*2"
+  },
+  "message_emoji": {
+    "statistic": {
+      "feedback": "💬"
+    }
   }
 }

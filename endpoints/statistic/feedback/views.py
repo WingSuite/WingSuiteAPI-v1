@@ -13,7 +13,11 @@ from . import (
     delete_feedback,
 )
 from flask import request
-from database.statistics.feedback import FeedbackAccess
+from utils.communications.email import send_email
+from utils.html import read_html_file
+from database.statistic.feedback import FeedbackAccess
+from database.user import UserAccess
+from config.config import config
 
 
 #
@@ -33,8 +37,34 @@ def create_feedback_endpoint(**kwargs):
     # Parse information from the call's body
     data = request.get_json()
 
+    # Check if the user is an actual user and get their email
+    to_user = UserAccess.get_user(data["to_user"])
+    if to_user.status == "error":
+        return to_user, 400
+    to_user = to_user.message.info
+
+    # # Calculate the recipients appropriate name
+    # to_user_name = (
+    #     to_user.rank + " " + to_user.full_name
+    #     if "rank" in to_user
+    #     else to_user.first_name
+    # )
+
     # Add the feedback to the database
     result = FeedbackAccess.create_feedback(**data, from_user=kwargs["id"])
+
+    # Notify user of the new feedback
+    if result.status == "success" and data["notify"]:
+        # Get feedback HTML content
+        content = read_html_file("./messages/html/statistic/feedback.html")
+
+        # Send an email with the HTML content
+        send_email(
+            receiver=to_user.email,
+            subject="New Feedback",
+            content=content,
+            emoji=config.message_emoji.statistic.feedback,
+        )
 
     # Return response data
     return result, (200 if result.status == "success" else 400)

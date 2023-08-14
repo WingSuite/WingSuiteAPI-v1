@@ -2,7 +2,7 @@
   "endpoints": {
     "statistic": {
       "feedback": {
-        "create_feedback": ["to_user", "name", "feedback"],
+        "create_feedback": ["to_user", "name", "feedback", "notify"],
         "get_feedback_info": ["id"],
         "update_feedback": ["id"],
         "delete_feedback": ["id"]

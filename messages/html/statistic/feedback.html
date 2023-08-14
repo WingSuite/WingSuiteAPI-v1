@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-200 p-5">
+    <div class="mx-auto bg-white p-5 rounded shadow-lg max-w-lg">
+      <div
+        class="flex flex-col items-center pb-4 border-b border-gray-200 gap-4"
+      >
+        <div class="flex flex-row items-center gap-4 text-sm text-black">
+          <img
+            src="https://avatars.githubusercontent.com/u/134102646?s=400&u=c00ade4de15a1534c95050bf4642d311b23329a3&v=4"
+            height="100"
+            width="100"
+          />
+          <div class="flex flex-col">
+            <div class="text-5xl font-thin">WingSuite</div>
+            <div class="text-2xl font-thin">{org_name}</div>
+          </div>
+        </div>
+      </div>
+      <div class="py-5">
+        <p class="mb-4">Hello {to_user},</p>
+        <p class="mb-4">
+          You received the following feedback from {from_user}:
+        </p>
+        <div class="text-xs italic">"{message}"</div>
+      </div>
+      <div class="text-center pt-4 border-t border-gray-200 text-gray-500">
+        Regards,<br />
+        {org_name} WingSuite
+      </div>
+    </div>
+  </body>
+</html>

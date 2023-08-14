@@ -26,9 +26,9 @@ from . import (
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
-from database.statistics.feedback import FeedbackAccess
-from database.statistics.warrior import WarriorAccess
-from database.statistics.pfa import PFAAccess
+from database.statistic.feedback import FeedbackAccess
+from database.statistic.warrior import WarriorAccess
+from database.statistic.pfa import PFAAccess
 from database.notification import NotificationAccess
 from database.event import EventAccess
 from database.user import UserAccess

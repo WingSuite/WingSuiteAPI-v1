@@ -20,9 +20,9 @@ from . import (
 from utils.permissions import isOfficerFromAbove
 from flask_jwt_extended import jwt_required
 from flask import request
-from database.statistics.pfa import PFAAccess
+from database.statistic.pfa import PFAAccess
 from database.user import UserAccess
-from models.statistics.pfa import PFA
+from models.statistic.pfa import PFA
 
 
 #

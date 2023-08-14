@@ -23,6 +23,9 @@ def send_email(
         message["To"] = receiver
         message.set_content(content)
 
+        # Add the HTML content as an alternative to plain text content
+        message.add_alternative(content, subtype="html")
+
         # Send message
         SERVER.send_message(message)
 

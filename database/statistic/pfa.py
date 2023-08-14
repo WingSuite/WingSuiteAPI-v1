@@ -1,7 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-from models.statistics.pfa import PFA
+from models.statistic.pfa import PFA
 from typing import Any
 import uuid
 import math

@@ -20,9 +20,9 @@ from . import (
 from utils.permissions import isOfficerFromAbove
 from flask_jwt_extended import jwt_required
 from flask import request
-from database.statistics.warrior import WarriorAccess
+from database.statistic.warrior import WarriorAccess
 from database.user import UserAccess
-from models.statistics.warrior import Warrior
+from models.statistic.warrior import Warrior
 
 #
 #   CREATE OPERATIONS

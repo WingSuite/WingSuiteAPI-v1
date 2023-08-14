@@ -68,13 +68,13 @@ from endpoints.notification import (
     update_notification,
     delete_notification,
 )
-from endpoints.statistics.feedback import (
+from endpoints.statistic.feedback import (
     create_feedback,
     get_feedback_info,
     update_feedback,
     delete_feedback,
 )
-from endpoints.statistics.five_point import (
+from endpoints.statistic.five_point import (
     create_five_point,
     get_five_point_info,
     get_user_five_point_info,
@@ -83,7 +83,7 @@ from endpoints.statistics.five_point import (
     update_five_point,
     delete_five_point,
 )
-from endpoints.statistics.pfa import (
+from endpoints.statistic.pfa import (
     create_pfa,
     get_pfa_info,
     get_user_pfa_info,
@@ -92,7 +92,7 @@ from endpoints.statistics.pfa import (
     update_pfa,
     delete_pfa,
 )
-from endpoints.statistics.warrior import (
+from endpoints.statistic.warrior import (
     create_warrior,
     get_warrior_info,
     get_user_warrior_info,

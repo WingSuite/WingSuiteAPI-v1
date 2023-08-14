@@ -1,7 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-from models.statistics.five_point import FivePoint
+from models.statistic.five_point import FivePoint
 from typing import Any
 import uuid
 import math
