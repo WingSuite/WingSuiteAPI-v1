@@ -98,7 +98,7 @@ def event_dispatch(**kwargs):
     events = EventAccess.get_occurring_events(offset=config.heads_up).message
 
     # Print debug
-    print(f"Found {len(events)} to dispatch")
+    print(f"Found {len(events)} events to dispatch")
 
     # Iterate through each event
     for i in events:
