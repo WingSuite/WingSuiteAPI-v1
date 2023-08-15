@@ -70,7 +70,9 @@ class UserAccess(DataAccessBase):
             # return success
             DataAccessBase.USER_COL.insert_one(user)
             DataAccessBase.REGISTER_COL.delete_one({"_id": id})
-            return DataAccessBase.sendSuccess("User added to system")
+            return DataAccessBase.sendSuccess(
+                "User added to system", user_info=user
+            )
         # Return false if the given information exists
         else:
             return DataAccessBase.sendError("User did not register")

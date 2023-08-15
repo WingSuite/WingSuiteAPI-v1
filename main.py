@@ -17,6 +17,10 @@ from endpoints.authentication import (
     reject,
     kick_user,
 )
+from endpoints.communications import (
+    send_user_email_message,
+    send_unit_discord_message,
+)
 from endpoints.user import (
     add_permissions,
     who_am_i,
@@ -45,12 +49,14 @@ from endpoints.unit import (
     get_all_officers,
     get_all_members,
     is_superior_officer,
+    get_all_five_point_data,
     get_all_pfa_data,
     get_all_warrior_data,
     delete_unit,
     delete_members,
     delete_officers,
 )
+from endpoints.event.views import event_dispatch
 from endpoints.event import (
     create_event,
     get_event_info,
@@ -63,13 +69,22 @@ from endpoints.notification import (
     update_notification,
     delete_notification,
 )
-from endpoints.statistics.feedback import (
+from endpoints.statistic.feedback import (
     create_feedback,
     get_feedback_info,
     update_feedback,
     delete_feedback,
 )
-from endpoints.statistics.pfa import (
+from endpoints.statistic.five_point import (
+    create_five_point,
+    get_five_point_info,
+    get_user_five_point_info,
+    get_five_point_format_info,
+    get_test_five_point_score,
+    update_five_point,
+    delete_five_point,
+)
+from endpoints.statistic.pfa import (
     create_pfa,
     get_pfa_info,
     get_user_pfa_info,
@@ -78,7 +93,7 @@ from endpoints.statistics.pfa import (
     update_pfa,
     delete_pfa,
 )
-from endpoints.statistics.warrior import (
+from endpoints.statistic.warrior import (
     create_warrior,
     get_warrior_info,
     get_user_warrior_info,
@@ -88,9 +103,14 @@ from endpoints.statistics.warrior import (
     delete_warrior,
 )
 
+# Scheduler Imports
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
+import atexit
 import os
 
 """
@@ -168,6 +188,7 @@ ROUTE HANDLING
 """
 
 # Authentication routes
+# region
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(login, url_prefix="/auth/")
 app.register_blueprint(get_register_requests, url_prefix="/auth/")
@@ -176,8 +197,18 @@ app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(kick_user, url_prefix="/auth/")
+# endregion
+
+# Communication routes
+# region
+app.register_blueprint(send_user_email_message, url_prefix="/communications/")
+app.register_blueprint(
+    send_unit_discord_message, url_prefix="/communications/"
+)
+# endregion
 
 # User routes
+# region
 app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
 app.register_blueprint(everyone, url_prefix="/user/")
@@ -192,8 +223,10 @@ app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
 app.register_blueprint(update_rank, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
+# endregion
 
 # Unit routes
+# region
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
@@ -203,6 +236,7 @@ app.register_blueprint(get_all_units, url_prefix="/unit/")
 app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
 app.register_blueprint(is_superior_officer, url_prefix="/unit/")
+app.register_blueprint(get_all_five_point_data, url_prefix="/unit/")
 app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")
 app.register_blueprint(get_all_warrior_data, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
@@ -210,26 +244,53 @@ app.register_blueprint(update_frontpage, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
+# endregion
 
 # Event routes
+# region
 app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
+# endregion
 
 # Notification routes
+# region
 app.register_blueprint(create_notification, url_prefix="/notification/")
 app.register_blueprint(get_notification_info, url_prefix="/notification/")
 app.register_blueprint(update_notification, url_prefix="/notification/")
 app.register_blueprint(delete_notification, url_prefix="/notification/")
+# endregion
 
 # Statistic Feedback routes
+# region
 app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
+# endregion
+
+# Statistic Five Point Evaluation routes
+# region
+app.register_blueprint(create_five_point, url_prefix="/statistic/five_point/")
+app.register_blueprint(
+    get_five_point_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_user_five_point_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_five_point_format_info, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(
+    get_test_five_point_score, url_prefix="/statistic/five_point/"
+)
+app.register_blueprint(update_five_point, url_prefix="/statistic/five_point/")
+app.register_blueprint(delete_five_point, url_prefix="/statistic/five_point/")
+# endregion
 
 # Statistic PFA routes
+# region
 app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_user_pfa_info, url_prefix="/statistic/pfa/")
@@ -237,8 +298,10 @@ app.register_blueprint(get_pfa_format_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_test_pfa_score, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
+# endregion
 
 # Statistic Warrior routes
+# region
 app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_warrior_info, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_user_warrior_info, url_prefix="/statistic/warrior/")
@@ -250,10 +313,31 @@ app.register_blueprint(
 )
 app.register_blueprint(update_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")
+# endregion
 
 """
 APP RUNTIME HANDLING
 """
+
+# Scheduler functionalities
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    # Initialize scheduler functionalities
+    print("Starting background scheduler...")
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+
+    # Schedule the event update function to run every minute
+    trigger = IntervalTrigger(minutes=1)
+    scheduler.add_job(
+        func=event_dispatch,
+        trigger=trigger,
+        id="check_events_job",
+        replace_existing=True,
+    )
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+    print("Background scheduler created!")
 
 # Main run thread
 if __name__ == "__main__":

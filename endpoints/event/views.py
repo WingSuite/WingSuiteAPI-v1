@@ -8,9 +8,11 @@ from endpoints.base import (
     ARGS,
 )
 from . import create_event, get_event_info, update_event, delete_event
+from utils.communications.email import send_email_by_units
 from utils.permissions import isOfficerFromAbove
-from database.unit import UnitAccess
 from database.event import EventAccess
+from database.unit import UnitAccess
+from config.config import config
 from flask import request
 
 #
@@ -33,16 +35,38 @@ def create_event_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["unit"])
     if unit.status == "error":
-        return unit
-    unit = unit.message.info
+        return unit, 400
+    unit = unit.message
 
     # Check if the user is an officer of a superior unit
     is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
+    if kwargs["isRoot"] or kwargs["id"] in unit.info.officers or is_above:
         # Add the event to the database
         result = EventAccess.create_event(**data)
+
+        # Check if the user wants to notify the people under this unit
+        if result.status == "success" and data["notify"]:
+            # Get and prep metadata for the message
+            event = EventAccess.get_event_by_id(result.id).message
+            msg_content = {
+                "template": "event.create",
+                "event_name": event.info.name,
+                "duration": event.get_formatted_duration(time_only=False),
+                "target_unit": unit.info.name,
+                "location": event.info.location,
+                "description": event.info.description,
+                "event_link": f"{config.wingsuite_link}/events",
+            }
+
+            # Send emails
+            send_email_by_units(
+                unit=unit.info._id,
+                msg_content=msg_content,
+                subject="New Event",
+                emoji=config.message_emoji.event,
+            )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -84,6 +108,40 @@ def get_event_info_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+def event_dispatch(**kwargs):
+    """Function to dispatch event notifications"""
+
+    # Get events currently happening
+    events = EventAccess.get_occurring_events(offset=config.heads_up).message
+
+    # Print debug
+    print(f"Found {len(events)} events to dispatch")
+
+    # Iterate through each event
+    for i in events:
+        # Prep the contents of the message
+        msg_content = {
+            "template": "event.heads_up",
+            "event_name": i.info.name,
+            "duration": i.get_formatted_duration(),
+            "target_unit": UnitAccess.get_unit(i.info.unit).message.info.name,
+            "location": i.info.location,
+            "description": i.info.description,
+            "event_link": f"{config.wingsuite_link}/events",
+        }
+
+        # Send emails
+        send_email_by_units(
+            unit=i.info.unit,
+            msg_content=msg_content,
+            subject=f"{i.info.name} Starting in {config.heads_up} Minutes",
+            emoji=config.message_emoji.event,
+        )
+
+        # Update the event so  that it has been tracked
+        EventAccess.update_event(id=i.info._id, heads_up_dispatched=True)
 
 
 #   endregion
@@ -163,7 +221,7 @@ def delete_event_endpoint(**kwargs):
     # Get the unit object of the target unit
     unit = UnitAccess.get_unit(event.message.info.unit)
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit

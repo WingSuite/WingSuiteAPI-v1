@@ -2,10 +2,21 @@
   "endpoints": {
     "statistic": {
       "feedback": {
-        "create_feedback": ["to_user", "name", "feedback"],
+        "create_feedback": ["to_user", "name", "feedback", "notify"],
         "get_feedback_info": ["id"],
         "update_feedback": ["id"],
         "delete_feedback": ["id"]
+      },
+      "five_point": {
+        "create_five_point": ["to_user", "name", "datetime_taken",
+          "category_1", "category_2", "category_3", "category_4",
+          "category_5"],
+        "get_five_point_info": ["id"],
+        "get_user_five_point_info": ["id", "page_size", "page_index"],
+        "get_test_five_point_score": ["category_1", "category_2", "category_3",
+          "category_4", "category_5"],
+        "update_five_point": ["id"],
+        "delete_five_point": ["id"]
       },
       "pfa": {
         "create_pfa": ["to_user", "name", "datetime_taken", "pushup", "situp",
@@ -26,15 +37,19 @@
         "delete_warrior": ["id"]
       }
     },
+    "communications": {
+      "send_user_email_message": ["id", "title", "message"],
+      "send_unit_discord_message": ["id", "title", "message"]
+    },
     "notification": {
-      "create_notification": ["name", "unit", "notification"],
+      "create_notification": ["name", "unit", "notification", "notify"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
-        "end_datetime", "description"],
+        "end_datetime", "description", "notify"],
       "get_event_info": ["id"],
       "update_event": ["id"],
       "delete_event": ["id"]
@@ -49,6 +64,7 @@
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
       "is_superior_officer": ["id"],
+      "get_all_five_point_data": ["id"],
       "get_all_pfa_data": ["id"],
       "get_all_warrior_data": ["id"],
       "update_unit": ["id"],

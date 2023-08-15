@@ -13,11 +13,13 @@ from . import (
     update_notification,
     delete_notification,
 )
+from utils.communications.email import send_email_by_units
 from utils.permissions import isOfficerFromAbove
 from database.notification import NotificationAccess
 from database.unit import UnitAccess
+from database.user import UserAccess
+from config.config import config
 from flask import request
-
 
 #
 #   CREATE OPERATIONS
@@ -39,8 +41,16 @@ def create_notification_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["unit"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
+
+    # Get the sender's user info
+    from_user = UserAccess.get_user(kwargs["id"]).message.info
+    from_user_name = (
+        from_user.rank + " " + from_user.full_name
+        if "rank" in from_user
+        else from_user.first_name
+    )
 
     # Check if the user is an officer of a superior unit
     is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
@@ -51,6 +61,25 @@ def create_notification_endpoint(**kwargs):
         result = NotificationAccess.create_notification(
             **data, author=kwargs["id"]
         )
+
+        # Check if the user wants to notify the people under this unit
+        if result.status == "success" and data["notify"]:
+            # Prep the contents of the message
+            msg_content = {
+                "template": "notification",
+                "from_user": from_user_name,
+                "message": data["notification"],
+                "target_unit": unit.name,
+                "notification_link": f"{config.wingsuite_link}/notifications",
+            }
+
+            # Send emails
+            send_email_by_units(
+                unit=unit._id,
+                msg_content=msg_content,
+                subject="New Notification",
+                emoji=config.message_emoji.notification,
+            )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -171,7 +200,7 @@ def delete_notification_endpoint(**kwargs):
     # Get the unit object of the target unit
     unit = UnitAccess.get_unit(notification.message.info.unit)
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit

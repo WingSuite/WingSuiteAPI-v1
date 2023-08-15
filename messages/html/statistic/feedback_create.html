@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      background: linear-gradient(to top right, #4678f4, #54c0ff);
+      padding: 30px;
+    "
+  >
+    <div
+      style="
+        margin: auto;
+        background-color: #ffffff;
+        padding: 50px;
+        border-radius: 5px;
+        max-width: 40rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      "
+    >
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #edf2f7"
+      >
+        <tr>
+          <td align="center" style="padding-bottom: 16px">
+            <table cellpadding="0" cellspacing="5" border="0">
+              <tr>
+                <td>
+                  <img
+                    src="https://avatars.githubusercontent.com/u/134102646?s=400&u=c00ade4de15a1534c95050bf4642d311b23329a3&v=4"
+                    height="100"
+                    width="100"
+                  />
+                </td>
+                <td>
+                  <div
+                    style="
+                      font-size: 2.25rem;
+                      font-weight: 200;
+                      line-height: 2.5rem;
+                    "
+                  >
+                    WingSuite
+                  </div>
+                  <div style="font-size: 1.1rem; font-weight: 200">
+                    {org_name}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <div>
+        <p>Hello {to_user},</p>
+        <p>You received the following feedback from {from_user}:</p>
+        <div style="font-size: 0.75rem; font-style: italic">"{message}"</div>
+        <p>
+          You can view this message in your
+          <a href="{feedback_link}">feedback page</a>
+        </p>
+      </div>
+      <div
+        style="
+          text-align: center;
+          padding-top: 16px;
+          border-top: 1px solid #edf2f7;
+          color: #a0aec0;
+        "
+      >
+        Respectfully,<br />
+        {org_name} WingSuite
+      </div>
+    </div>
+  </body>
+</html>

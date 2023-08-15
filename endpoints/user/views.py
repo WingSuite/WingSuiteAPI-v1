@@ -26,9 +26,9 @@ from . import (
 )
 from flask_jwt_extended import jwt_required, decode_token
 from flask import request
-from database.statistics.feedback import FeedbackAccess
-from database.statistics.warrior import WarriorAccess
-from database.statistics.pfa import PFAAccess
+from database.statistic.feedback import FeedbackAccess
+from database.statistic.warrior import WarriorAccess
+from database.statistic.pfa import PFAAccess
 from database.notification import NotificationAccess
 from database.event import EventAccess
 from database.user import UserAccess
@@ -58,7 +58,7 @@ def add_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -559,7 +559,7 @@ def update_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -590,7 +590,7 @@ def update_rank_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message
@@ -625,7 +625,7 @@ def delete_permissions_endpoint(**kwargs):
     # If content is not in result of getting the user, return the
     # error message
     if user.status == "error":
-        return user
+        return user, 400
 
     # Get the content from the user fetch
     user = user.message

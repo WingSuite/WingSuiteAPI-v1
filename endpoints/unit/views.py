@@ -20,20 +20,25 @@ from . import (
     get_all_officers,
     get_all_members,
     is_superior_officer,
+    get_all_five_point_data,
     get_all_pfa_data,
     get_all_warrior_data,
     delete_unit,
     delete_members,
     delete_officers,
 )
+from utils.communications.email import send_email
 from utils.permissions import isOfficerFromAbove
+from utils.html import read_html_file
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
-from database.statistics.warrior import WarriorAccess
-from database.statistics.pfa import PFAAccess
+from database.statistic.five_point import FivePointAccess
+from database.statistic.warrior import WarriorAccess
+from database.statistic.pfa import PFAAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
+from urllib.parse import quote
 
 
 def _update_personnel_helper(id, users, operation, participation):
@@ -49,7 +54,7 @@ def _update_personnel_helper(id, users, operation, participation):
     # If content is not in result of getting the unit, return the
     # error message
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Get the content from the unit fetch
     unit = unit.message
@@ -67,6 +72,13 @@ def _update_personnel_helper(id, users, operation, participation):
 
         # Extract user object
         user_obj = user_obj.message
+
+        # Calculate the recipient's appropriate name
+        to_user_name = (
+            user_obj.info.rank + " " + user_obj.info.full_name
+            if "rank" in user_obj.info
+            else user_obj.info.first_name
+        )
 
         # Do an add operation if operation is "add"
         if operation == "add":
@@ -96,6 +108,42 @@ def _update_personnel_helper(id, users, operation, participation):
             if res
             else f"User already {past_tense} as an officer or member"
         )
+
+        # Send added email if the user was successfully added
+        if operation == "add" and res:
+            # Get feedback HTML content
+            content = read_html_file(
+                "unit.added",
+                to_user=to_user_name,
+                unit_name=unit.info.name,
+                unit_link=f"{config.wingsuite_link}/unit/"
+                + f"{quote(unit.info.name)}/frontpage",
+            )
+
+            # Send an email with the HTML content
+            send_email(
+                receiver=user_obj.info.email,
+                subject=f"Added to {unit.info.name}",
+                content=content,
+                emoji=config.message_emoji.unit.added,
+            )
+
+        # Send added email if the user was successfully added
+        elif operation == "delete" and res:
+            # Get feedback HTML content
+            content = read_html_file(
+                "unit.kicked",
+                to_user=to_user_name,
+                unit_name=unit.info.name
+            )
+
+            # Send an email with the HTML content
+            send_email(
+                receiver=user_obj.info.email,
+                subject=f"Kicked from {unit.info.name}",
+                content=content,
+                emoji=config.message_emoji.unit.kicked,
+            )
 
     # Push unit changes
     UnitAccess.update_unit(id, **unit.info)
@@ -150,7 +198,7 @@ def add_members_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -185,7 +233,7 @@ def add_officers_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -324,7 +372,7 @@ def get_all_members_endpoint(**kwargs):
 
     # Check if the unit exists
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Extract unit information
     unit = unit.message.info
@@ -381,7 +429,7 @@ def get_all_officers_endpoint(**kwargs):
 
     # Check if the unit exists
     if unit.status == "error":
-        return unit
+        return unit, 400
 
     # Extract unit information
     unit = unit.message.info
@@ -436,7 +484,7 @@ def is_superior_officer_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -444,6 +492,70 @@ def is_superior_officer_endpoint(**kwargs):
 
     # Return result
     return success_response(True) if res else client_error_response(False)
+
+
+@get_all_five_point_data.route("/get_all_five_point_data/", methods=["POST"])
+@is_root
+@permissions_required(["unit.get_all_five_point_data"])
+@param_check(ARGS.unit.get_all_five_point_data)
+@error_handler
+def get_all_five_point_data_endpoint(**kwargs):
+    """
+    Respond with a given unit's five point data for all its members and
+    officers
+    """
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return client_error_response(unit.message)
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
+
+    # Get a list of all units and their members below
+    below = UnitAccess.get_units_below([unit._id]).message
+
+    # Get all of the users' five point info and the mapping for the unit they
+    # are in
+    mapper = {}
+    memoize = set()
+    for item in below:
+        track = []
+        for user in item.members + item.officers:
+            if user in memoize:
+                continue
+            res = FivePointAccess.get_user_five_point(user, 10000, 0).message
+            for i in res:
+                i["full_name"] = UserAccess.get_user(
+                    i["to_user"]
+                ).message.info.full_name
+            memoize.add(user)
+            track += res
+        track = sorted(
+            track,
+            key=lambda x: x["composite_score"],
+            reverse=True,
+        )
+        mapper[item.name] = track
+
+    # Success return
+    return success_response(mapper)
 
 
 @get_all_pfa_data.route("/get_all_pfa_data/", methods=["POST"])
@@ -587,7 +699,7 @@ def update_unit_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user specified the parent class
@@ -648,7 +760,7 @@ def update_frontpage_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -715,7 +827,7 @@ def delete_members_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit
@@ -750,7 +862,7 @@ def delete_officers_endpoint(**kwargs):
     # Get the unit object of the target unit and return if error
     unit = UnitAccess.get_unit(data["id"])
     if unit.status == "error":
-        return unit
+        return unit, 400
     unit = unit.message.info
 
     # Check if the user is an officer of a superior unit

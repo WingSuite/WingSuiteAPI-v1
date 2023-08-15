@@ -1,7 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-from models.statistics.warrior import Warrior
+from models.statistic.warrior import Warrior
 from typing import Any
 import uuid
 import math
