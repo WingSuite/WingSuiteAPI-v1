@@ -133,22 +133,6 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
 )
 jwt = JWTManager(app)
 
-# Initialize scheduler functionalities
-scheduler = BackgroundScheduler()
-scheduler.start()
-
-# Schedule the event update function to run every minute
-trigger = IntervalTrigger(minutes=1)
-scheduler.add_job(
-    func=event_dispatch,
-    trigger=trigger,
-    id="check_events_job",
-    replace_existing=True,
-)
-
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
-
 
 # Define the blacklist checker for JWT
 @jwt.token_in_blocklist_loader
@@ -334,6 +318,26 @@ app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")
 """
 APP RUNTIME HANDLING
 """
+
+# Scheduler functionalities
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    # Initialize scheduler functionalities
+    print("Starting background scheduler...")
+    scheduler = BackgroundScheduler()
+    scheduler.start()
+
+    # Schedule the event update function to run every minute
+    trigger = IntervalTrigger(minutes=1)
+    scheduler.add_job(
+        func=event_dispatch,
+        trigger=trigger,
+        id="check_events_job",
+        replace_existing=True,
+    )
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+    print("Background scheduler created!") 
 
 # Main run thread
 if __name__ == "__main__":
