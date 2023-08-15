@@ -8,13 +8,10 @@ from endpoints.base import (
     ARGS,
 )
 from . import create_event, get_event_info, update_event, delete_event
-from utils.communications.email import send_email
+from utils.communications.email import send_email_by_units
 from utils.permissions import isOfficerFromAbove
-from utils.dict_parse import DictParse
-from utils.html import read_html_file
 from database.event import EventAccess
 from database.unit import UnitAccess
-from database.user import UserAccess
 from config.config import config
 from flask import request
 
@@ -51,60 +48,25 @@ def create_event_endpoint(**kwargs):
 
         # Check if the user wants to notify the people under this unit
         if result.status == "success" and data["notify"]:
-            # Get the event created
+            # Get and prep metadata for the message
             event = EventAccess.get_event_by_id(result.id).message
+            msg_content = {
+                "template": "event.create",
+                "event_name": event.info.name,
+                "duration": event.get_formatted_duration(time_only=False),
+                "target_unit": unit.info.name,
+                "location": event.info.location,
+                "description": event.info.description,
+                "event_link": f"{config.wingsuite_link}/events",
+            }
 
-            # Get the units below
-            units = UnitAccess.get_units_below([unit.info._id]).message
-
-            # Iterate through the units and add the members and officers into
-            # a set for message dispatch
-            personnel = set()
-            for i in units:
-                personnel = personnel.union(i.members)
-                personnel = personnel.union(i.officers)
-            personnel = [
-                UserAccess.get_user(i).message.info for i in personnel
-            ]
-            personnel = [
-                DictParse(
-                    {
-                        "email": i.email,
-                        "full_name": (
-                            i.rank + " " + i.full_name
-                            if "rank" in i
-                            else i.first_name
-                        ),
-                    }
-                )
-                for i in personnel
-            ]
-
-            # Get metadata for the message
-            duration = event.get_formatted_duration(time_only=False)
-            unit_name = unit.info.name
-
-            # Iterate through the email list and send the emails
-            for i in personnel:
-                # Get feedback HTML content
-                content = read_html_file(
-                    "event.create",
-                    to_user=i.full_name,
-                    event_name=event.info.name,
-                    duration=duration,
-                    target_unit=unit_name,
-                    location=event.info.location,
-                    description=event.info.description,
-                    event_link=f"{config.wingsuite_link}/events",
-                )
-
-                # Send an email with the HTML content
-                send_email(
-                    receiver=i.email,
-                    subject="New Event",
-                    content=content,
-                    emoji=config.message_emoji.notification,
-                )
+            # Send emails
+            send_email_by_units(
+                unit=unit.info._id,
+                msg_content=msg_content,
+                subject="New Event",
+                emoji=config.message_emoji.event,
+            )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -159,55 +121,24 @@ def event_dispatch(**kwargs):
 
     # Iterate through each event
     for i in events:
-        # Get the units below
-        units = UnitAccess.get_units_below([i.info.unit]).message
+        # Prep the contents of the message
+        msg_content = {
+            "template": "event.heads_up",
+            "event_name": i.info.name,
+            "duration": i.get_formatted_duration(),
+            "target_unit": UnitAccess.get_unit(i.info.unit).message.info.name,
+            "location": i.info.location,
+            "description": i.info.description,
+            "event_link": f"{config.wingsuite_link}/events",
+        }
 
-        # Iterate through the units and add the members and officers into
-        # a set for message dispatch
-        personnel = set()
-        for j in units:
-            personnel = personnel.union(j.members)
-            personnel = personnel.union(j.officers)
-        personnel = [UserAccess.get_user(j).message.info for j in personnel]
-        personnel = [
-            DictParse(
-                {
-                    "email": j.email,
-                    "full_name": (
-                        j.rank + " " + j.full_name
-                        if "rank" in j
-                        else j.first_name
-                    ),
-                }
-            )
-            for j in personnel
-        ]
-
-        # Get metadata for the message
-        duration = i.get_formatted_duration()
-        unit_name = UnitAccess.get_unit(i.info.unit).message.info.name
-
-        # Iterate through the email list and send the emails
-        for j in personnel:
-            # Get feedback HTML content
-            content = read_html_file(
-                "event.heads_up",
-                to_user=j.full_name,
-                event_name=i.info.name,
-                duration=duration,
-                target_unit=unit_name,
-                location=i.info.location,
-                description=i.info.description,
-                event_link=f"{config.wingsuite_link}/events",
-            )
-
-            # Send an email with the HTML content
-            send_email(
-                receiver=j.email,
-                subject=f"{i.info.name} Starting in {config.heads_up} Minutes",
-                content=content,
-                emoji=config.message_emoji.notification,
-            )
+        # Send emails
+        send_email_by_units(
+            unit=i.info.unit,
+            msg_content=msg_content,
+            subject=f"{i.info.name} Starting in {config.heads_up} Minutes",
+            emoji=config.message_emoji.event,
+        )
 
         # Update the event so  that it has been tracked
         EventAccess.update_event(id=i.info._id, heads_up_dispatched=True)
