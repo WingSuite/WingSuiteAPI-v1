@@ -160,7 +160,7 @@ def authorize_user_endpoint(**kwargs):
 
         # Get feedback HTML content
         content = read_html_file(
-            "authorized",
+            "auth.authorized",
             to_user=to_user_name,
             detachment_name=config.organization_name,
             wingsuite_link=f"{config.wingsuite_link}/homepage"
@@ -258,7 +258,7 @@ def kick_user_endpoint(**kwargs):
 
         # Get feedback HTML content
         content = read_html_file(
-            "kicked",
+            "auth.kicked",
             to_user=to_user_name,
             detachment_name=config.organization_name,
         )

@@ -3,6 +3,6 @@
     "notification": "./messages/html/notification_create.html",
     "event.heads_up": "./messages/html/event_heads_up.html",
     "event.create": "./messages/html/event_create.html",
-    "authorized": "./messages/html/authorized.html",
-    "kicked": "./messages/html/kicked.html"
+    "auth.authorized": "./messages/html/auth_authorized.html",
+    "auth.kicked": "./messages/html/auth_kicked.html"
 }
