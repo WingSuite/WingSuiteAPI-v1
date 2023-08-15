@@ -337,7 +337,7 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
-    print("Background scheduler created!") 
+    print("Background scheduler created!")
 
 # Main run thread
 if __name__ == "__main__":

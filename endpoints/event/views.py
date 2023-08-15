@@ -39,15 +39,72 @@ def create_event_endpoint(**kwargs):
     unit = UnitAccess.get_unit(data["unit"])
     if unit.status == "error":
         return unit, 400
-    unit = unit.message.info
+    unit = unit.message
 
     # Check if the user is an officer of a superior unit
     is_above = isOfficerFromAbove(data["unit"], kwargs["id"])
 
     # Check if the user is rooted or is officer of the unit
-    if kwargs["isRoot"] or kwargs["id"] in unit.officers or is_above:
+    if kwargs["isRoot"] or kwargs["id"] in unit.info.officers or is_above:
         # Add the event to the database
         result = EventAccess.create_event(**data)
+
+        # Check if the user wants to notify the people under this unit
+        if result.status == "success" and data["notify"]:
+            # Get the event created
+            event = EventAccess.get_event_by_id(result.id).message
+
+            # Get the units below
+            units = UnitAccess.get_units_below([unit.info._id]).message
+
+            # Iterate through the units and add the members and officers into
+            # a set for message dispatch
+            personnel = set()
+            for i in units:
+                personnel = personnel.union(i.members)
+                personnel = personnel.union(i.officers)
+            personnel = [
+                UserAccess.get_user(i).message.info for i in personnel
+            ]
+            personnel = [
+                DictParse(
+                    {
+                        "email": i.email,
+                        "full_name": (
+                            i.rank + " " + i.full_name
+                            if "rank" in i
+                            else i.first_name
+                        ),
+                    }
+                )
+                for i in personnel
+            ]
+
+            # Get metadata for the message
+            duration = event.get_formatted_duration(time_only=False)
+            unit_name = unit.info.name
+
+            # Iterate through the email list and send the emails
+            for i in personnel:
+                # Get feedback HTML content
+                content = read_html_file(
+                    "event.create",
+                    to_user=i.full_name,
+                    event_name=event.info.name,
+                    duration=duration,
+                    target_unit=unit_name,
+                    location=event.info.location,
+                    description=event.info.description,
+                    event_link=f"{config.wingsuite_link}/events",
+                )
+
+                # Send an email with the HTML content
+                send_email(
+                    receiver=i.email,
+                    subject="New Event",
+                    content=content,
+                    emoji=config.message_emoji.notification,
+                )
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

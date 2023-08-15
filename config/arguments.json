@@ -49,7 +49,7 @@
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
-        "end_datetime", "description"],
+        "end_datetime", "description", "notify"],
       "get_event_info": ["id"],
       "update_event": ["id"],
       "delete_event": ["id"]
