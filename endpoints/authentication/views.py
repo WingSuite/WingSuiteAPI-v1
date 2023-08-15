@@ -163,7 +163,7 @@ def authorize_user_endpoint(**kwargs):
             "auth.authorized",
             to_user=to_user_name,
             detachment_name=config.organization_name,
-            wingsuite_link=f"{config.wingsuite_link}/homepage"
+            wingsuite_link=f"{config.wingsuite_link}/homepage",
         )
 
         # Send an email with the HTML content
@@ -175,7 +175,9 @@ def authorize_user_endpoint(**kwargs):
         )
 
     # Return response data
-    return result, (200 if result.status == "success" else 400)
+    return {"message": result.message, "status": result.status}, (
+        200 if result.status == "success" else 400
+    )
 
 
 @signout.route("/signout/", methods=["POST"])
@@ -249,7 +251,7 @@ def kick_user_endpoint(**kwargs):
 
     # Notify user of the new feedback
     if result.status == "success":
-        # Calculate the recipient's and sender's appropriate name
+        # Calculate the recipient's appropriate name
         to_user_name = (
             user.rank + " " + user.full_name
             if "rank" in user
@@ -268,7 +270,7 @@ def kick_user_endpoint(**kwargs):
             receiver=user.email,
             subject="You Have Been Kicked Out",
             content=content,
-            emoji=config.message_emoji.authentication.rejected,
+            emoji=config.message_emoji.authentication.kicked,
         )
 
     # Return response data

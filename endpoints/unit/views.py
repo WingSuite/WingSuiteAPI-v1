@@ -27,7 +27,9 @@ from . import (
     delete_members,
     delete_officers,
 )
+from utils.communications.email import send_email
 from utils.permissions import isOfficerFromAbove
+from utils.html import read_html_file
 from config.config import config
 from flask_jwt_extended import jwt_required
 from flask import request
@@ -36,6 +38,7 @@ from database.statistic.warrior import WarriorAccess
 from database.statistic.pfa import PFAAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
+from urllib.parse import quote
 
 
 def _update_personnel_helper(id, users, operation, participation):
@@ -70,6 +73,13 @@ def _update_personnel_helper(id, users, operation, participation):
         # Extract user object
         user_obj = user_obj.message
 
+        # Calculate the recipient's appropriate name
+        to_user_name = (
+            user_obj.info.rank + " " + user_obj.info.full_name
+            if "rank" in user_obj.info
+            else user_obj.info.first_name
+        )
+
         # Do an add operation if operation is "add"
         if operation == "add":
             res = user_obj.add_unit(id)
@@ -98,6 +108,42 @@ def _update_personnel_helper(id, users, operation, participation):
             if res
             else f"User already {past_tense} as an officer or member"
         )
+
+        # Send added email if the user was successfully added
+        if operation == "add" and res:
+            # Get feedback HTML content
+            content = read_html_file(
+                "unit.added",
+                to_user=to_user_name,
+                unit_name=unit.info.name,
+                unit_link=f"{config.wingsuite_link}/unit/"
+                + f"{quote(unit.info.name)}/frontpage",
+            )
+
+            # Send an email with the HTML content
+            send_email(
+                receiver=user_obj.info.email,
+                subject=f"Added to {unit.info.name}",
+                content=content,
+                emoji=config.message_emoji.unit.added,
+            )
+
+        # Send added email if the user was successfully added
+        elif operation == "delete" and res:
+            # Get feedback HTML content
+            content = read_html_file(
+                "unit.kicked",
+                to_user=to_user_name,
+                unit_name=unit.info.name
+            )
+
+            # Send an email with the HTML content
+            send_email(
+                receiver=user_obj.info.email,
+                subject=f"Kicked from {unit.info.name}",
+                content=content,
+                emoji=config.message_emoji.unit.kicked,
+            )
 
     # Push unit changes
     UnitAccess.update_unit(id, **unit.info)

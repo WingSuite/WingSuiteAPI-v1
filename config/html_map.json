@@ -4,5 +4,7 @@
     "event.heads_up": "./messages/html/event_heads_up.html",
     "event.create": "./messages/html/event_create.html",
     "auth.authorized": "./messages/html/auth_authorized.html",
-    "auth.kicked": "./messages/html/auth_kicked.html"
+    "auth.kicked": "./messages/html/auth_kicked.html",
+    "unit.added": "./messages/html/unit_added.html",
+    "unit.kicked": "./messages/html/unit_kicked.html"
 }
