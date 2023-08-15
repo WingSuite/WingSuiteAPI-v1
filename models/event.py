@@ -27,3 +27,28 @@ class Event:
         return datetime.fromtimestamp(self.info.datetime).strftime(
             "%d %m %Y, %H:%M"
         )
+
+    def get_formatted_duration(self: "Event") -> str:
+        """Method to return the formatted datetime"""
+        # Get start datetime, formatted
+        start = datetime.fromtimestamp(self.info.start_datetime).strftime(
+            "%H%M"
+        )
+
+        # Get end datetime, formatted
+        end = datetime.fromtimestamp(self.info.end_datetime).strftime(
+            "%H%M"
+        )
+
+        # Calculate the difference in seconds
+        delta_seconds = self.info.end_datetime - self.info.start_datetime
+
+        # Calculate hours and minutes
+        hours, remainder = divmod(delta_seconds, 3600)
+        minutes, _ = divmod(remainder, 60)
+
+        # Get formatted string
+        different = "{} hours, {} minutes".format(hours, minutes)
+
+        # Return formatted string
+        return f"{start} to {end} ({different})"

@@ -70,11 +70,29 @@
       </table>
       <div>
         <p>Hello {to_user},</p>
-        <p>You received the following feedback from {from_user}:</p>
-        <div style="font-size: 0.75rem; font-style: italic">"{message}"</div>
         <p>
-          You can view this message in your
-          <a href="{feedback_link}">feedback page</a>
+          {event_name} is about to begin in 30 minutes. The following are
+          details for this event:
+        </p>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Event Duration:
+        </div>
+        <div style="font-size: 0.75rem">{duration}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          For Units Under:
+        </div>
+        <div style="font-size: 0.75rem">{target_unit}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Location:
+        </div>
+        <div style="font-size: 0.75rem">{location}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Description:
+        </div>
+        <div style="font-size: 0.75rem">{description}</div>
+        <p>
+          You can view this event in your
+          <a href="{event_link}">events page</a>
         </p>
       </div>
       <div

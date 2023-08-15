@@ -1,4 +1,5 @@
 {
     "statistic.feedback": "./messages/html/statistic/feedback.html",
-    "notification": "./messages/html/notification.html"
+    "notification": "./messages/html/notification.html",
+    "event.heads_up": "./messages/html/event_heads_up.html"
 }

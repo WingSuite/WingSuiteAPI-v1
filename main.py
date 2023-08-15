@@ -56,6 +56,7 @@ from endpoints.unit import (
     delete_members,
     delete_officers,
 )
+from endpoints.event.views import event_dispatch
 from endpoints.event import (
     create_event,
     get_event_info,
@@ -102,9 +103,14 @@ from endpoints.statistic.warrior import (
     delete_warrior,
 )
 
+# Scheduler Imports
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
+import atexit
 import os
 
 """
@@ -126,6 +132,22 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
     hours=config.JWT.refresh_expiry
 )
 jwt = JWTManager(app)
+
+# Initialize scheduler functionalities
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+# Schedule the event update function to run every minute
+trigger = IntervalTrigger(minutes=1)
+scheduler.add_job(
+    func=event_dispatch,
+    trigger=trigger,
+    id="check_events_job",
+    replace_existing=True,
+)
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 
 # Define the blacklist checker for JWT
@@ -182,6 +204,7 @@ ROUTE HANDLING
 """
 
 # Authentication routes
+# region
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(login, url_prefix="/auth/")
 app.register_blueprint(get_register_requests, url_prefix="/auth/")
@@ -190,14 +213,18 @@ app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(kick_user, url_prefix="/auth/")
+# endregion
 
 # Communication routes
+# region
 app.register_blueprint(send_user_email_message, url_prefix="/communications/")
 app.register_blueprint(
     send_unit_discord_message, url_prefix="/communications/"
 )
+# endregion
 
 # User routes
+# region
 app.register_blueprint(add_permissions, url_prefix="/user/")
 app.register_blueprint(who_am_i, url_prefix="/user/")
 app.register_blueprint(everyone, url_prefix="/user/")
@@ -212,8 +239,10 @@ app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
 app.register_blueprint(update_rank, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
+# endregion
 
 # Unit routes
+# region
 app.register_blueprint(create_unit, url_prefix="/unit/")
 app.register_blueprint(add_members, url_prefix="/unit/")
 app.register_blueprint(add_officers, url_prefix="/unit/")
@@ -231,26 +260,34 @@ app.register_blueprint(update_frontpage, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
+# endregion
 
 # Event routes
+# region
 app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
+# endregion
 
 # Notification routes
+# region
 app.register_blueprint(create_notification, url_prefix="/notification/")
 app.register_blueprint(get_notification_info, url_prefix="/notification/")
 app.register_blueprint(update_notification, url_prefix="/notification/")
 app.register_blueprint(delete_notification, url_prefix="/notification/")
+# endregion
 
 # Statistic Feedback routes
+# region
 app.register_blueprint(create_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(get_feedback_info, url_prefix="/statistic/feedback/")
 app.register_blueprint(update_feedback, url_prefix="/statistic/feedback/")
 app.register_blueprint(delete_feedback, url_prefix="/statistic/feedback/")
+# endregion
 
 # Statistic Five Point Evaluation routes
+# region
 app.register_blueprint(create_five_point, url_prefix="/statistic/five_point/")
 app.register_blueprint(
     get_five_point_info, url_prefix="/statistic/five_point/"
@@ -266,8 +303,10 @@ app.register_blueprint(
 )
 app.register_blueprint(update_five_point, url_prefix="/statistic/five_point/")
 app.register_blueprint(delete_five_point, url_prefix="/statistic/five_point/")
+# endregion
 
 # Statistic PFA routes
+# region
 app.register_blueprint(create_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_pfa_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_user_pfa_info, url_prefix="/statistic/pfa/")
@@ -275,8 +314,10 @@ app.register_blueprint(get_pfa_format_info, url_prefix="/statistic/pfa/")
 app.register_blueprint(get_test_pfa_score, url_prefix="/statistic/pfa/")
 app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
+# endregion
 
 # Statistic Warrior routes
+# region
 app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_warrior_info, url_prefix="/statistic/warrior/")
 app.register_blueprint(get_user_warrior_info, url_prefix="/statistic/warrior/")
@@ -288,6 +329,7 @@ app.register_blueprint(
 )
 app.register_blueprint(update_warrior, url_prefix="/statistic/warrior/")
 app.register_blueprint(delete_warrior, url_prefix="/statistic/warrior/")
+# endregion
 
 """
 APP RUNTIME HANDLING

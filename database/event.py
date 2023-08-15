@@ -3,6 +3,7 @@ from utils.dict_parse import DictParse
 from .base import DataAccessBase
 from models.event import Event
 from typing import Any
+import time
 import uuid
 
 
@@ -34,33 +35,6 @@ class EventAccess(DataAccessBase):
 
         # Return a statement
         return DataAccessBase.sendSuccess("Event created", id=data["_id"])
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def delete_event(id: str) -> DictParse:
-        """Method to delete an event"""
-
-        # Check if the event based on its id does not exist
-        event = DataAccessBase.EVENT_COL.find_one({"_id": id})
-        if event is None:
-            return DataAccessBase.sendError("Event does not exist")
-
-        # Delete the document and return a success message
-        DataAccessBase.EVENT_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Event deleted", id=id)
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def update_event(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a event"""
-
-        # Check if the event based on its id does exist
-        if DataAccessBase.EVENT_COL.find_one({"_id": id}) is None:
-            return DataAccessBase.sendError("Event does not exist")
-
-        # Update the document and return a success message
-        DataAccessBase.EVENT_COL.update_one({"_id": id}, {"$set": kwargs})
-        return DataAccessBase.sendSuccess("Event updated")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -132,3 +106,62 @@ class EventAccess(DataAccessBase):
 
         # Return with a list of Event objects
         return DataAccessBase.sendSuccess(results)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_occurring_events(offset: int = 0) -> DictParse:
+        """Method to get events that are currently happening right now"""
+
+        # Get current time with offset (in minutes)
+        current_time = int(time.time()) + (offset * 60)
+
+        # Search the collection based on id
+        events = DataAccessBase.EVENT_COL.find(
+            {
+                "start_datetime": {"$lte": current_time},
+                "$or": [
+                    {"heads_up_dispatched": {"$ne": True}},
+                    {"heads_up_dispatched": {"$exists": False}},
+                ],
+            }
+        )
+
+        # Return if the given event is not in the database
+        if events is None:
+            return {
+                "status": "error",
+                "message": "No events happening right now at the moment",
+            }
+
+        # Cast every event into an event object
+        events = [Event(**item) for item in events]
+
+        # Return with a Event object
+        return DataAccessBase.sendSuccess(events)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def update_event(id: str, **kwargs: Any) -> DictParse:
+        """Method to delete a event"""
+
+        # Check if the event based on its id does exist
+        if DataAccessBase.EVENT_COL.find_one({"_id": id}) is None:
+            return DataAccessBase.sendError("Event does not exist")
+
+        # Update the document and return a success message
+        DataAccessBase.EVENT_COL.update_one({"_id": id}, {"$set": kwargs})
+        return DataAccessBase.sendSuccess("Event updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_event(id: str) -> DictParse:
+        """Method to delete an event"""
+
+        # Check if the event based on its id does not exist
+        event = DataAccessBase.EVENT_COL.find_one({"_id": id})
+        if event is None:
+            return DataAccessBase.sendError("Event does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.EVENT_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("Event deleted", id=id)
