@@ -1,6 +1,8 @@
 {
-    "statistic.feedback": "./messages/html/statistic/feedback.html",
-    "notification": "./messages/html/notification.html",
+    "statistic.feedback": "./messages/html/statistic/feedback_create.html",
+    "notification": "./messages/html/notification_create.html",
     "event.heads_up": "./messages/html/event_heads_up.html",
-    "event.create": "./messages/html/event_create.html"
+    "event.create": "./messages/html/event_create.html",
+    "authorized": "./messages/html/authorized.html",
+    "kicked": "./messages/html/kicked.html"
 }

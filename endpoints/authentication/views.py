@@ -22,7 +22,10 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
+from utils.communications.email import send_email
+from utils.html import read_html_file
 from database.user import UserAccess
+from config.config import config
 from flask import request
 
 #
@@ -143,6 +146,34 @@ def authorize_user_endpoint(**kwargs):
     # Get the user's instance based on the given information
     result = UserAccess.add_user(data["id"])
 
+    # Notify user of the new feedback
+    if result.status == "success":
+        # Extract user info
+        user = result.user_info
+
+        # Calculate the recipient's and sender's appropriate name
+        to_user_name = (
+            user.rank + " " + user.full_name
+            if "rank" in user
+            else user.first_name
+        )
+
+        # Get feedback HTML content
+        content = read_html_file(
+            "authorized",
+            to_user=to_user_name,
+            detachment_name=config.organization_name,
+            wingsuite_link=f"{config.wingsuite_link}/homepage"
+        )
+
+        # Send an email with the HTML content
+        send_email(
+            receiver=user.email,
+            subject="Access Granted",
+            content=content,
+            emoji=config.message_emoji.authentication.accepted,
+        )
+
     # Return response data
     return result, (200 if result.status == "success" else 400)
 
@@ -215,6 +246,30 @@ def kick_user_endpoint(**kwargs):
 
     # Kick the user out
     result = UserAccess.kick_user(user._id)
+
+    # Notify user of the new feedback
+    if result.status == "success":
+        # Calculate the recipient's and sender's appropriate name
+        to_user_name = (
+            user.rank + " " + user.full_name
+            if "rank" in user
+            else user.first_name
+        )
+
+        # Get feedback HTML content
+        content = read_html_file(
+            "kicked",
+            to_user=to_user_name,
+            detachment_name=config.organization_name,
+        )
+
+        # Send an email with the HTML content
+        send_email(
+            receiver=user.email,
+            subject="You Have Been Kicked Out",
+            content=content,
+            emoji=config.message_emoji.authentication.rejected,
+        )
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
