@@ -11,6 +11,7 @@ from endpoints.authentication import (
     register,
     login,
     get_register_requests,
+    password_reset_request,
     refresh,
     authorize,
     signout,
@@ -192,6 +193,7 @@ ROUTE HANDLING
 app.register_blueprint(register, url_prefix="/auth/")
 app.register_blueprint(login, url_prefix="/auth/")
 app.register_blueprint(get_register_requests, url_prefix="/auth/")
+app.register_blueprint(password_reset_request, url_prefix="/auth/")
 app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")

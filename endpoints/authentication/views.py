@@ -9,13 +9,16 @@ from . import (
     register,
     login,
     get_register_requests,
+    password_reset_request,
     refresh,
     authorize,
     signout,
+    reset_password,
     reject,
     kick_user,
 )
 from endpoints.base import (
+    success_response,
     is_root,
     permissions_required,
     param_check,
@@ -27,6 +30,8 @@ from utils.html import read_html_file
 from database.user import UserAccess
 from config.config import config
 from flask import request
+import datetime
+import uuid
 
 #
 #   CREATE OPERATIONS
@@ -108,6 +113,57 @@ def get_register_requests_endpoint(**kwargs):
     return result, 200
 
 
+@password_reset_request.route("/password_reset_request/", methods=["POST"])
+@param_check(ARGS.authentication.password_reset_request)
+@error_handler
+def password_reset_request_endpoint(**kwargs):
+    """Method to request password reset"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the user's email
+    user = UserAccess.get_user(id="_email", email=data["email"])
+    if user.status == "error":
+        return user, 400
+    user = user.message.info
+
+    # Generate a reset token and update the user's info
+    token = str(uuid.uuid4())
+    UserAccess.update_user(
+        id=user._id,
+        reset_token=token,
+        token_expiry=datetime.datetime.now()
+        + datetime.timedelta(minutes=config.JWT.password_reset_expiry),
+    )
+
+    # Get the user's proper name
+    to_user_name = (
+        user.rank + " " + user.full_name if "rank" in user else user.first_name
+    )
+
+    # Get password reset HTML content
+    content = read_html_file(
+        "auth.reset_request",
+        to_user=to_user_name,
+        reset_link=f"{config.wingsuite_link}/reset?token={token}",
+    )
+
+    # Send message to the user
+    send_email(
+        receiver=data["email"],
+        subject="Password Reset",
+        content=content,
+        emoji=config.message_emoji.authentication.reset,
+    )
+
+    # Send success message
+    return success_response(
+        "Your password reset link has been sent to your email. You have 5 "
+        + "minutes to reset it, before the link expires."
+    )
+
+
 #   endregion
 
 #
@@ -162,8 +218,7 @@ def authorize_user_endpoint(**kwargs):
         content = read_html_file(
             "auth.authorized",
             to_user=to_user_name,
-            detachment_name=config.organization_name,
-            wingsuite_link=f"{config.wingsuite_link}/homepage",
+            wingsuite_link=f"{config.wingsuite_dashboard_link}/homepage",
         )
 
         # Send an email with the HTML content
@@ -262,7 +317,6 @@ def kick_user_endpoint(**kwargs):
         content = read_html_file(
             "auth.kicked",
             to_user=to_user_name,
-            detachment_name=config.organization_name,
         )
 
         # Send an email with the HTML content

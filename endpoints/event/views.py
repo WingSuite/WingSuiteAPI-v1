@@ -57,7 +57,7 @@ def create_event_endpoint(**kwargs):
                 "target_unit": unit.info.name,
                 "location": event.info.location,
                 "description": event.info.description,
-                "event_link": f"{config.wingsuite_link}/events",
+                "event_link": f"{config.wingsuite_dashboard_link}/events",
             }
 
             # Send emails
@@ -129,7 +129,7 @@ def event_dispatch(**kwargs):
             "target_unit": UnitAccess.get_unit(i.info.unit).message.info.name,
             "location": i.info.location,
             "description": i.info.description,
-            "event_link": f"{config.wingsuite_link}/events",
+            "event_link": f"{config.wingsuite_dashboard_link}/events",
         }
 
         # Send emails

@@ -104,11 +104,14 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_user(id: str) -> DictParse:
+    def get_user(id: str, **kwargs) -> DictParse:
         """Base method for get_user methods"""
 
         # Get the results from the query
-        user = DataAccessBase.USER_COL.find_one({"_id": id})
+        if id == "_email" and "email" in kwargs:
+            user = DataAccessBase.USER_COL.find_one({"email": kwargs["email"]})
+        else:
+            user = DataAccessBase.USER_COL.find_one({"_id": id})
 
         # Return if the given user is not in the database
         if user is None:

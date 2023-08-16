@@ -70,7 +70,8 @@ def create_notification_endpoint(**kwargs):
                 "from_user": from_user_name,
                 "message": data["notification"],
                 "target_unit": unit.name,
-                "notification_link": f"{config.wingsuite_link}/notifications",
+                "notification_link": f"{config.wingsuite_dashboard_link}"
+                + "/notifications",
             }
 
             # Send emails

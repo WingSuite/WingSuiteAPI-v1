@@ -69,7 +69,7 @@ def create_feedback_endpoint(**kwargs):
             to_user=to_user_name,
             from_user=from_user_name,
             message=data["feedback"],
-            feedback_link=f"{config.wingsuite_link}/feedback"
+            feedback_link=f"{config.wingsuite_dashboard_link}/feedback",
         )
 
         # Send an email with the HTML content

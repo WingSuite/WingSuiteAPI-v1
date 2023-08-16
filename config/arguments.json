@@ -77,6 +77,7 @@
       "register": ["first_name", "last_name", "email", "phone_number",
         "password"],
       "login": ["email", "password"],
+      "password_reset_request": ["email"],
       "authorize_user": ["id"],
       "signout": ["access", "refresh"],
       "reject_user": ["id"],
