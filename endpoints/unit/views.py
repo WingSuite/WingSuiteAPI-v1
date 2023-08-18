@@ -116,7 +116,7 @@ def _update_personnel_helper(id, users, operation, participation):
                 "unit.added",
                 to_user=to_user_name,
                 unit_name=unit.info.name,
-                unit_link=f"{config.wingsuite_link}/unit/"
+                unit_link=f"{config.wingsuite_dashboard_link}/unit/"
                 + f"{quote(unit.info.name)}/frontpage",
             )
 
@@ -132,9 +132,7 @@ def _update_personnel_helper(id, users, operation, participation):
         elif operation == "delete" and res:
             # Get feedback HTML content
             content = read_html_file(
-                "unit.kicked",
-                to_user=to_user_name,
-                unit_name=unit.info.name
+                "unit.kicked", to_user=to_user_name, unit_name=unit.info.name
             )
 
             # Send an email with the HTML content

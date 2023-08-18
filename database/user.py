@@ -5,6 +5,7 @@ from .base import DataAccessBase
 from typing import Union, Any
 from utils.hash import sha256
 from models.user import User
+import datetime
 import uuid
 import math
 
@@ -41,6 +42,7 @@ class UserAccess(DataAccessBase):
             data["_id"] = uuid.uuid4().hex
             data["permissions"] = []
             data["units"] = []
+            data["email"] = data["email"].lower()
             del data["query"]
 
             # Hash and save the given password
@@ -104,11 +106,14 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_user(id: str) -> DictParse:
+    def get_user(id: str, **kwargs) -> DictParse:
         """Base method for get_user methods"""
 
         # Get the results from the query
-        user = DataAccessBase.USER_COL.find_one({"_id": id})
+        if id == "_email" and "email" in kwargs:
+            user = DataAccessBase.USER_COL.find_one({"email": kwargs["email"]})
+        else:
+            user = DataAccessBase.USER_COL.find_one({"_id": id})
 
         # Return if the given user is not in the database
         if user is None:
@@ -116,6 +121,22 @@ class UserAccess(DataAccessBase):
 
         # Return results based on types of representation
         return DataAccessBase.sendSuccess(User(**user))
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_user_with_reset_token(token: str) -> DictParse:
+        """Method to get the user object that fits the information"""
+
+        # Find user by token and ensure the token hasn't expired
+        user = DataAccessBase.USER_COL.find_one(
+            {
+                "reset_token": token,
+                "token_expiry": {"$gte": datetime.datetime.now()},
+            }
+        )
+
+        # Return the result
+        return user
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -179,6 +200,23 @@ class UserAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
+    def update_user_password(id: str, password: str) -> DictParse:
+        """Method to update a user's password from password reset request"""
+
+        # Hash password
+        password = sha256(password, DataAccessBase.DB_SPECS.spicer)
+
+        # Update the user
+        DataAccessBase.USER_COL.update_one({"_id": id}, {
+            "$set": {"password": password},
+            "$unset": {"reset_token": 1, "token_expiry": 1}
+        })
+
+        # Return message
+        return DataAccessBase.sendSuccess("Password updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
     def handle_jwt_blacklisting(refresh: str, access: str) -> DictParse:
         """Handles the blacklisting of JWT tokens"""
 
@@ -197,7 +235,7 @@ class UserAccess(DataAccessBase):
         )
 
         # Return message
-        return DataAccessBase.sendSuccess("Signed Out")
+        return DataAccessBase.sendSuccess("Signed out")
 
     @staticmethod
     @DataAccessBase.dict_wrap
