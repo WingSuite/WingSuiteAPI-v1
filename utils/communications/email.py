@@ -40,10 +40,12 @@ def send_email(
             server.send_message(message)
 
             # Return true
+            print("Email sent")
             return True
 
         # Return false on error
         except Exception:
+            print("Error occurred")
             return False
 
 

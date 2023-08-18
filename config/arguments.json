@@ -80,6 +80,7 @@
       "password_reset_request": ["email"],
       "authorize_user": ["id"],
       "signout": ["access", "refresh"],
+      "reset_password": ["token", "new_password"],
       "reject_user": ["id"],
       "kick_user": ["id"]
     },

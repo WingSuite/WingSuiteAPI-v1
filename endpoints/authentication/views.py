@@ -19,6 +19,7 @@ from . import (
 )
 from endpoints.base import (
     success_response,
+    client_error_response,
     is_root,
     permissions_required,
     param_check,
@@ -251,6 +252,32 @@ def signout_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@reset_password.route("/reset_password/", methods=["POST"])
+@param_check(ARGS.authentication.reset_password)
+@error_handler
+def password_reset_endpoint(**kwargs):
+    """Endpoint to reset password"""
+
+    # Extract the body information
+    token = request.json["token"]
+    new_password = request.json["new_password"]
+
+    # Get the user with the token
+    user = UserAccess.get_user_with_reset_token(token)
+
+    # Return error message if the nothing is found
+    if not user:
+        return client_error_response(
+            "Invalid or expired token. Request a new link."
+        )
+
+    # Update the user's password
+    result = UserAccess.update_user_password(user._id, new_password)
+
+    # Return success
+    return success_response(result.message)
 
 
 #   endregion

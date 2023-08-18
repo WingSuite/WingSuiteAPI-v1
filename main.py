@@ -15,6 +15,7 @@ from endpoints.authentication import (
     refresh,
     authorize,
     signout,
+    reset_password,
     reject,
     kick_user,
 )
@@ -197,6 +198,7 @@ app.register_blueprint(password_reset_request, url_prefix="/auth/")
 app.register_blueprint(refresh, url_prefix="/auth/")
 app.register_blueprint(authorize, url_prefix="/auth/")
 app.register_blueprint(signout, url_prefix="/auth/")
+app.register_blueprint(reset_password, url_prefix="/auth/")
 app.register_blueprint(reject, url_prefix="/auth/")
 app.register_blueprint(kick_user, url_prefix="/auth/")
 # endregion
