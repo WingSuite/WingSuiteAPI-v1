@@ -9,12 +9,12 @@
       },
       "five_point": {
         "create_five_point": ["to_user", "name", "datetime_taken",
-          "category_1", "category_2", "category_3", "category_4",
-          "category_5"],
+          "professionalism", "receptiveness", "team_build", "communication",
+          "performance"],
         "get_five_point_info": ["id"],
         "get_user_five_point_info": ["id", "page_size", "page_index"],
-        "get_test_five_point_score": ["category_1", "category_2", "category_3",
-          "category_4", "category_5"],
+        "get_test_five_point_score": ["professionalism", "receptiveness",
+          "team_build", "communication", "performance"],
         "update_five_point": ["id"],
         "delete_five_point": ["id"]
       },
