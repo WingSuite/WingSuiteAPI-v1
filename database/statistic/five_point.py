@@ -17,11 +17,11 @@ class FivePointAccess(DataAccessBase):
         to_user: str,
         name: str,
         datetime_taken: int,
-        category_1: int,
-        category_2: int,
-        category_3: int,
-        category_4: int,
-        category_5: int,
+        professionalism: int,
+        receptiveness: int,
+        team_build: int,
+        communication: int,
+        performance: int,
         **kwargs: Any
     ) -> DictParse:
         """Method to create a five point"""
@@ -36,20 +36,20 @@ class FivePointAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
         data["subscores"] = {
-            "category_1": int(category_1),
-            "category_2": int(category_2),
-            "category_3": int(category_3),
-            "category_4": int(category_4),
-            "category_5": int(category_5),
+            "professionalism": int(professionalism),
+            "receptiveness": int(receptiveness),
+            "team_build": int(team_build),
+            "communication": int(communication),
+            "performance": int(performance),
         }
         data["info"] = {}
 
         # Remove unncessary data
-        del data["category_1"]
-        del data["category_2"]
-        del data["category_3"]
-        del data["category_4"]
-        del data["category_5"]
+        del data["professionalism"]
+        del data["receptiveness"]
+        del data["team_build"]
+        del data["communication"]
+        del data["performance"]
 
         # Get an object representation of the given info
         five_point_obj = FivePoint(**data)
@@ -128,11 +128,11 @@ class FivePointAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def get_test_five_point(
-        category_1: int,
-        category_2: int,
-        category_3: int,
-        category_4: str,
-        category_5: str,
+        professionalism: int,
+        receptiveness: int,
+        team_build: int,
+        communication: str,
+        performance: str,
         **kwargs: Any
     ):
         """Calculate the user's test five point information"""
@@ -146,20 +146,20 @@ class FivePointAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
         data["subscores"] = {
-            "category_1": category_1,
-            "category_2": category_2,
-            "category_3": category_3,
-            "category_4": category_4,
-            "category_5": category_5,
+            "professionalism": professionalism,
+            "receptiveness": receptiveness,
+            "team_build": team_build,
+            "communication": communication,
+            "performance": performance,
         }
         data["info"] = {}
 
         # Remove unncessary data
-        del data["category_1"]
-        del data["category_2"]
-        del data["category_3"]
-        del data["category_4"]
-        del data["category_5"]
+        del data["professionalism"]
+        del data["receptiveness"]
+        del data["team_build"]
+        del data["communication"]
+        del data["performance"]
 
         # Get an object representation of the given info
         five_point_obj = FivePoint(

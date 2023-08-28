@@ -35,11 +35,11 @@ class FivePoint:
         """Return composite score and subscore ids"""
         return [
             "composite_score",
-            "category_1",
-            "category_2",
-            "category_3",
-            "category_4",
-            "category_5",
+            "professionalism",
+            "receptiveness",
+            "team_build",
+            "communication",
+            "performance",
         ]
 
     @staticmethod
@@ -58,11 +58,11 @@ class FivePoint:
     def get_scoring_options() -> dict:
         """Return a list of option for the composite and subscore"""
         return {
-            "category_1": [0, 1, 2, 3, 4, 5],
-            "category_2": [0, 1, 2, 3, 4, 5],
-            "category_3": [0, 1, 2, 3, 4, 5],
-            "category_4": [0, 1, 2, 3, 4, 5],
-            "category_5": [0, 1, 2, 3, 4, 5],
+            "professionalism": [0, 1, 2, 3, 4, 5],
+            "receptiveness": [0, 1, 2, 3, 4, 5],
+            "team_build": [0, 1, 2, 3, 4, 5],
+            "communication": [0, 1, 2, 3, 4, 5],
+            "performance": [0, 1, 2, 3, 4, 5],
         }
 
     @staticmethod
@@ -70,11 +70,11 @@ class FivePoint:
         """Return composite score and subscore ids, formatted"""
         return [
             "Composite Score",
-            "Category 1",
-            "Category 2",
-            "Category 3",
-            "Category 4",
-            "Category 5",
+            "Professionalism",
+            "Receptiveness to Training",
+            "Team-Building",
+            "Effective Communication",
+            "PMT Performance",
         ]
 
     @staticmethod
@@ -82,11 +82,11 @@ class FivePoint:
         """Return composite score and subscore ids' domain range"""
         return {
             "composite_score": [0, 5],
-            "category_1": [0, 5],
-            "category_2": [0, 5],
-            "category_3": [0, 5],
-            "category_4": [0, 5],
-            "category_5": [0, 5],
+            "professionalism": [0, 5],
+            "receptiveness": [0, 5],
+            "team_build": [0, 5],
+            "communication": [0, 5],
+            "performance": [0, 5],
         }
 
     @staticmethod
