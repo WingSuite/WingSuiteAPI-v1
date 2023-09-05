@@ -40,7 +40,7 @@ def send_email(
             server.send_message(message)
 
             # Return true
-            print("Email sent")
+            print("Email sent -", receiver)
             return True
 
         # Return false on error
