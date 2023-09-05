@@ -19,6 +19,7 @@ from database.notification import NotificationAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
 from config.config import config
+from threading import Thread
 from flask import request
 
 #
@@ -75,12 +76,16 @@ def create_notification_endpoint(**kwargs):
             }
 
             # Send emails
-            send_email_by_units(
-                unit=unit._id,
-                msg_content=msg_content,
-                subject="New Notification",
-                emoji=config.message_emoji.notification,
+            thread = Thread(
+                target=send_email_by_units,
+                args=(
+                    unit._id,
+                    msg_content,
+                    "New Notification",
+                    config.message_emoji.notification,
+                ),
             )
+            thread.start()
 
         # Return response data
         return result, (200 if result.status == "success" else 400)

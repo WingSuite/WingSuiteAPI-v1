@@ -13,6 +13,7 @@ from utils.permissions import isOfficerFromAbove
 from database.event import EventAccess
 from database.unit import UnitAccess
 from config.config import config
+from threading import Thread
 from flask import request
 
 #
@@ -61,12 +62,16 @@ def create_event_endpoint(**kwargs):
             }
 
             # Send emails
-            send_email_by_units(
-                unit=unit.info._id,
-                msg_content=msg_content,
-                subject="New Event",
-                emoji=config.message_emoji.event,
+            thread = Thread(
+                target=send_email_by_units,
+                args=(
+                    unit.info._id,
+                    msg_content,
+                    "New Event",
+                    config.message_emoji.event,
+                ),
             )
+            thread.start()
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -133,12 +138,16 @@ def event_dispatch(**kwargs):
         }
 
         # Send emails
-        send_email_by_units(
-            unit=i.info.unit,
-            msg_content=msg_content,
-            subject=f"{i.info.name} Starting in {config.heads_up} Minutes",
-            emoji=config.message_emoji.event,
+        thread = Thread(
+            target=send_email_by_units,
+            args=(
+                i.info.unit,
+                msg_content,
+                f"{i.info.name} Starting in {config.heads_up} Minutes",
+                config.message_emoji.event,
+            ),
         )
+        thread.start()
 
         # Update the event so  that it has been tracked
         EventAccess.update_event(id=i.info._id, heads_up_dispatched=True)
