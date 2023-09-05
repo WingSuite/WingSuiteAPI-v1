@@ -63,7 +63,7 @@ def create_notification_endpoint(**kwargs):
         )
 
         # Check if the user wants to notify the people under this unit
-        if result.status == "success" and data["notify"]:
+        if result.status == "success" and data["notify_email"]:
             # Prep the contents of the message
             msg_content = {
                 "template": "notification",

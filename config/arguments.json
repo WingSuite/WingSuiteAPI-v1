@@ -2,7 +2,7 @@
   "endpoints": {
     "statistic": {
       "feedback": {
-        "create_feedback": ["to_user", "name", "feedback", "notify"],
+        "create_feedback": ["to_user", "name", "feedback", "notify_email"],
         "get_feedback_info": ["id"],
         "update_feedback": ["id"],
         "delete_feedback": ["id"]
@@ -42,14 +42,14 @@
       "send_unit_discord_message": ["id", "title", "message"]
     },
     "notification": {
-      "create_notification": ["name", "unit", "notification", "notify"],
+      "create_notification": ["name", "unit", "notification", "notify_email"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
     },
     "event": {
       "create_event": ["name", "unit", "location", "start_datetime",
-        "end_datetime", "description", "notify"],
+        "end_datetime", "description", "notify_email"],
       "get_event_info": ["id"],
       "update_event": ["id"],
       "delete_event": ["id"]

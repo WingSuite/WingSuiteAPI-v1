@@ -47,7 +47,7 @@ def create_event_endpoint(**kwargs):
         result = EventAccess.create_event(**data)
 
         # Check if the user wants to notify the people under this unit
-        if result.status == "success" and data["notify"]:
+        if result.status == "success" and data["notify_email"]:
             # Get and prep metadata for the message
             event = EventAccess.get_event_by_id(result.id).message
             msg_content = {
