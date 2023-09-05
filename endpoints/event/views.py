@@ -14,6 +14,7 @@ from database.event import EventAccess
 from database.unit import UnitAccess
 from config.config import config
 from flask import request
+import logging
 
 #
 #   CREATE OPERATIONS
@@ -117,7 +118,7 @@ def event_dispatch(**kwargs):
     events = EventAccess.get_occurring_events(offset=config.heads_up).message
 
     # Print debug
-    print(f"Found {len(events)} events to dispatch")
+    logging.info(f"Found {len(events)} events to dispatch")
 
     # Iterate through each event
     for i in events:
