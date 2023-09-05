@@ -6,7 +6,6 @@ from typing import List, Any
 from functools import wraps
 from flask import request
 import traceback
-import logging
 
 
 def success_response(message: str, **kwargs: Any) -> dict:
@@ -150,7 +149,7 @@ def error_handler(func: object) -> object:
         # If the exception occurs, print the error to the console and
         # return a server error response
         except Exception:
-            logging.error(f"Caught an exception in {func.__name__}():")
+            print(f"Caught an exception in {func.__name__}():")
             traceback.print_exc()
             return server_error_response("A server error occurred")
 

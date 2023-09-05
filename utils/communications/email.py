@@ -7,7 +7,6 @@ from email.message import EmailMessage
 from config.config import config
 from typing import Any
 import smtplib
-import logging
 
 
 def send_email(
@@ -41,12 +40,12 @@ def send_email(
             server.send_message(message)
 
             # Return true
-            logging.info("Email sent -", receiver)
+            print("Email sent -", receiver)
             return True
 
         # Return false on error
         except Exception:
-            logging.info("Error occurred")
+            print("Error occurred")
             return False
 
 

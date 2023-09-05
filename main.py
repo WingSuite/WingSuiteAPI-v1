@@ -112,7 +112,6 @@ from apscheduler.triggers.interval import IntervalTrigger
 # Miscellaneous Imports
 from config.config import config
 from datetime import timedelta
-import logging
 import atexit
 import os
 
@@ -325,9 +324,11 @@ APP RUNTIME HANDLING
 """
 
 # Scheduler functionalities
-if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+if os.environ.get(
+    "WERKZEUG_RUN_MAIN"
+) == "true" or "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
     # Initialize scheduler functionalities
-    logging.info("Starting background scheduler...")
+    print("Starting background scheduler...")
     scheduler = BackgroundScheduler()
     scheduler.start()
 
@@ -342,7 +343,7 @@ if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
-    logging.info("Background scheduler created!")
+    print("Background scheduler created!")
 
 # Main run thread
 if __name__ == "__main__":
@@ -352,13 +353,13 @@ if __name__ == "__main__":
     # Check if the server is in development mode
     mode_type = int(os.environ.get("RUN_MODE"))
     if mode_type == 0:
-        logging.info("Running API Server in DEVELOPMENT MODE")
+        print("Running API Server in DEVELOPMENT MODE")
         app.run(host="0.0.0.0", port=5000)
     # Check if the server is in production mode
     elif mode_type == 1:
-        logging.info("Running API Server in PRODUCTION MODE")
+        print("Running API Server in PRODUCTION MODE")
         serve(app, host="0.0.0.0", port=5000)
     # If the mode value was not provided, exit with a message
     else:
-        logging.error("Invalid mode specification. Exiting...")
+        print("Invalid mode specification. Exiting...")
         exit()
