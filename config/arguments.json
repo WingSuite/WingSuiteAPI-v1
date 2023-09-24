@@ -42,7 +42,8 @@
       "send_unit_discord_message": ["id", "title", "message"]
     },
     "notification": {
-      "create_notification": ["name", "unit", "notification", "notify_email"],
+      "create_notification": ["name", "unit", "notification", "notify_email",
+        "tag"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
@@ -116,7 +117,7 @@
     },
     "notification": {
       "init": ["_id", "name", "unit", "created_datetime", "notification",
-        "author"]
+        "author", "tag"]
     },
     "event": {
       "init": ["_id", "name", "unit", "location", "start_datetime",

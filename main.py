@@ -68,6 +68,7 @@ from endpoints.event import (
 from endpoints.notification import (
     create_notification,
     get_notification_info,
+    get_notification_format,
     update_notification,
     delete_notification,
 )
@@ -262,6 +263,7 @@ app.register_blueprint(delete_event, url_prefix="/event/")
 # region
 app.register_blueprint(create_notification, url_prefix="/notification/")
 app.register_blueprint(get_notification_info, url_prefix="/notification/")
+app.register_blueprint(get_notification_format, url_prefix="/notification/")
 app.register_blueprint(update_notification, url_prefix="/notification/")
 app.register_blueprint(delete_notification, url_prefix="/notification/")
 # endregion

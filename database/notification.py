@@ -13,11 +13,7 @@ class NotificationAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def create_notification(
-        name: str,
-        unit: str,
-        notification: str,
-        author: str,
-        **kwargs: Any
+        name: str, unit: str, notification: str, author: str, **kwargs: Any
     ) -> DictParse:
         """Method to create a notification"""
 
@@ -28,6 +24,12 @@ class NotificationAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["created_datetime"] = int(time.time())
+
+        # Throw error if the tag is one of the available keys
+        if data["tag"] not in Notification.get_available_tags():
+            return DataAccessBase.sendError(
+                f"{data['tag']} is not an available tag"
+            )
 
         # Insert into the collection
         DataAccessBase.NOTIFICATION_COL.insert_one(data)
@@ -57,6 +59,12 @@ class NotificationAccess(DataAccessBase):
         # Check if the notification based on its id does exist
         if DataAccessBase.NOTIFICATION_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Notification does not exist")
+
+        # Check if the given tag value is a proper tag
+        if kwargs["tag"] not in Notification.get_available_tags():
+            return DataAccessBase.sendError(
+                f"{kwargs['tag']} is not an available tag"
+            )
 
         # Update the document and return a success message
         DataAccessBase.NOTIFICATION_COL.update_one(
@@ -111,3 +119,8 @@ class NotificationAccess(DataAccessBase):
 
         # Return with a Notification object
         return DataAccessBase.sendSuccess(notifications)
+
+    @staticmethod
+    def get_notification_tags() -> DictParse:
+        """Method to return a dictionary of the available tags"""
+        return Notification.get_available_tags()
