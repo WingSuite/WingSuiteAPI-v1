@@ -62,7 +62,7 @@ def create_feedback_endpoint(**kwargs):
     result = FeedbackAccess.create_feedback(**data, from_user=kwargs["id"])
 
     # Notify user of the new feedback
-    if result.status == "success" and data["notify"]:
+    if result.status == "success" and data["notify_email"]:
         # Get feedback HTML content
         content = read_html_file(
             "statistic.feedback",

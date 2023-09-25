@@ -10,6 +10,7 @@ from endpoints.base import (
 from . import (
     create_notification,
     get_notification_info,
+    get_notification_format,
     update_notification,
     delete_notification,
 )
@@ -19,6 +20,8 @@ from database.notification import NotificationAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
 from config.config import config
+from threading import Thread
+from flask_jwt_extended import jwt_required
 from flask import request
 
 #
@@ -63,7 +66,7 @@ def create_notification_endpoint(**kwargs):
         )
 
         # Check if the user wants to notify the people under this unit
-        if result.status == "success" and data["notify"]:
+        if result.status == "success" and data["notify_email"]:
             # Prep the contents of the message
             msg_content = {
                 "template": "notification",
@@ -75,12 +78,16 @@ def create_notification_endpoint(**kwargs):
             }
 
             # Send emails
-            send_email_by_units(
-                unit=unit._id,
-                msg_content=msg_content,
-                subject="New Notification",
-                emoji=config.message_emoji.notification,
+            thread = Thread(
+                target=send_email_by_units,
+                args=(
+                    unit._id,
+                    msg_content,
+                    "New Notification",
+                    config.message_emoji.notification,
+                ),
             )
+            thread.start()
 
         # Return response data
         return result, (200 if result.status == "success" else 400)
@@ -122,6 +129,19 @@ def get_notification_info_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@get_notification_format.route("/get_notification_format/", methods=["GET"])
+@jwt_required()
+@error_handler
+def get_notification_format_endpoint(**kwargs):
+    """Endpoint to return a notification's format"""
+
+    # Build response message
+    result = {"tag_options": NotificationAccess.get_notification_tags()}
+
+    # Return response data
+    return result, 200
 
 
 #   endregion
