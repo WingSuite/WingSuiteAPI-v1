@@ -61,10 +61,11 @@ class NotificationAccess(DataAccessBase):
             return DataAccessBase.sendError("Notification does not exist")
 
         # Check if the given tag value is a proper tag
-        if kwargs["tag"] not in Notification.get_available_tags():
-            return DataAccessBase.sendError(
-                f"{kwargs['tag']} is not an available tag"
-            )
+        if "tag" in kwargs:
+            if kwargs["tag"] not in Notification.get_available_tags():
+                return DataAccessBase.sendError(
+                    f"{kwargs['tag']} is not an available tag"
+                )
 
         # Update the document and return a success message
         DataAccessBase.NOTIFICATION_COL.update_one(
