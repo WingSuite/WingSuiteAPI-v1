@@ -29,7 +29,7 @@ class Notification:
             "INFO": "#ADD8E6",
             "Community": "#90EE90",
             "Volunteer": "#FFD700",
-            "Morale": "#FFFF99",
+            "Morale": "#FF70FF",
             "Award": "#FFA500",
             "Scholarship": "#FF8C00",
             "WK": "#82FFE2",
