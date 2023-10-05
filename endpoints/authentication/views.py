@@ -44,7 +44,7 @@ import uuid
 @param_check(ARGS.authentication.register)
 @error_handler
 def register_endpoint(**kwargs):
-    """Log In Handling"""
+    """Register Handling"""
 
     # Parse information from the call's body
     data = request.get_json()
