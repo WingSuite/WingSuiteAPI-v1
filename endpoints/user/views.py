@@ -363,6 +363,7 @@ def get_notifications_endpoint(**kwargs):
     ]
 
     # Sort the user events by start datetime
+    # TODO: Have sorting be handled by user's end
     user_notifications = sorted(
         user_notifications,
         key=lambda x: x["created_datetime"],

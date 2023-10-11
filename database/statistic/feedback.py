@@ -128,21 +128,21 @@ class FeedbackAccess(DataAccessBase):
             }
 
         # Add a formatted from_user key for each feedback
-        memoized = DictParse({})
+        memoize = DictParse({})
         result = list(result)
         for i in result:
             # Add key if the iterated from_user is not memoized
-            if i["from_user"] not in memoized:
+            if i["from_user"] not in memoize:
                 # Add user's formatted name to the memoization
                 from_user = UserAccess.get_user(
                     i["from_user"], check_former=True
                 ).message
-                memoized[i["from_user"]] = from_user.get_fullname(
+                memoize[i["from_user"]] = from_user.get_fullname(
                     lastNameFirst=True, with_rank=True
                 )
 
             # Add formatted key
-            i["formatted_from_user"] = memoized[i["from_user"]]
+            i["formatted_from_user"] = memoize[i["from_user"]]
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)

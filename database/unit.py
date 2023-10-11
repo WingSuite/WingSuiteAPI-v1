@@ -51,7 +51,7 @@ class UnitAccess(DataAccessBase):
             user = UserAccess.get_user(item).message
 
             # Continue if the iterated user is not a User
-            if type(user) != User:
+            if type(user) is not User:
                 continue
 
             # Add the officer to the unit
@@ -66,7 +66,7 @@ class UnitAccess(DataAccessBase):
             unit = UnitAccess.get_unit(item).message
 
             # Continue if the iterated unit is not a Unit
-            if type(user) != Unit:
+            if type(user) is not Unit:
                 continue
 
             # Update their parent pointer
@@ -108,7 +108,7 @@ class UnitAccess(DataAccessBase):
             user = UserAccess.get_user(item).message
 
             # Continue if the iterated user is not a User
-            if type(user) != User:
+            if type(user) is not User:
                 continue
 
             # Add the officer to the unit
@@ -123,7 +123,7 @@ class UnitAccess(DataAccessBase):
             iter_unit = UnitAccess.get_unit(item).message
 
             # Continue if the iterated unit is not a Unit
-            if type(iter_unit) != Unit:
+            if type(iter_unit) is not Unit:
                 continue
 
             # Update their parent pointer
@@ -263,7 +263,7 @@ class UnitAccess(DataAccessBase):
                 config.unit_types.index(x["unit_type"]),
                 x["name"],
             ),
-            reverse=True
+            reverse=True,
         )
 
         # Return the units
