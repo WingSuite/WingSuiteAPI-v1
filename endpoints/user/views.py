@@ -536,7 +536,6 @@ def get_permissions_list_endpoint(**kwargs):
 
 #   endregion
 
-
 #
 #   UPDATE OPERATIONS
 #   region

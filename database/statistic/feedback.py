@@ -1,6 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
+from database.user import UserAccess
 from models.statistic.feedback import Feedback
 from typing import Any
 import uuid
@@ -19,9 +20,7 @@ class FeedbackAccess(DataAccessBase):
         """Method to create a feedback"""
 
         # Prep data to be inserted
-        data = {
-            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
-        }
+        data = {k: v for k, v in locals().items() if k not in ["kwargs", "args"]}
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "feedback"
@@ -57,9 +56,7 @@ class FeedbackAccess(DataAccessBase):
             return DataAccessBase.sendError("Feedback does not exist")
 
         # Update the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.update_one(
-            {"_id": id}, {"$set": kwargs}
-        )
+        DataAccessBase.CURRENT_STATS_COL.update_one({"_id": id}, {"$set": kwargs})
         return DataAccessBase.sendSuccess("Feedback updated")
 
     @staticmethod
@@ -101,8 +98,7 @@ class FeedbackAccess(DataAccessBase):
 
         # Get the total amount of pages based on pagination size
         pages = math.ceil(
-            (DataAccessBase.CURRENT_STATS_COL.count_documents(query))
-            / page_size
+            (DataAccessBase.CURRENT_STATS_COL.count_documents(query)) / page_size
         )
 
         # Check if the page_index is outside the page range
@@ -114,9 +110,7 @@ class FeedbackAccess(DataAccessBase):
 
         # Search the collection based on id
         result = (
-            DataAccessBase.CURRENT_STATS_COL.find(query)
-            .skip(skips)
-            .limit(page_size)
+            DataAccessBase.CURRENT_STATS_COL.find(query).skip(skips).limit(page_size)
         )
 
         # Return if the given feedback is not in the database
@@ -125,6 +119,24 @@ class FeedbackAccess(DataAccessBase):
                 "status": "error",
                 "message": "Feedback not found",
             }
+
+        # Add a formatted from_user key for each feedback
+        memoized = DictParse({})
+        for i in result:
+            # Add key if the iterated from_user is not memoized
+            if i["from_user"] not in memoized:
+                # Add user's formatted name to the memoization
+                from_user = UserAccess.get_user(
+                    i["from_user"], check_former=True
+                ).message
+                memoized[i["from_user"]] = from_user.get_fullname(
+                    lastNameFirst=True, with_rank=True
+                )
+
+            # Add formatted key
+            i["formatted_from_user"] = memoized[i["from_user"]]
+
+        print(memoized)
 
         # Turn result into a list
         result = list(result)

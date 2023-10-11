@@ -33,11 +33,7 @@ class UserAccess(DataAccessBase):
             and DataAccessBase.REGISTER_COL.find_one(query) is None
         ):
             # Prep data to be inserted
-            data = {
-                k: v
-                for k, v in locals().items()
-                if k not in ["kwargs", "args"]
-            }
+            data = {k: v for k, v in locals().items() if k not in ["kwargs", "args"]}
             data.update(locals()["kwargs"])
             data["_id"] = uuid.uuid4().hex
             data["permissions"] = []
@@ -55,9 +51,7 @@ class UserAccess(DataAccessBase):
 
         # Return false if the given information exists
         else:
-            return DataAccessBase.sendError(
-                "User has registered or is authorized"
-            )
+            return DataAccessBase.sendError("User has registered or is authorized")
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -72,9 +66,7 @@ class UserAccess(DataAccessBase):
             # return success
             DataAccessBase.USER_COL.insert_one(user)
             DataAccessBase.REGISTER_COL.delete_one({"_id": id})
-            return DataAccessBase.sendSuccess(
-                "User added to system", user_info=user
-            )
+            return DataAccessBase.sendSuccess("User added to system", user_info=user)
         # Return false if the given information exists
         else:
             return DataAccessBase.sendError("User did not register")
@@ -116,8 +108,22 @@ class UserAccess(DataAccessBase):
             user = DataAccessBase.USER_COL.find_one({"_id": id})
 
         # Return if the given user is not in the database
+        # If an call also looks into the former users, return the user
+        # object if in the former users section
         if user is None:
-            return DataAccessBase.sendError("User not found")
+            # Check former database if the call specifies
+            if kwargs.get("check_former", False):
+                # Get the results from the query
+                if id == "_email" and "email" in kwargs:
+                    user = DataAccessBase.REGISTER_COL.find_one(
+                        {"email": kwargs["email"]}
+                    )
+                else:
+                    user = DataAccessBase.REGISTER_COL.find_one({"_id": id})
+
+            # Return error if else
+            else:
+                return DataAccessBase.sendError("User not found")
 
         # Return results based on types of representation
         return DataAccessBase.sendSuccess(User(**user))
@@ -148,9 +154,7 @@ class UserAccess(DataAccessBase):
             return DataAccessBase.sendError("Invalid pagination size or index")
 
         # Get the total amount of pages based on pagination size
-        pages = math.ceil(
-            DataAccessBase.USER_COL.count_documents({}) / page_size
-        )
+        pages = math.ceil(DataAccessBase.USER_COL.count_documents({}) / page_size)
 
         # Check if the page_index is outside the page range
         if page_index >= pages:
@@ -207,10 +211,13 @@ class UserAccess(DataAccessBase):
         password = sha256(password, DataAccessBase.DB_SPECS.spicer)
 
         # Update the user
-        DataAccessBase.USER_COL.update_one({"_id": id}, {
-            "$set": {"password": password},
-            "$unset": {"reset_token": 1, "token_expiry": 1}
-        })
+        DataAccessBase.USER_COL.update_one(
+            {"_id": id},
+            {
+                "$set": {"password": password},
+                "$unset": {"reset_token": 1, "token_expiry": 1},
+            },
+        )
 
         # Return message
         return DataAccessBase.sendSuccess("Password updated")
