@@ -55,7 +55,7 @@ class User:
         # Get the user's names
         first_name = self.info.first_name
         last_name = self.info.last_name
-        rank = self.info.rank if "rank" in self.info else ""
+        rank = self.info.rank + " " if "rank" in self.info else ""
         middle_initial = ""
         if "middle_initial" in self.info:
             middle_initial = " " + self.info.middle_initial
@@ -68,7 +68,7 @@ class User:
 
         # Add rank if true
         if with_rank:
-            return rank + " " + name
+            return rank + name
         else:
             return name
 
