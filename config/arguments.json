@@ -27,6 +27,7 @@
         "update_pfa": ["id"],
         "delete_pfa": ["id"]
       },
+      "task": {},
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
@@ -106,10 +107,19 @@
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
       },
+      "five_point": {
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "datetime_taken", "subscores", "info"]
+      },
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "datetime_taken", "subscores", "info"]
       },
+      "task": {
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+        "description", "datetime_created", "suspense", "auto_accept",
+        "requests", "record", "not_complete", "suspense"]
+        },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "composite_score"]

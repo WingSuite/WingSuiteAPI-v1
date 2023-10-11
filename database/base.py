@@ -38,6 +38,7 @@ class DataAccessBase:
     CURRENT_STATS_COL = DB["currentStats"]
     NOTIFICATION_COL = DB["notifications"]
     FORMER_USERS_COL = DB["formerUsers"]
+    TASK_COL = DB["tasks"]
 
     # Set config constants
     DB_SPECS = db_spec

@@ -12,7 +12,7 @@ class PFA:
     REQ_ARGS = arguments.models.statistic
 
     def __init__(self: "PFA", **kwargs: Any) -> None:
-        """Constructor for base unit"""
+        """Constructor for base pfa"""
 
         # Check if kwargs has the minimum arguments
         for arg in PFA.REQ_ARGS.pfa.init:
