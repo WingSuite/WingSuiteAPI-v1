@@ -27,7 +27,13 @@
         "update_pfa": ["id"],
         "delete_pfa": ["id"]
       },
-      "task": {},
+      "task": {
+        "create_task": ["to_users", "name", "description", "suspense",
+          "auto_accept_requests", "notify_email"],
+        "get_feedback_info": ["id"],
+        "update_feedback": ["id"],
+        "delete_feedback": ["id"]
+      },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
@@ -117,10 +123,10 @@
           "datetime_taken", "subscores", "info"]
       },
       "task": {
-        "init": ["_id", "stat_type", "from_user", "to_user", "name",
-        "description", "datetime_created", "suspense", "auto_accept",
-        "requests", "record", "not_complete", "suspense"]
-        },
+        "init": ["_id", "stat_type", "from_user", "to_users", "name",
+        "description", "datetime_created", "suspense", "auto_accept_requests",
+        "requests", "record", "not_complete"]
+      },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "composite_score"]

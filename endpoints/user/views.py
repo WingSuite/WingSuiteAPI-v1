@@ -161,7 +161,7 @@ def everyone_endpoint(**kwargs):
 
     # Get the content information based on the given page size and
     # page index
-    results = UserAccess.get_users(**data)
+    results = UserAccess.get_all_users(**data)
 
     # If the resulting information is in error, respond with error
     if results.status == "error":

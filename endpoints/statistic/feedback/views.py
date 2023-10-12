@@ -41,22 +41,10 @@ def create_feedback_endpoint(**kwargs):
     to_user = UserAccess.get_user(data["to_user"])
     if to_user.status == "error":
         return to_user, 400
-    to_user = to_user.message.info
+    to_user = to_user.message
 
     # Get the sender's user info
-    from_user = UserAccess.get_user(kwargs["id"]).message.info
-
-    # Calculate the recipient's and sender's appropriate name
-    to_user_name = (
-        to_user.rank + " " + to_user.full_name
-        if "rank" in to_user
-        else to_user.first_name
-    )
-    from_user_name = (
-        from_user.rank + " " + from_user.full_name
-        if "rank" in from_user
-        else from_user.first_name
-    )
+    from_user = UserAccess.get_user(kwargs["id"]).message
 
     # Add the feedback to the database
     result = FeedbackAccess.create_feedback(**data, from_user=kwargs["id"])
@@ -66,15 +54,15 @@ def create_feedback_endpoint(**kwargs):
         # Get feedback HTML content
         content = read_html_file(
             "statistic.feedback",
-            to_user=to_user_name,
-            from_user=from_user_name,
+            to_user=to_user.get_fullname(with_rank=True),
+            from_user=from_user.get_fullname(with_rank=True),
             message=data["feedback"],
             feedback_link=f"{config.wingsuite_dashboard_link}/feedback",
         )
 
         # Send an email with the HTML content
         send_email(
-            receiver=to_user.email,
+            receiver=to_user.info.email,
             subject="New Feedback",
             content=content,
             emoji=config.message_emoji.statistic.feedback,

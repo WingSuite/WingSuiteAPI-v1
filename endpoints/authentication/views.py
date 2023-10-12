@@ -331,7 +331,7 @@ def kick_user_endpoint(**kwargs):
     # Kick the user out
     result = UserAccess.kick_user(user._id)
 
-    # Notify user of the new feedback
+    # Notify user of the event
     if result.status == "success":
         # Calculate the recipient's appropriate name
         to_user_name = (

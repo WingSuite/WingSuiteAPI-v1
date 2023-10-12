@@ -1,6 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
+
 # from database.user import UserAccess
 from models.statistic.task import Task
 from typing import Any, List
@@ -32,14 +33,13 @@ class TaskAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "task"
-        data["datetime_taken"] = int(time.time())
+        data["datetime_created"] = int(time.time())
         data["requests"] = {}
         data["record"] = {}
-        data["not_complete"] = set()
-        data["info"] = {}
+        data["not_complete"] = []
 
         # Insert into the collection
-        DataAccessBase.TASK_COL.insert_one(data)
+        DataAccessBase.CURRENT_STATS_COL.insert_one(data)
 
         # Return a statement
         return DataAccessBase.sendSuccess("Task created")
@@ -50,12 +50,12 @@ class TaskAccess(DataAccessBase):
         """Method to delete an task"""
 
         # Check if the task based on its id does not exist
-        task = DataAccessBase.TASK_COL.find_one({"_id": id})
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
         if task is None:
             return DataAccessBase.sendError("Task does not exist")
 
         # Delete the document and return a success message
-        DataAccessBase.TASK_COL.delete_one({"_id": id})
+        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
         return DataAccessBase.sendSuccess("Task deleted")
 
     @staticmethod
@@ -64,11 +64,13 @@ class TaskAccess(DataAccessBase):
         """Method to delete a task"""
 
         # Check if the task based on its id does exist
-        if DataAccessBase.TASK_COL.find_one({"_id": id}) is None:
+        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Task does not exist")
 
         # Update the document and return a success message
-        DataAccessBase.TASK_COL.update_one({"_id": id}, {"$set": kwargs})
+        DataAccessBase.CURRENT_STATS_COL.update_one(
+            {"_id": id}, {"$set": kwargs}
+        )
         return DataAccessBase.sendSuccess("Task updated")
 
     @staticmethod
@@ -77,7 +79,7 @@ class TaskAccess(DataAccessBase):
         """Method to retrieve a single task based on ID"""
 
         # Search the collection based on id
-        task = DataAccessBase.TASK_COL.find_one(
+        task = DataAccessBase.CURRENT_STATS_COL.find_one(
             {"stat_type": "task", "_id": id}
         )
 
@@ -107,7 +109,8 @@ class TaskAccess(DataAccessBase):
 
         # Get the total amount of pages based on pagination size
         pages = math.ceil(
-            (DataAccessBase.TASK_COL.count_documents(query)) / page_size
+            (DataAccessBase.CURRENT_STATS_COL.count_documents(query))
+            / page_size
         )
 
         # Check if the page_index is outside the page range
@@ -119,7 +122,9 @@ class TaskAccess(DataAccessBase):
 
         # Search the collection based on id
         result = (
-            DataAccessBase.TASK_COL.find(query).skip(skips).limit(page_size)
+            DataAccessBase.CURRENT_STATS_COL.find(query)
+            .skip(skips)
+            .limit(page_size)
         )
 
         # Return if the given feedback is not in the database

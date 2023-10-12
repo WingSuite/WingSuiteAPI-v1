@@ -7,9 +7,19 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
-    <style>
+    <style type="text/css">
       body {
         font-family: "Poppins", sans-serif;
+      }
+      .email-content p,
+      .email-content h1,
+      .email-content h2,
+      .email-content h3,
+      .email-content h4,
+      .email-content h5,
+      .email-content h6 {
+        margin: 0 !important;
+        padding: 0 !important;
       }
     </style>
   </head>
@@ -71,7 +81,12 @@
       <div>
         <p>Hello {to_user},</p>
         <p>You received the following feedback from {from_user}:</p>
-        <div style="font-size: 0.75rem; font-style: italic">{message}</div>
+        <div
+          style="font-size: 0.75rem; font-style: italic"
+          class="email-content"
+        >
+          {message}
+        </div>
         <p>
           You can view this message in your
           <a href="{feedback_link}">feedback page</a>
