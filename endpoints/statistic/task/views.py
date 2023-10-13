@@ -6,7 +6,7 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import create_task, get_task_info
+from . import create_task, get_task_info, update_task
 from flask import request
 from utils.communications.email import send_email
 from utils.html import read_html_file
@@ -110,6 +110,26 @@ def get_task_info_endpoint(**kwargs):
 #   UPDATE OPERATIONS
 #   region
 #
+
+
+@update_task.route("/update_task/", methods=["POST"])
+@permissions_required(["statistic.task.update_task"])
+@param_check(ARGS.statistic.task.update_task)
+@error_handler
+def update_task_endpoint(**kwargs):
+    """Method to handle the update of a task"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target feedback
+    id = data.pop("id")
+
+    # Add the feedback to the database
+    result = TaskAccess.update_task(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

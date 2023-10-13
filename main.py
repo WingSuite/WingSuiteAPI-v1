@@ -99,8 +99,8 @@ from endpoints.statistic.pfa import (
 )
 from endpoints.statistic.task import (
     create_task,
-    # get_task_info,
-    # update_task,
+    get_task_info,
+    update_task,
     # request_completion,
     # reject_completion,
     # approve_completion,
@@ -320,6 +320,8 @@ app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 # Statistic Task routes
 # region
 app.register_blueprint(create_task, url_prefix="/statistic/task/")
+app.register_blueprint(get_task_info, url_prefix="/statistic/task/")
+app.register_blueprint(update_task, url_prefix="/statistic/task/")
 # endregion
 
 # Statistic Warrior routes
