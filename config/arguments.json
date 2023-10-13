@@ -116,11 +116,11 @@
       },
       "five_point": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "datetime_taken", "subscores", "info"]
+          "datetime_taken", "datetime_created", "subscores", "info"]
       },
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "datetime_taken", "subscores", "info"]
+          "datetime_taken", "datetime_created", "subscores", "info"]
       },
       "task": {
         "init": ["_id", "stat_type", "from_user", "to_users", "name",
@@ -129,7 +129,7 @@
       },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "composite_score"]
+          "datetime_taken", "datetime_created", "composite_score"]
       }
     },
     "notification": {
