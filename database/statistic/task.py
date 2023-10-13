@@ -16,7 +16,7 @@ class TaskAccess(DataAccessBase):
     @DataAccessBase.dict_wrap
     def create_task(
         from_user: str,
-        to_users: List[str],
+        incomplete: List[str],
         name: str,
         description: str,
         suspense: int,
@@ -33,9 +33,8 @@ class TaskAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "task"
         data["datetime_created"] = int(time.time())
-        data["requests"] = {}
-        data["record"] = {}
-        data["not_complete"] = []
+        data["pending"] = {}
+        data["complete"] = {}
 
         # Insert into the collection
         DataAccessBase.CURRENT_STATS_COL.insert_one(data)
@@ -66,15 +65,64 @@ class TaskAccess(DataAccessBase):
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Task does not exist")
 
-        # Disable the changing of time_created attribute
-        if ("datetime_created" in kwargs):
-            return DataAccessBase.sendError("Cannot change creation datetime")
+        # Disable the changing of certain attributes
+        immutable = [
+            "datetime_created",
+            "notify_email",
+            "incomplete",
+            "pending",
+            "complete",
+        ]
+        if any(i in kwargs for i in immutable):
+            return DataAccessBase.sendError(
+                "Cannot change the following attributes: "
+                + ", ".join(immutable)
+            )
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(
             {"_id": id}, {"$set": kwargs}
         )
         return DataAccessBase.sendSuccess("Task updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def request_completion(task_id: str, user_id: str) -> DictParse:
+        """Method to handle the user's completion request"""
+
+        # Check if the task based on its id does not exist
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
+        if task is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Check if the user is part of the task's incomplete list
+        if user_id not in task["incomplete"]:
+            # If the user is pending approval, send a message about that
+            if user_id in task["pending"]:
+                return DataAccessBase.sendError(
+                    "You are pending approval for completing this task"
+                )
+            # If the user completed this task, send a message about that
+            else:
+                return DataAccessBase.sendError(
+                    "You are not assigned to this task"
+                )
+
+        # Automatically approve user if requesting
+        push_query = {}
+        if task["auto_accept_requests"]:
+            push_query["complete"] = user_id
+        else:
+            push_query["pending"] = user_id
+
+        # Update database
+        DataAccessBase.CURRENT_STATS_COL.update_one(
+            {"_id": task_id},
+            {
+                "$pull": {"incomplete": user_id},
+                "$push": push_query,
+            },
+        )
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -125,7 +173,7 @@ class TaskAccess(DataAccessBase):
         result = (
             DataAccessBase.CURRENT_STATS_COL.find(
                 query,
-                {"requests": 0, "record": 0, "not_complete": 0, "to_users": 0},
+                {"incomplete": 0, "pending": 0, "complete": 0},
             )
             .skip(skips)
             .limit(page_size)

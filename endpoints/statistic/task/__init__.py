@@ -11,4 +11,4 @@ approve_completion = Blueprint("approve_completion", __name__)
 delete_task = Blueprint("delete_task", __name__)
 
 # Import views
-from . import views   # noqa
+from . import views  # noqa

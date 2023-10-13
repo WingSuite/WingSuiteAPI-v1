@@ -6,7 +6,7 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import create_task, get_task_info, update_task
+from . import create_task, get_task_info, update_task, request_completion
 from flask import request
 from utils.communications.email import send_email
 from utils.html import read_html_file
@@ -33,12 +33,14 @@ def create_task_endpoint(**kwargs):
     data = request.get_json()
 
     # Get an object instance of the users in the list
-    to_users = UserAccess.get_users(data["to_users"]).message
+    to_users = UserAccess.get_users(data["users"]).message
 
     # Get the sender's user info
     from_user = UserAccess.get_user(kwargs["id"]).message
 
     # Add task to the database
+    data["incomplete"] = data["users"]
+    del data["users"]
     result = TaskAccess.create_task(**data, from_user=kwargs["id"])
 
     # Send an email to each recipient if success in creating task
@@ -127,6 +129,28 @@ def update_task_endpoint(**kwargs):
 
     # Add the feedback to the database
     result = TaskAccess.update_task(id, **data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
+@request_completion.route("/request_completion/", methods=["POST"])
+@is_root
+@param_check(ARGS.statistic.task.update_task)
+@error_handler
+# TODO: FIX ISSUES WITH PENDING AND COMPLETE BEING OBJECTS
+def request_completion_endpoint(**kwargs):
+    """Method to handling users' completion request"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target feedback and user
+    task_id = data.pop("id")
+    user_id = kwargs["id"]
+
+    # Update the task
+    result = TaskAccess.request_completion(task_id, user_id)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
