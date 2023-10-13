@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    />
+    <style type="text/css">
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+      .email-content p,
+      .email-content h1,
+      .email-content h2,
+      .email-content h3,
+      .email-content h4,
+      .email-content h5,
+      .email-content h6 {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      background: linear-gradient(to top right, #4678f4, #54c0ff);
+      padding: 30px;
+    "
+  >
+    <div
+      style="
+        margin: auto;
+        background-color: #ffffff;
+        padding: 50px;
+        border-radius: 5px;
+        max-width: 40rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      "
+    >
+      <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+        style="border-bottom: 1px solid #edf2f7"
+      >
+        <tr>
+          <td align="center" style="padding-bottom: 16px">
+            <table cellpadding="0" cellspacing="5" border="0">
+              <tr>
+                <td>
+                  <img
+                    src="https://avatars.githubusercontent.com/u/134102646?s=400&u=c00ade4de15a1534c95050bf4642d311b23329a3&v=4"
+                    height="100"
+                    width="100"
+                  />
+                </td>
+                <td>
+                  <div
+                    style="
+                      font-size: 2.25rem;
+                      font-weight: 200;
+                      line-height: 2.5rem;
+                    "
+                  >
+                    WingSuite
+                  </div>
+                  <div style="font-size: 1.1rem; font-weight: 200">
+                    {org_name}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <div>
+        <p>Hello {to_user},</p>
+        <p>
+          You received the a task to complete from {from_user}. The following
+          are details for this event.
+        </p>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Name:
+        </div>
+        <div style="font-size: 0.75rem" class="email-content">{name}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Suspense:
+        </div>
+        <div style="font-size: 0.75rem" class="email-content">{suspense}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Description:
+        </div>
+        <div style="font-size: 0.75rem" class="email-content">{description}</div>
+        <p>
+          You can view this task in your
+          <a href="{task_link}">task page</a>
+        </p>
+      </div>
+      <div
+        style="
+          text-align: center;
+          padding-top: 16px;
+          border-top: 1px solid #edf2f7;
+          color: #a0aec0;
+        "
+      >
+        Respectfully,<br />
+        {org_name} WingSuite
+      </div>
+    </div>
+  </body>
+</html>

@@ -7,7 +7,8 @@ from endpoints.base import (
     ARGS,
 )
 from . import (
-    create_task
+    create_task,
+    get_task_info
 )
 from flask import request
 from utils.communications.email import send_email
@@ -15,6 +16,7 @@ from utils.html import read_html_file
 from database.statistic.task import TaskAccess
 from database.user import UserAccess
 from config.config import config
+from datetime import datetime
 
 #
 #   CREATE OPERATIONS
@@ -45,21 +47,25 @@ def create_task_endpoint(**kwargs):
     # Send an email to each recipient if success in creating task
     if result.status == "success" and data["notify_email"]:
         for i in to_users:
-            # Get feedback HTML content
+            # Get task HTML content
             content = read_html_file(
-                "statistic.feedback",
+                "statistic.task",
                 to_user=i.get_fullname(with_rank=True),
                 from_user=from_user.get_fullname(with_rank=True),
-                message=data["description"],
-                feedback_link=f"{config.wingsuite_dashboard_link}/feedback",
+                name=data["name"], 
+                suspense=datetime.fromtimestamp(data["suspense"]).strftime(
+                    "%d %b %Y, %H:%M"
+                ),
+                description=data["description"],
+                task_link=f"{config.wingsuite_dashboard_link}/task",
             )
 
             # Send an email with the HTML content
             send_email(
                 receiver=i.info.email,
-                subject="New Feedback",
+                subject="New Task",
                 content=content,
-                emoji=config.message_emoji.statistic.feedback,
+                emoji=config.message_emoji.statistic.task,
             )
 
     # Return response data
@@ -71,6 +77,33 @@ def create_task_endpoint(**kwargs):
 #   READ OPERATIONS
 #   region
 #
+
+
+@get_task_info.route("get_task_info", methods=["POST"])
+@permissions_required(["statistic.task.get_task_info"])
+@param_check(ARGS.statistic.task.get_task_info)
+@error_handler
+def get_task_info_endpoint(**kwargs):
+    """Method to get the info of a task"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target task
+    id = data.pop("id")
+
+    # Get the task's information from the database
+    result = TaskAccess.get_task(id)
+
+    # Return error if no task was provided
+    if result.status == "error":
+        return result, 200
+
+    # Format message
+    result.message = result.message.info
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

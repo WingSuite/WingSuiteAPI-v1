@@ -57,6 +57,7 @@
     "statistic.pfa.delete_pfa",
 
     "statistic.task.create_task",
+    "statistic.task.get_task_info",
 
     "statistic.warrior.create_warrior",
     "statistic.warrior.get_warrior_info",

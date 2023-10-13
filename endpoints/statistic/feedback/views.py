@@ -80,7 +80,7 @@ def create_feedback_endpoint(**kwargs):
 #
 
 
-@get_feedback_info.route("/get_feedback_info/", methods=["GET"])
+@get_feedback_info.route("/get_feedback_info/", methods=["POST"])
 @permissions_required(["statistic.feedback.get_feedback_info"])
 @param_check(ARGS.statistic.feedback.get_feedback_info)
 @error_handler

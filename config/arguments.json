@@ -30,9 +30,9 @@
       "task": {
         "create_task": ["to_users", "name", "description", "suspense",
           "auto_accept_requests", "notify_email"],
-        "get_feedback_info": ["id"],
-        "update_feedback": ["id"],
-        "delete_feedback": ["id"]
+        "get_task_info": ["id"],
+        "update_task": ["id"],
+        "delete_task": ["id"]
       },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
