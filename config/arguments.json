@@ -32,7 +32,7 @@
           "auto_accept_requests", "notify_email"],
         "get_task_info": ["id"],
         "update_task": ["id"],
-        "request_completion": ["id"],
+        "request_completion": ["id", "message"],
         "delete_task": ["id"]
       },
       "warrior": {

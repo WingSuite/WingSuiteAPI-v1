@@ -87,7 +87,7 @@ class TaskAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def request_completion(task_id: str, user_id: str) -> DictParse:
+    def request_completion(task_id: str, user_id: str, msg: str) -> DictParse:
         """Method to handle the user's completion request"""
 
         # Check if the task based on its id does not exist
@@ -97,6 +97,7 @@ class TaskAccess(DataAccessBase):
 
         # Check if the user is part of the task's incomplete list
         if user_id not in task["incomplete"]:
+            print(task["incomplete"])
             # If the user is pending approval, send a message about that
             if user_id in task["pending"]:
                 return DataAccessBase.sendError(
@@ -109,20 +110,17 @@ class TaskAccess(DataAccessBase):
                 )
 
         # Automatically approve user if requesting
-        push_query = {}
+        task["incomplete"].remove(user_id)
         if task["auto_accept_requests"]:
-            push_query["complete"] = user_id
+            task["complete"][user_id] = msg
+            result_message = "Task completed"
         else:
-            push_query["pending"] = user_id
+            task["pending"][user_id] = msg
+            result_message = "Request filed"
 
-        # Update database
-        DataAccessBase.CURRENT_STATS_COL.update_one(
-            {"_id": task_id},
-            {
-                "$pull": {"incomplete": user_id},
-                "$push": push_query,
-            },
-        )
+        # Update database and return message
+        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
+        return DataAccessBase.sendSuccess(result_message)
 
     @staticmethod
     @DataAccessBase.dict_wrap

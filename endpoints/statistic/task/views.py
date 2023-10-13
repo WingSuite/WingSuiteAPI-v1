@@ -136,9 +136,8 @@ def update_task_endpoint(**kwargs):
 
 @request_completion.route("/request_completion/", methods=["POST"])
 @is_root
-@param_check(ARGS.statistic.task.update_task)
+@param_check(ARGS.statistic.task.request_completion)
 @error_handler
-# TODO: FIX ISSUES WITH PENDING AND COMPLETE BEING OBJECTS
 def request_completion_endpoint(**kwargs):
     """Method to handling users' completion request"""
 
@@ -148,9 +147,10 @@ def request_completion_endpoint(**kwargs):
     # Get the id of the target feedback and user
     task_id = data.pop("id")
     user_id = kwargs["id"]
+    message = data["message"]
 
     # Update the task
-    result = TaskAccess.request_completion(task_id, user_id)
+    result = TaskAccess.request_completion(task_id, user_id, message)
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
