@@ -6,10 +6,7 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import (
-    create_task,
-    get_task_info
-)
+from . import create_task, get_task_info
 from flask import request
 from utils.communications.email import send_email
 from utils.html import read_html_file
@@ -52,7 +49,7 @@ def create_task_endpoint(**kwargs):
                 "statistic.task",
                 to_user=i.get_fullname(with_rank=True),
                 from_user=from_user.get_fullname(with_rank=True),
-                name=data["name"], 
+                name=data["name"],
                 suspense=datetime.fromtimestamp(data["suspense"]).strftime(
                     "%d %b %Y, %H:%M"
                 ),
@@ -70,6 +67,7 @@ def create_task_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
 
 #   endregion
 

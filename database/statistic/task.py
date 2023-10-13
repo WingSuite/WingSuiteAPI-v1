@@ -1,8 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
-
-# from database.user import UserAccess
+from database.user import UserAccess
 from models.statistic.task import Task
 from typing import Any, List
 import uuid
@@ -95,9 +94,7 @@ class TaskAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_own_task(
-        id: str, page_size: int, page_index: int, sent: bool
-    ) -> DictParse:
+    def get_own_task(id: str, page_size: int, page_index: int) -> DictParse:
         """Method to retrieve a multiple task based on the receiver's ID"""
 
         # Generate query based on whether to return sent or received documents
@@ -122,7 +119,10 @@ class TaskAccess(DataAccessBase):
 
         # Search the collection based on id
         result = (
-            DataAccessBase.CURRENT_STATS_COL.find(query)
+            DataAccessBase.CURRENT_STATS_COL.find(
+                query,
+                {"requests": 0, "record": 0, "not_complete": 0, "to_users": 0},
+            )
             .skip(skips)
             .limit(page_size)
         )
@@ -134,8 +134,22 @@ class TaskAccess(DataAccessBase):
                 "message": "Feedback not found",
             }
 
-        # Cast result into list format
+        # Add a formatted from_user key for each feedback
+        memoize = DictParse({})
         result = list(result)
+        for i in result:
+            # Add key if the iterated from_user is not memoized
+            if i["from_user"] not in memoize:
+                # Add user's formatted name to the memoization
+                from_user = UserAccess.get_user(
+                    i["from_user"], check_former=True
+                ).message
+                memoize[i["from_user"]] = from_user.get_fullname(
+                    lastNameFirst=True, with_rank=True
+                )
+
+            # Add formatted key
+            i["formatted_from_user"] = memoize[i["from_user"]]
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)
