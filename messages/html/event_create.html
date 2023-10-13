@@ -7,9 +7,19 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
-    <style>
+    <style type="text/css">
       body {
         font-family: "Poppins", sans-serif;
+      }
+      .content-format p,
+      .content-format h1,
+      .content-format h2,
+      .content-format h3,
+      .content-format h4,
+      .content-format h5,
+      .content-format h6 {
+        margin: 0 !important;
+        padding: 0 !important;
       }
     </style>
   </head>
@@ -71,25 +81,29 @@
       <div>
         <p>Hello {to_user},</p>
         <p>
-          The {event_name} event have been created for units/personnel under
-          or in {target_unit}. The following are details for this event.
+          The {event_name} event have been created for units/personnel under or
+          in {target_unit}. The following are details for this event.
         </p>
         <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
           Event Duration:
         </div>
-        <div style="font-size: 0.75rem">{duration}</div>
+        <div style="font-size: 0.75rem" class="content-format">{duration}</div>
         <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
           For Units/Personnel Under:
         </div>
-        <div style="font-size: 0.75rem">{target_unit}</div>
+        <div style="font-size: 0.75rem" class="content-format">
+          {target_unit}
+        </div>
         <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
           Location:
         </div>
-        <div style="font-size: 0.75rem">{location}</div>
+        <div style="font-size: 0.75rem" class="content-format">{location}</div>
         <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
           Description:
         </div>
-        <div style="font-size: 0.75rem">{description}</div>
+        <div style="font-size: 0.75rem" class="content-format">
+          {description}
+        </div>
         <p>
           You can view this event in your
           <a href="{event_link}">events page</a>
