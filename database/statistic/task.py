@@ -250,18 +250,18 @@ class TaskAccess(DataAccessBase):
                     lastNameFirst=True, with_rank=True
                 )
 
-                # Replace statuses with single status
-                if id in i["incomplete"]:
-                    i["status"] = "incomplete"
-                elif id in i["pending"]:
-                    i["status"] = "pending"
-                elif id in i["complete"]:
-                    i["status"] = "complete"
+            # Replace statuses with single status
+            if id in i["incomplete"]:
+                i["status"] = "incomplete"
+            elif id in i["pending"]:
+                i["status"] = "pending"
+            elif id in i["complete"]:
+                i["status"] = "complete"
 
-                # Delete sensitive content
-                del i["incomplete"]
-                del i["pending"]
-                del i["complete"]
+            # Delete sensitive content
+            del i["incomplete"]
+            del i["pending"]
+            del i["complete"]
 
             # Add formatted key
             i["formatted_from_user"] = memoize[i["from_user"]]
