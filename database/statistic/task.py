@@ -21,7 +21,7 @@ class TaskAccess(DataAccessBase):
         description: str,
         suspense: int,
         auto_accept_requests: bool,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> DictParse:
         """Method to create a task"""
 
@@ -190,11 +190,18 @@ class TaskAccess(DataAccessBase):
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_own_task(id: str, page_size: int, page_index: int) -> DictParse:
+    def get_own_task(
+        id: str, page_size: int, page_index: int, get_completed: bool
+    ) -> DictParse:
         """Method to retrieve a multiple task based on the receiver's ID"""
 
         # Generate query based on whether to return sent or received documents
-        query = {"stat_type": "task", "from_user": id}
+        user_id_key = f"complete.{id}"
+        query = {
+            "stat_type": "task",
+            "from_user": id,
+            user_id_key: {"$exists": get_completed},
+        }
 
         # Check if the page_size or page_index is negative
         if page_size <= 0 or page_index < 0:
@@ -217,20 +224,19 @@ class TaskAccess(DataAccessBase):
         result = (
             DataAccessBase.CURRENT_STATS_COL.find(
                 query,
-                {"incomplete": 0, "pending": 0, "complete": 0},
             )
             .skip(skips)
             .limit(page_size)
         )
 
-        # Return if the given feedback is not in the database
+        # Return if the given task is not in the database
         if result is None:
             return {
                 "status": "error",
-                "message": "Feedback not found",
+                "message": "Task not found",
             }
 
-        # Add a formatted from_user key for each feedback
+        # Add a formatted from_user key for each task
         memoize = DictParse({})
         result = list(result)
         for i in result:
@@ -243,6 +249,19 @@ class TaskAccess(DataAccessBase):
                 memoize[i["from_user"]] = from_user.get_fullname(
                     lastNameFirst=True, with_rank=True
                 )
+
+                # Replace statuses with single status
+                if id in i["incomplete"]:
+                    i["status"] = "incomplete"
+                elif id in i["pending"]:
+                    i["status"] = "pending"
+                elif id in i["complete"]:
+                    i["status"] = "complete"
+
+                # Delete sensitive content
+                del i["incomplete"]
+                del i["pending"]
+                del i["complete"]
 
             # Add formatted key
             i["formatted_from_user"] = memoize[i["from_user"]]
