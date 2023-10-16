@@ -33,6 +33,7 @@
         "get_task_info": ["id"],
         "update_task": ["id"],
         "request_completion": ["id", "message"],
+        "change_status": ["task_id", "user_id", "message", "action"],
         "delete_task": ["id"]
       },
       "warrior": {

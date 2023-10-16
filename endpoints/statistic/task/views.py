@@ -6,7 +6,14 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import create_task, get_task_info, update_task, request_completion
+from . import (
+    create_task,
+    get_task_info,
+    update_task,
+    request_completion,
+    change_status,
+    delete_task
+)
 from flask import request
 from utils.communications.email import send_email
 from utils.html import read_html_file
@@ -39,7 +46,7 @@ def create_task_endpoint(**kwargs):
     from_user = UserAccess.get_user(kwargs["id"]).message
 
     # Add task to the database
-    data["incomplete"] = data["users"]
+    data["incomplete"] = {i: "" for i in data["users"]}
     del data["users"]
     result = TaskAccess.create_task(**data, from_user=kwargs["id"])
 
@@ -156,6 +163,30 @@ def request_completion_endpoint(**kwargs):
     return result, (200 if result.status == "success" else 400)
 
 
+@change_status.route("/change_status/", methods=["POST"])
+@is_root
+@permissions_required(["statistic.task.change_status"])
+@param_check(ARGS.statistic.task.change_status)
+@error_handler
+def change_status_endpoint(**kwargs):
+    """Method to handle users' completion status, rejection"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the id of the target feedback and user
+    task_id = data.pop("task_id")
+    user_id = data.pop("user_id")
+    message = data.pop("message")
+    action = data.pop("action")
+
+    # Reject the target user
+    result = TaskAccess.change_status(task_id, user_id, message, action)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
+
+
 #   endregion
 
 
@@ -163,6 +194,23 @@ def request_completion_endpoint(**kwargs):
 #   DELETE OPERATIONS
 #   region
 #
+
+
+@delete_task.route("/delete_task/", methods=["POST"])
+@permissions_required(["statistic.task.delete_task"])
+@param_check(ARGS.statistic.task.delete_task)
+@error_handler
+def delete_task_endpoint(**kwargs):
+    """Method to handle the deletion of an task"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Add the event to the database
+    result = TaskAccess.delete_task(**data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

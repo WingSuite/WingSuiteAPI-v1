@@ -102,9 +102,8 @@ from endpoints.statistic.task import (
     get_task_info,
     update_task,
     request_completion,
-    # reject_completion,
-    # approve_completion,
-    # delete_task,
+    change_status,
+    delete_task,
 )
 from endpoints.statistic.warrior import (
     create_warrior,
@@ -323,6 +322,8 @@ app.register_blueprint(create_task, url_prefix="/statistic/task/")
 app.register_blueprint(get_task_info, url_prefix="/statistic/task/")
 app.register_blueprint(update_task, url_prefix="/statistic/task/")
 app.register_blueprint(request_completion, url_prefix="/statistic/task/")
+app.register_blueprint(change_status, url_prefix="/statistic/task/")
+app.register_blueprint(delete_task, url_prefix="/statistic/task/")
 # endregion
 
 # Statistic Warrior routes

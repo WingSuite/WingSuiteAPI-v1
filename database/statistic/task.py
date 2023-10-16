@@ -97,7 +97,6 @@ class TaskAccess(DataAccessBase):
 
         # Check if the user is part of the task's incomplete list
         if user_id not in task["incomplete"]:
-            print(task["incomplete"])
             # If the user is pending approval, send a message about that
             if user_id in task["pending"]:
                 return DataAccessBase.sendError(
@@ -110,13 +109,60 @@ class TaskAccess(DataAccessBase):
                 )
 
         # Automatically approve user if requesting
-        task["incomplete"].remove(user_id)
+        del task["incomplete"][user_id]
         if task["auto_accept_requests"]:
             task["complete"][user_id] = msg
             result_message = "Task completed"
         else:
             task["pending"][user_id] = msg
             result_message = "Request filed"
+
+        # Update database and return message
+        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
+        return DataAccessBase.sendSuccess(result_message)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def change_status(
+        task_id: str, user_id: str, msg: str, action: str
+    ) -> DictParse:
+        """Method to handle the placement of users to different statuses"""
+
+        # Check if the task based on its id does not exist
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
+        if task is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Check if the user is incomplete status
+        if user_id in task["incomplete"]:
+            return DataAccessBase.sendError(
+                "This user is in incomplete stage. You cannot do anything."
+            )
+
+        # Check if the request is to deny
+        if action == "deny" and user_id in task["complete"]:
+            # Move the user from complete to incomplete stage
+            del task["complete"][user_id]
+            task["incomplete"][user_id] = msg
+            result_message = "User moved to incomplete stage"
+
+        # Check if the request is to reject
+        elif action == "reject" and user_id in task["pending"]:
+            # Move the user from complete to incomplete stage
+            del task["pending"][user_id]
+            task["incomplete"][user_id] = msg
+            result_message = "User moved to incomplete stage"
+
+        # Check if the request is to approve
+        elif action == "approve" and user_id in task["pending"]:
+            # Move the user from complete to incomplete stage
+            del task["pending"][user_id]
+            task["complete"][user_id] = msg
+            result_message = "User moved to complete stage"
+
+        # If anything else, return an error
+        else:
+            return DataAccessBase.sendError("Invalid option configuration")
 
         # Update database and return message
         DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
