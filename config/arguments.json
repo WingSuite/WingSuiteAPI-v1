@@ -73,6 +73,7 @@
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
+      "get_specified_personnel": ["raw"],
       "is_superior_officer": ["id"],
       "get_all_five_point_data": ["id"],
       "get_all_pfa_data": ["id"],

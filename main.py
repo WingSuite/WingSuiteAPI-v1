@@ -50,6 +50,7 @@ from endpoints.unit import (
     get_unit_types,
     get_all_units,
     get_all_officers,
+    get_specified_personnel,
     get_all_members,
     is_superior_officer,
     get_all_five_point_data,
@@ -248,8 +249,9 @@ app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_unit_types, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
-app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
+app.register_blueprint(get_all_officers, url_prefix="/unit/")
+app.register_blueprint(get_specified_personnel, url_prefix="/unit/")
 app.register_blueprint(is_superior_officer, url_prefix="/unit/")
 app.register_blueprint(get_all_five_point_data, url_prefix="/unit/")
 app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")

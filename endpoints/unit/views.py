@@ -18,6 +18,7 @@ from . import (
     get_unit_types,
     get_all_units,
     get_all_officers,
+    get_specified_personnel,
     get_all_members,
     is_superior_officer,
     get_all_five_point_data,
@@ -157,6 +158,19 @@ def _update_personnel_helper(id, users, operation, participation):
 
     # Return
     return message, 200
+
+
+def _handle_error(unit_result, unit_id):
+    """Function help handle errors when parsing over unit trees"""
+
+    # Return error if the result is error
+    if unit_result.status == "error":
+        return client_error_response(
+            f"Error occurred when processing unit: {unit_id}"
+        )
+
+    # Return nothing is all is good
+    return None
 
 
 #
@@ -467,6 +481,69 @@ def get_all_officers_endpoint(**kwargs):
 
     # Return information
     return success_response(officers)
+
+
+@get_specified_personnel.route("/get_specified_personnel/", methods=["POST"])
+@is_root
+@param_check(ARGS.unit.get_specified_personnel)
+@error_handler
+def get_specified_personnel_endpoint(**kwargs):
+    """Endpoint to get the users that the callee is wanting to extract"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Initialize result set to store processed items
+    result = set()
+
+    # Process each item in the raw data
+    for raw_item in data["raw"]:
+        # Split item for easier processing
+        item = raw_item.split(", ")
+
+        # Directly add the user if the action is "User"
+        if item[0] == "User":
+            result.add(item[1])
+            continue
+
+        # Extract specifications from the iteration
+        action, user_type, unit_id = item
+
+        # Function to handle error for a given unit
+        def handle_error(unit_result):
+            if unit_result.status == "error":
+                return client_error_response(
+                    f"Error occurred when processing unit: {unit_id}"
+                )
+            return None
+
+        # Fetch the units based on action: "Cascade" or "No Cascade"
+        units = []
+        if action == "Cascade":
+            response = UnitAccess.get_units_below([unit_id])
+            error_response = _handle_error(response, unit_id)
+            if error_response:
+                return error_response
+            units = response.message
+        elif action == "No Cascade":
+            response = UnitAccess.get_unit(unit_id)
+            error_response = _handle_error(response, unit_id)
+            if error_response:
+                return error_response
+            units = [response.message.info]
+
+        # Process users based on user type: "All", "Members-Only", or
+        # "Officers-Only"
+        for unit in units:
+            if user_type == "All":
+                result.update(unit["officers"], unit["members"])
+            elif user_type == "Members-Only":
+                result.update(unit["members"])
+            elif user_type == "Officers-Only":
+                result.update(unit["officers"])
+
+    # Return results
+    return success_response(list(result))
 
 
 @is_superior_officer.route("/is_superior_officer/", methods=["POST"])
