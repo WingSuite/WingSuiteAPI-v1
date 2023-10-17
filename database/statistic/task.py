@@ -253,10 +253,13 @@ class TaskAccess(DataAccessBase):
             # Replace statuses with single status
             if id in i["incomplete"]:
                 i["status"] = "incomplete"
+                i["message"] = i["incomplete"][id]
             elif id in i["pending"]:
                 i["status"] = "pending"
+                i["message"] = i["pending"][id]
             elif id in i["complete"]:
                 i["status"] = "complete"
+                i["message"] = i["complete"][id]
 
             # Delete sensitive content
             del i["incomplete"]
