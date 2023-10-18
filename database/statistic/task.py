@@ -279,3 +279,57 @@ class TaskAccess(DataAccessBase):
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_dispatched_tasks(
+        id: str, page_size: int, page_index: int
+    ) -> DictParse:
+        """Method to retrieve a multiple task based on the receiver's ID"""
+
+        # Generate query based on whether to return sent or received documents
+        query = {
+            "$and": [
+                {"stat_type": "task"},
+                {"from_user": id},
+            ]
+        }
+
+        # Check if the page_size or page_index is negative
+        if page_size <= 0 or page_index < 0:
+            return DataAccessBase.sendError("Invalid pagination size or index")
+
+        # Get the total amount of pages based on pagination size
+        pages = math.ceil(
+            (DataAccessBase.CURRENT_STATS_COL.count_documents(query))
+            / page_size
+        )
+
+        # Check if the page_index is outside the page range
+        if page_index >= pages:
+            return DataAccessBase.sendError("Pagination index out of bounds")
+
+        # Calculate skip value
+        skips = page_size * (page_index)
+
+        # Search the collection based on id
+        result = (
+            DataAccessBase.CURRENT_STATS_COL.find(
+                query,
+            )
+            .skip(skips)
+            .limit(page_size)
+        )
+
+        # Return if the given task is not in the database
+        if result is None:
+            return {
+                "status": "error",
+                "message": "Task not found",
+            }
+
+        # Add a formatted from_user key for each task
+        result = list(result)
+
+        # Return with a Feedback object
+        return DataAccessBase.sendSuccess(result, pages=pages)

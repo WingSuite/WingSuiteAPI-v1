@@ -101,6 +101,7 @@ from endpoints.statistic.pfa import (
 from endpoints.statistic.task import (
     create_task,
     get_task_info,
+    get_dispatched_tasks,
     update_task,
     request_completion,
     change_status,
@@ -322,6 +323,7 @@ app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 # region
 app.register_blueprint(create_task, url_prefix="/statistic/task/")
 app.register_blueprint(get_task_info, url_prefix="/statistic/task/")
+app.register_blueprint(get_dispatched_tasks, url_prefix="/statistic/task/")
 app.register_blueprint(update_task, url_prefix="/statistic/task/")
 app.register_blueprint(request_completion, url_prefix="/statistic/task/")
 app.register_blueprint(change_status, url_prefix="/statistic/task/")

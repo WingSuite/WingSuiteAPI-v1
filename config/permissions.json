@@ -58,6 +58,7 @@
 
     "statistic.task.create_task",
     "statistic.task.get_task_info",
+    "statistic.task.get_dispatched_tasks",
     "statistic.task.update_task",
     "statistic.task.reject_completion",
     "statistic.task.change_status",

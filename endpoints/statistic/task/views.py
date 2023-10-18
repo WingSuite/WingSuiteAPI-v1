@@ -1,6 +1,7 @@
 # Import the test blueprint
 from endpoints.base import (
     is_root,
+    client_error_response,
     permissions_required,
     param_check,
     error_handler,
@@ -9,6 +10,7 @@ from endpoints.base import (
 from . import (
     create_task,
     get_task_info,
+    get_dispatched_tasks,
     update_task,
     request_completion,
     change_status,
@@ -86,7 +88,7 @@ def create_task_endpoint(**kwargs):
 #
 
 
-@get_task_info.route("get_task_info", methods=["POST"])
+@get_task_info.route("/get_task_info/", methods=["POST"])
 @permissions_required(["statistic.task.get_task_info"])
 @param_check(ARGS.statistic.task.get_task_info)
 @error_handler
@@ -112,6 +114,27 @@ def get_task_info_endpoint(**kwargs):
     # Return response data
     return result, (200 if result.status == "success" else 400)
 
+
+@get_dispatched_tasks.route("/get_dispatched_tasks/", methods=["POST"])
+@is_root
+@permissions_required(["statistic.task.get_dispatched_tasks"])
+@param_check(ARGS.statistic.task.get_dispatched_tasks)
+@error_handler
+def get_dispatched_tasks_endpoint(**kwargs):
+    """Endpoint to get dispatched tasks made by the user"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get warrior knowledge information based on the user's id
+    result = TaskAccess.get_dispatched_tasks(id=kwargs["id"], **data)
+
+    # If the resulting information is in error, respond with error
+    if result.status == "error":
+        return client_error_response(result.message)
+
+    # Return the content of the information
+    return result, (200 if result.status == "success" else 400)
 
 #   endregion
 
