@@ -196,11 +196,19 @@ class TaskAccess(DataAccessBase):
         """Method to retrieve a multiple task based on the receiver's ID"""
 
         # Generate query based on whether to return sent or received documents
-        user_id_key = f"complete.{id}"
+        incomplete = [
+            {f"pending.{id}": {"$exists": True}},
+            {f"incomplete.{id}": {"$exists": True}},
+        ]
         query = {
-            "stat_type": "task",
-            "from_user": id,
-            user_id_key: {"$exists": get_completed},
+            "$and": [
+                {"stat_type": "task"},
+                {
+                    "$or": [{f"complete.{id}": {"$exists": get_completed}}]
+                    if get_completed
+                    else incomplete
+                },
+            ]
         }
 
         # Check if the page_size or page_index is negative
