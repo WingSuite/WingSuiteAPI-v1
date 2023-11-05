@@ -185,6 +185,25 @@ class TaskAccess(DataAccessBase):
                 "message": "Task not found",
             }
 
+        # Get a list of users from the incomplete, pending, complete areas
+        users_in_task = (
+            list(task["incomplete"].keys())
+            + list(task["pending"].keys())
+            + list(task["complete"].keys())
+        )
+
+        # Get a mapping of their names
+        mapping = {}
+        for i in users_in_task:
+            # Get the user's object
+            user = UserAccess.get_user(i)
+
+            # Save their name to mapping
+            mapping[i] = user.message.get_fullname(with_rank=True)
+
+        # Add info to the task details
+        task["name_map"] = mapping
+
         # Return with a task object
         return DataAccessBase.sendSuccess(Task(**task))
 
