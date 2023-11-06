@@ -14,7 +14,7 @@ from . import (
     update_task,
     request_completion,
     change_status,
-    delete_task
+    delete_task,
 )
 from flask import request
 from utils.communications.email import send_email
@@ -23,6 +23,7 @@ from database.statistic.task import TaskAccess
 from database.user import UserAccess
 from config.config import config
 from datetime import datetime
+from threading import Thread
 
 #
 #   CREATE OPERATIONS
@@ -57,7 +58,7 @@ def create_task_endpoint(**kwargs):
         for i in to_users:
             # Get task HTML content
             content = read_html_file(
-                "statistic.task",
+                "statistic.task.create",
                 to_user=i.get_fullname(with_rank=True),
                 from_user=from_user.get_fullname(with_rank=True),
                 name=data["name"],
@@ -65,16 +66,20 @@ def create_task_endpoint(**kwargs):
                     "%d %b %Y, %H:%M"
                 ),
                 description=data["description"],
-                task_link=f"{config.wingsuite_dashboard_link}/task",
+                task_link=f"{config.wingsuite_dashboard_link}/tasks",
             )
 
             # Send an email with the HTML content
-            send_email(
-                receiver=i.info.email,
-                subject="New Task",
-                content=content,
-                emoji=config.message_emoji.statistic.task,
+            thread = Thread(
+                target=send_email,
+                args=(
+                    i.info.email,
+                    "New Task",
+                    content,
+                    config.message_emoji.statistic.task,
+                ),
             )
+            thread.start()
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -135,6 +140,64 @@ def get_dispatched_tasks_endpoint(**kwargs):
 
     # Return the content of the information
     return result, (200 if result.status == "success" else 400)
+
+
+def task_dispatch(**kwargs):
+    """Function to dispatch task notifications"""
+
+    # Get tasks that have reminders
+    tasks = TaskAccess.get_upcoming_tasks().message
+
+    # Print debug
+    print(f"Found {len(tasks)} tasks to dispatch")
+
+    # Iterate through each event]
+    memoize = {}
+    for i in tasks:
+        # Get suspense time for the iterate task
+        suspense_str = datetime.fromtimestamp(i.info.suspense).strftime(
+            "%d %b %Y, %H:%M"
+        )
+        # Iterate through the people in the incomplete stage
+        for user in i.info.incomplete:
+            # If the iterated user is not in the memoized list, add them
+            if user not in memoize:
+                # If the iterate user is no longer a user, continue
+                user_info = UserAccess.get_user(user)
+                if user_info.status == "error":
+                    continue
+
+                # Add user to the memoization
+                memoize[user] = user_info.message
+
+            # Extract the user's email and name
+            email = memoize[user].info.email
+            name = memoize[user].get_fullname(with_rank=True)
+            print(f"{config.wingsuite_dashboard_link}/tasks")
+
+            # Prep the contents of the message
+            msg_content = {
+                "to_user": name,
+                "template": "statistic.task.notify",
+                "name": i.info.name,
+                "time_to_completion": i.info.formatted_time_remain,
+                "suspense": suspense_str,
+                "description": i.info.description,
+                "task_link": f"{config.wingsuite_dashboard_link}/tasks",
+            }
+
+            # Send emails
+            thread = Thread(
+                target=send_email,
+                args=(
+                    email,
+                    "Task Reminder",
+                    read_html_file(**msg_content),
+                    config.message_emoji.statistic.task,
+                ),
+            )
+            thread.start()
+
 
 #   endregion
 

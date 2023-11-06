@@ -29,7 +29,7 @@
       },
       "task": {
         "create_task": ["users", "name", "description", "suspense",
-          "auto_accept_requests", "notify_email"],
+          "auto_accept_requests", "notify_email", "reminders"],
         "get_task_info": ["id"],
         "get_dispatched_tasks": ["page_size", "page_index"],
         "update_task": ["id"],
@@ -129,7 +129,7 @@
       "task": {
         "init": ["_id", "stat_type", "datetime_created", "from_user", "name",
         "description", "suspense", "auto_accept_requests", "incomplete",
-        "pending", "complete"]
+        "pending", "complete", "reminders"]
       },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",

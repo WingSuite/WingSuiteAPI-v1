@@ -98,6 +98,7 @@ from endpoints.statistic.pfa import (
     update_pfa,
     delete_pfa,
 )
+from endpoints.statistic.task.views import task_dispatch
 from endpoints.statistic.task import (
     create_task,
     get_task_info,
@@ -359,11 +360,17 @@ if os.environ.get(
     scheduler.start()
 
     # Schedule the event update function to run every minute
-    trigger = IntervalTrigger(minutes=1)
+    trigger = IntervalTrigger(seconds=10)
     scheduler.add_job(
         func=event_dispatch,
         trigger=trigger,
         id="check_events_job",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        func=task_dispatch,
+        trigger=trigger,
+        id="check_tasks_notification_job",
         replace_existing=True,
     )
 

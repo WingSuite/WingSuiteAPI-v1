@@ -1,4 +1,5 @@
 # Imports
+from utils.time import seconds_to_largest_time_unit
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
 from database.user import UserAccess
@@ -21,6 +22,7 @@ class TaskAccess(DataAccessBase):
         description: str,
         suspense: int,
         auto_accept_requests: bool,
+        reminders: dict,
         **kwargs: Any,
     ) -> DictParse:
         """Method to create a task"""
@@ -41,132 +43,6 @@ class TaskAccess(DataAccessBase):
 
         # Return a statement
         return DataAccessBase.sendSuccess("Task created")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def delete_task(id: str) -> DictParse:
-        """Method to delete an task"""
-
-        # Check if the task based on its id does not exist
-        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
-        if task is None:
-            return DataAccessBase.sendError("Task does not exist")
-
-        # Delete the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
-        return DataAccessBase.sendSuccess("Task deleted")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def update_task(id: str, **kwargs: Any) -> DictParse:
-        """Method to delete a task"""
-
-        # Check if the task based on its id does exist
-        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
-            return DataAccessBase.sendError("Task does not exist")
-
-        # Disable the changing of certain attributes
-        immutable = [
-            "datetime_created",
-            "notify_email",
-            "incomplete",
-            "pending",
-            "complete",
-        ]
-        if any(i in kwargs for i in immutable):
-            return DataAccessBase.sendError(
-                "Cannot change the following attributes: "
-                + ", ".join(immutable)
-            )
-
-        # Update the document and return a success message
-        DataAccessBase.CURRENT_STATS_COL.update_one(
-            {"_id": id}, {"$set": kwargs}
-        )
-        return DataAccessBase.sendSuccess("Task updated")
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def request_completion(task_id: str, user_id: str, msg: str) -> DictParse:
-        """Method to handle the user's completion request"""
-
-        # Check if the task based on its id does not exist
-        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
-        if task is None:
-            return DataAccessBase.sendError("Task does not exist")
-
-        # Check if the user is part of the task's incomplete list
-        if user_id not in task["incomplete"]:
-            # If the user is pending approval, send a message about that
-            if user_id in task["pending"]:
-                return DataAccessBase.sendError(
-                    "You are pending approval for completing this task"
-                )
-            # If the user completed this task, send a message about that
-            else:
-                return DataAccessBase.sendError(
-                    "You are not assigned to this task"
-                )
-
-        # Automatically approve user if requesting
-        del task["incomplete"][user_id]
-        if task["auto_accept_requests"]:
-            task["complete"][user_id] = msg
-            result_message = "Task completed"
-        else:
-            task["pending"][user_id] = msg
-            result_message = "Request filed"
-
-        # Update database and return message
-        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
-        return DataAccessBase.sendSuccess(result_message)
-
-    @staticmethod
-    @DataAccessBase.dict_wrap
-    def change_status(
-        task_id: str, user_id: str, msg: str, action: str
-    ) -> DictParse:
-        """Method to handle the placement of users to different statuses"""
-
-        # Check if the task based on its id does not exist
-        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
-        if task is None:
-            return DataAccessBase.sendError("Task does not exist")
-
-        # Check if the user is incomplete status
-        if user_id in task["incomplete"]:
-            return DataAccessBase.sendError(
-                "This user is in incomplete stage. You cannot do anything."
-            )
-
-        # Check if the request is to deny
-        if action == "deny" and user_id in task["complete"]:
-            # Move the user from complete to incomplete stage
-            del task["complete"][user_id]
-            task["incomplete"][user_id] = msg
-            result_message = "User moved to incomplete stage"
-
-        # Check if the request is to reject
-        elif action == "reject" and user_id in task["pending"]:
-            # Move the user from complete to incomplete stage
-            del task["pending"][user_id]
-            task["incomplete"][user_id] = msg
-            result_message = "User moved to incomplete stage"
-
-        # Check if the request is to approve
-        elif action == "approve" and user_id in task["pending"]:
-            # Move the user from complete to incomplete stage
-            del task["pending"][user_id]
-            task["complete"][user_id] = msg
-            result_message = "User moved to complete stage"
-
-        # If anything else, return an error
-        else:
-            return DataAccessBase.sendError("Invalid option configuration")
-
-        # Update database and return message
-        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
-        return DataAccessBase.sendSuccess(result_message)
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -352,3 +228,173 @@ class TaskAccess(DataAccessBase):
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_upcoming_tasks() -> DictParse:
+        """Method to get tasks that are upcoming"""
+
+        # Get the current timestamp in seconds
+        current_timestamp = int(time.time())
+
+        # Search the collection based on id
+        tasks = DataAccessBase.CURRENT_STATS_COL.find(
+            {"reminders": {"$elemMatch": {"$lte": current_timestamp}}}
+        )
+        tasks = list(tasks)
+
+        # Return if the given event is not in the database
+        if tasks is None:
+            return {
+                "status": "error",
+                "message": "No events happening right now at the moment",
+            }
+
+        # Update resulting items
+        DataAccessBase.CURRENT_STATS_COL.update_many(
+            {
+                "reminders": {"$elemMatch": {"$lte": current_timestamp}},
+                "stat_type": "task",
+            },
+            {"$pull": {"reminders": {"$lte": current_timestamp}}},
+        )
+
+        # Add a parsed time remaining value
+        tasks_temp = []
+        for item in tasks:
+            item["formatted_time_remain"] = seconds_to_largest_time_unit(
+                item["suspense"] - current_timestamp
+            )
+            tasks_temp.append(item)
+
+        # Cast every event into an event object
+        tasks = [Task(**item) for item in tasks_temp]
+
+        # Return with a Event object
+        return DataAccessBase.sendSuccess(tasks)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def update_task(id: str, **kwargs: Any) -> DictParse:
+        """Method to delete a task"""
+
+        # Check if the task based on its id does exist
+        if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Disable the changing of certain attributes
+        immutable = [
+            "datetime_created",
+            "notify_email",
+            "incomplete",
+            "pending",
+            "complete",
+        ]
+        if any(i in kwargs for i in immutable):
+            return DataAccessBase.sendError(
+                "Cannot change the following attributes: "
+                + ", ".join(immutable)
+            )
+
+        # Update the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.update_one(
+            {"_id": id}, {"$set": kwargs}
+        )
+        return DataAccessBase.sendSuccess("Task updated")
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def request_completion(task_id: str, user_id: str, msg: str) -> DictParse:
+        """Method to handle the user's completion request"""
+
+        # Check if the task based on its id does not exist
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
+        if task is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Check if the user is part of the task's incomplete list
+        if user_id not in task["incomplete"]:
+            # If the user is pending approval, send a message about that
+            if user_id in task["pending"]:
+                return DataAccessBase.sendError(
+                    "You are pending approval for completing this task"
+                )
+            # If the user completed this task, send a message about that
+            else:
+                return DataAccessBase.sendError(
+                    "You are not assigned to this task"
+                )
+
+        # Automatically approve user if requesting
+        del task["incomplete"][user_id]
+        if task["auto_accept_requests"]:
+            task["complete"][user_id] = msg
+            result_message = "Task completed"
+        else:
+            task["pending"][user_id] = msg
+            result_message = "Request filed"
+
+        # Update database and return message
+        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
+        return DataAccessBase.sendSuccess(result_message)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def change_status(
+        task_id: str, user_id: str, msg: str, action: str
+    ) -> DictParse:
+        """Method to handle the placement of users to different statuses"""
+
+        # Check if the task based on its id does not exist
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": task_id})
+        if task is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Check if the user is incomplete status
+        if user_id in task["incomplete"]:
+            return DataAccessBase.sendError(
+                "This user is in incomplete stage. You cannot do anything."
+            )
+
+        # Check if the request is to deny
+        if action == "deny" and user_id in task["complete"]:
+            # Move the user from complete to incomplete stage
+            del task["complete"][user_id]
+            task["incomplete"][user_id] = msg
+            result_message = "User moved to incomplete stage"
+
+        # Check if the request is to reject
+        elif action == "reject" and user_id in task["pending"]:
+            # Move the user from complete to incomplete stage
+            del task["pending"][user_id]
+            task["incomplete"][user_id] = msg
+            result_message = "User moved to incomplete stage"
+
+        # Check if the request is to approve
+        elif action == "approve" and user_id in task["pending"]:
+            # Move the user from complete to incomplete stage
+            del task["pending"][user_id]
+            task["complete"][user_id] = msg
+            result_message = "User moved to complete stage"
+
+        # If anything else, return an error
+        else:
+            return DataAccessBase.sendError("Invalid option configuration")
+
+        # Update database and return message
+        DataAccessBase.CURRENT_STATS_COL.replace_one({"_id": task_id}, task)
+        return DataAccessBase.sendSuccess(result_message)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def delete_task(id: str) -> DictParse:
+        """Method to delete an task"""
+
+        # Check if the task based on its id does not exist
+        task = DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id})
+        if task is None:
+            return DataAccessBase.sendError("Task does not exist")
+
+        # Delete the document and return a success message
+        DataAccessBase.CURRENT_STATS_COL.delete_one({"_id": id})
+        return DataAccessBase.sendSuccess("Task deleted")

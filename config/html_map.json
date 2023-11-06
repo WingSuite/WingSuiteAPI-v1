@@ -1,6 +1,7 @@
 {
     "statistic.feedback": "./messages/html/statistic/feedback_create.html",
-    "statistic.task": "./messages/html/statistic/task_create.html",
+    "statistic.task.create": "./messages/html/statistic/task_create.html",
+    "statistic.task.notify": "./messages/html/statistic/task_notify.html",
     "notification": "./messages/html/notification_create.html",
     "event.heads_up": "./messages/html/event_heads_up.html",
     "event.create": "./messages/html/event_create.html",
