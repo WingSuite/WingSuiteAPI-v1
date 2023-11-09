@@ -36,8 +36,10 @@ class Notification:
             "PT": "#75E1FF",
             "LLAB": "#9DD1FC",
             "PDT": "#52F29A",
+            "Event": "#52E7F2",
             "Cadre": "#FFCCCC",
             "TASK": "#FF9999",
             "ACTION": "#FF6666",
             "URGENT": "#FF0000",
+            "<< ARCHIVED >>": "#A3A3A3",
         })

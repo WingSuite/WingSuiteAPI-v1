@@ -11,13 +11,13 @@
       body {
         font-family: "Poppins", sans-serif;
       }
-      .email-content p,
-      .email-content h1,
-      .email-content h2,
-      .email-content h3,
-      .email-content h4,
-      .email-content h5,
-      .email-content h6 {
+      .content-format p,
+      .content-format h1,
+      .content-format h2,
+      .content-format h3,
+      .content-format h4,
+      .content-format h5,
+      .content-format h6 {
         margin: 0 !important;
         padding: 0 !important;
       }
@@ -80,16 +80,24 @@
       </table>
       <div>
         <p>Hello {to_user},</p>
-        <p>You received the following feedback from {from_user}:</p>
-        <div
-          style="font-size: 0.75rem; font-style: italic"
-          class="email-content"
-        >
-          {message}
-        </div>
         <p>
-          You can view this message in your
-          <a href="{feedback_link}">feedback page</a>
+          You received a task from {from_user}. The following are its details.
+        </p>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Name:
+        </div>
+        <div style="font-size: 0.75rem" class="content-format">{name}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Suspense:
+        </div>
+        <div style="font-size: 0.75rem" class="content-format">{suspense}</div>
+        <div style="font-size: 1rem; font-weight: 700; margin-top: 7px">
+          Description:
+        </div>
+        <div style="font-size: 0.75rem" class="content-format">{description}</div>
+        <p>
+          You can view this task in your
+          <a href="{task_link}">task page</a>
         </p>
       </div>
       <div

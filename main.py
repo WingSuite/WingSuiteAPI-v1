@@ -33,6 +33,7 @@ from endpoints.user import (
     get_notifications,
     get_pfa_data,
     get_warrior_data,
+    get_tasks,
     get_users_units,
     get_permissions_list,
     update_permissions,
@@ -49,6 +50,7 @@ from endpoints.unit import (
     get_unit_types,
     get_all_units,
     get_all_officers,
+    get_specified_personnel,
     get_all_members,
     is_superior_officer,
     get_all_five_point_data,
@@ -95,6 +97,16 @@ from endpoints.statistic.pfa import (
     get_test_pfa_score,
     update_pfa,
     delete_pfa,
+)
+from endpoints.statistic.task.views import task_dispatch
+from endpoints.statistic.task import (
+    create_task,
+    get_task_info,
+    get_dispatched_tasks,
+    update_task,
+    request_completion,
+    change_status,
+    delete_task,
 )
 from endpoints.statistic.warrior import (
     create_warrior,
@@ -223,6 +235,7 @@ app.register_blueprint(get_events, url_prefix="/user/")
 app.register_blueprint(get_notifications, url_prefix="/user/")
 app.register_blueprint(get_pfa_data, url_prefix="/user/")
 app.register_blueprint(get_warrior_data, url_prefix="/user/")
+app.register_blueprint(get_tasks, url_prefix="/user/")
 app.register_blueprint(get_users_units, url_prefix="/user/")
 app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
@@ -238,8 +251,9 @@ app.register_blueprint(add_officers, url_prefix="/unit/")
 app.register_blueprint(get_unit_info, url_prefix="/unit/")
 app.register_blueprint(get_unit_types, url_prefix="/unit/")
 app.register_blueprint(get_all_units, url_prefix="/unit/")
-app.register_blueprint(get_all_officers, url_prefix="/unit/")
 app.register_blueprint(get_all_members, url_prefix="/unit/")
+app.register_blueprint(get_all_officers, url_prefix="/unit/")
+app.register_blueprint(get_specified_personnel, url_prefix="/unit/")
 app.register_blueprint(is_superior_officer, url_prefix="/unit/")
 app.register_blueprint(get_all_five_point_data, url_prefix="/unit/")
 app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")
@@ -306,6 +320,17 @@ app.register_blueprint(update_pfa, url_prefix="/statistic/pfa/")
 app.register_blueprint(delete_pfa, url_prefix="/statistic/pfa/")
 # endregion
 
+# Statistic Task routes
+# region
+app.register_blueprint(create_task, url_prefix="/statistic/task/")
+app.register_blueprint(get_task_info, url_prefix="/statistic/task/")
+app.register_blueprint(get_dispatched_tasks, url_prefix="/statistic/task/")
+app.register_blueprint(update_task, url_prefix="/statistic/task/")
+app.register_blueprint(request_completion, url_prefix="/statistic/task/")
+app.register_blueprint(change_status, url_prefix="/statistic/task/")
+app.register_blueprint(delete_task, url_prefix="/statistic/task/")
+# endregion
+
 # Statistic Warrior routes
 # region
 app.register_blueprint(create_warrior, url_prefix="/statistic/warrior/")
@@ -335,11 +360,17 @@ if os.environ.get(
     scheduler.start()
 
     # Schedule the event update function to run every minute
-    trigger = IntervalTrigger(minutes=1)
+    trigger = IntervalTrigger(seconds=10)
     scheduler.add_job(
         func=event_dispatch,
         trigger=trigger,
         id="check_events_job",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        func=task_dispatch,
+        trigger=trigger,
+        id="check_tasks_notification_job",
         replace_existing=True,
     )
 

@@ -22,7 +22,7 @@ class UnitAccess(DataAccessBase):
         children: list,
         officers: list,
         members: list,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> DictParse:
         """Method to create a new unit"""
 
@@ -51,7 +51,7 @@ class UnitAccess(DataAccessBase):
             user = UserAccess.get_user(item).message
 
             # Continue if the iterated user is not a User
-            if type(user) != User:
+            if type(user) is not User:
                 continue
 
             # Add the officer to the unit
@@ -66,7 +66,7 @@ class UnitAccess(DataAccessBase):
             unit = UnitAccess.get_unit(item).message
 
             # Continue if the iterated unit is not a Unit
-            if type(user) != Unit:
+            if type(user) is not Unit:
                 continue
 
             # Update their parent pointer
@@ -108,7 +108,7 @@ class UnitAccess(DataAccessBase):
             user = UserAccess.get_user(item).message
 
             # Continue if the iterated user is not a User
-            if type(user) != User:
+            if type(user) is not User:
                 continue
 
             # Add the officer to the unit
@@ -123,7 +123,7 @@ class UnitAccess(DataAccessBase):
             iter_unit = UnitAccess.get_unit(item).message
 
             # Continue if the iterated unit is not a Unit
-            if type(iter_unit) != Unit:
+            if type(iter_unit) is not Unit:
                 continue
 
             # Update their parent pointer
@@ -235,7 +235,17 @@ class UnitAccess(DataAccessBase):
             node = stack.pop()
 
             # Set ptr on start of given ID
-            ptr = UnitAccess.get_unit(node).message.info
+            ptr = UnitAccess.get_unit(node)
+
+            # Return error if one occurs
+            if ptr.status == "error":
+                units_message = ", ".join(user_units)
+                return DataAccessBase.sendError(
+                    f"Error processing one of the units in: {units_message} "
+                )
+
+            # Extract Unit object's attributes
+            ptr = ptr.message.info
 
             # Skip if the pointer ID has been tracked
             if ptr._id in tracked:
@@ -263,7 +273,7 @@ class UnitAccess(DataAccessBase):
                 config.unit_types.index(x["unit_type"]),
                 x["name"],
             ),
-            reverse=True
+            reverse=True,
         )
 
         # Return the units

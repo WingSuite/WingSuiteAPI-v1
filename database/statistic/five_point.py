@@ -5,6 +5,7 @@ from models.statistic.five_point import FivePoint
 from typing import Any
 import uuid
 import math
+import time
 
 
 class FivePointAccess(DataAccessBase):
@@ -35,6 +36,7 @@ class FivePointAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
+        data["datetime_created"] = int(time.time())
         data["subscores"] = {
             "professionalism": int(professionalism),
             "receptiveness": int(receptiveness),
@@ -179,6 +181,10 @@ class FivePointAccess(DataAccessBase):
             return DataAccessBase.sendError(
                 "Five point evaluation does not exist"
             )
+
+        # Disable the changing of time_created attribute
+        if ("datetime_created" in kwargs):
+            return DataAccessBase.sendError("Cannot change creation datetime")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(

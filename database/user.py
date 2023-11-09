@@ -2,7 +2,7 @@
 from flask_jwt_extended import decode_token
 from utils.dict_parse import DictParse
 from .base import DataAccessBase
-from typing import Union, Any
+from typing import Union, Any, List
 from utils.hash import sha256
 from models.user import User
 import datetime
@@ -116,31 +116,52 @@ class UserAccess(DataAccessBase):
             user = DataAccessBase.USER_COL.find_one({"_id": id})
 
         # Return if the given user is not in the database
+        # If an call also looks into the former users, return the user
+        # object if in the former users section
         if user is None:
-            return DataAccessBase.sendError("User not found")
+            # Check former database if the call specifies
+            if kwargs.get("check_former", False):
+                # Get the results from the query
+                if id == "_email" and "email" in kwargs:
+                    user = DataAccessBase.FORMER_USERS_COL.find_one(
+                        {"email": kwargs["email"]}
+                    )
+                else:
+                    user = DataAccessBase.FORMER_USERS_COL.find_one(
+                        {"_id": id}
+                    )
+
+            # Return error if else
+            else:
+                return DataAccessBase.sendError("User not found")
 
         # Return results based on types of representation
         return DataAccessBase.sendSuccess(User(**user))
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_user_with_reset_token(token: str) -> DictParse:
-        """Method to get the user object that fits the information"""
+    def get_users(ids: List[str], **kwargs) -> DictParse:
+        """Get a list of users that the given IDs are pertaining to"""
 
-        # Find user by token and ensure the token hasn't expired
-        user = DataAccessBase.USER_COL.find_one(
-            {
-                "reset_token": token,
-                "token_expiry": {"$gte": datetime.datetime.now()},
-            }
-        )
+        # Get all users that are in the user collection and the ID list
+        res = DataAccessBase.USER_COL.find({"_id": {"$in": ids}})
+        users = list(res)
 
-        # Return the result
-        return user
+        # If the kwargs also want to look into the former user collection,
+        # into that as well
+        res = []
+        if kwargs.get("check_former", False):
+            res = DataAccessBase.FORMER_USERS_COL.find({"_id": {"$in": ids}})
+
+        # Combine the two operations
+        users += res
+
+        # Return result
+        return DataAccessBase.sendSuccess([User(**i) for i in users])
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_users(page_size: int, page_index: int) -> DictParse:
+    def get_all_users(page_size: int, page_index: int) -> DictParse:
         """Get a list of users based on the page size and the index"""
 
         # Check if the page_size or page_index is negative
@@ -167,6 +188,22 @@ class UserAccess(DataAccessBase):
 
         # Return the results and the page size
         return DataAccessBase.sendSuccess(results, pages=pages)
+
+    @staticmethod
+    @DataAccessBase.dict_wrap
+    def get_user_with_reset_token(token: str) -> DictParse:
+        """Method to get the user object that has an equal reset token"""
+
+        # Find user by token and ensure the token hasn't expired
+        user = DataAccessBase.USER_COL.find_one(
+            {
+                "reset_token": token,
+                "token_expiry": {"$gte": datetime.datetime.now()},
+            }
+        )
+
+        # Return the result
+        return user
 
     @staticmethod
     @DataAccessBase.dict_wrap
@@ -207,10 +244,13 @@ class UserAccess(DataAccessBase):
         password = sha256(password, DataAccessBase.DB_SPECS.spicer)
 
         # Update the user
-        DataAccessBase.USER_COL.update_one({"_id": id}, {
-            "$set": {"password": password},
-            "$unset": {"reset_token": 1, "token_expiry": 1}
-        })
+        DataAccessBase.USER_COL.update_one(
+            {"_id": id},
+            {
+                "$set": {"password": password},
+                "$unset": {"reset_token": 1, "token_expiry": 1},
+            },
+        )
 
         # Return message
         return DataAccessBase.sendSuccess("Password updated")

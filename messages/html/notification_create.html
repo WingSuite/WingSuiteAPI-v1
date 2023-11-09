@@ -7,9 +7,19 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
     />
-    <style>
+    <style type="text/css">
       body {
         font-family: "Poppins", sans-serif;
+      }
+      .content-format p,
+      .content-format h1,
+      .content-format h2,
+      .content-format h3,
+      .content-format h4,
+      .content-format h5,
+      .content-format h6 {
+        margin: 0 !important;
+        padding: 0 !important;
       }
     </style>
   </head>
@@ -74,7 +84,12 @@
           You received the following notification from {from_user} for all units
           under {target_unit}:
         </p>
-        <div style="font-size: 0.75rem; font-style: italic">{message}</div>
+        <div
+          style="font-size: 0.75rem; font-style: italic"
+          class="content-format"
+        >
+          {message}
+        </div>
         <p>
           You can view this message in your
           <a href="{notification_link}">notifications page</a>

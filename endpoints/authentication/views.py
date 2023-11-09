@@ -44,7 +44,7 @@ import uuid
 @param_check(ARGS.authentication.register)
 @error_handler
 def register_endpoint(**kwargs):
-    """Log In Handling"""
+    """Register Handling"""
 
     # Parse information from the call's body
     data = request.get_json()
@@ -331,7 +331,7 @@ def kick_user_endpoint(**kwargs):
     # Kick the user out
     result = UserAccess.kick_user(user._id)
 
-    # Notify user of the new feedback
+    # Notify user of the event
     if result.status == "success":
         # Calculate the recipient's appropriate name
         to_user_name = (

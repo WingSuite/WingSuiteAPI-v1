@@ -5,6 +5,7 @@ from models.statistic.warrior import Warrior
 from typing import Any
 import uuid
 import math
+import time
 
 
 class WarriorAccess(DataAccessBase):
@@ -30,6 +31,7 @@ class WarriorAccess(DataAccessBase):
         # Prep data to be inserted
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
+        data["datetime_created"] = int(time.time())
         data["stat_type"] = "warrior"
         data["subscores"] = {}
         data["info"] = {}
@@ -138,6 +140,10 @@ class WarriorAccess(DataAccessBase):
         # Check if the warrior based on its id does exist
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Warrior knowledge does not exist")
+
+        # Disable the changing of time_created attribute
+        if ("datetime_created" in kwargs):
+            return DataAccessBase.sendError("Cannot change creation datetime")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(

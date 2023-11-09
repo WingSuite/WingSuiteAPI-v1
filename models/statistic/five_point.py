@@ -14,7 +14,7 @@ class FivePoint:
         """Constructor for the FivePoint Evaluation Metric"""
 
         # Check if kwargs has the minimum arguments
-        for arg in FivePoint.REQ_ARGS.pfa.init:
+        for arg in FivePoint.REQ_ARGS.five_point.init:
             if arg not in kwargs:
                 return False
 
