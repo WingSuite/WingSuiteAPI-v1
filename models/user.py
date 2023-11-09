@@ -22,7 +22,7 @@ class User:
         self.info = DictParse(kwargs)
 
         # Calculate user's full name
-        self.info.full_name = self.get_fullname(True)
+        self.info.full_name = self.get_fullname(lastNameFirst=True)
 
     def get_generic_info(
         self: "User",
@@ -42,26 +42,35 @@ class User:
         # Append full name information to the data based on the
         # given parameters
         if includeFullName:
-            data["full_name"] = self.get_fullname(lastNameFirst)
+            data["full_name"] = self.get_fullname(lastNameFirst=lastNameFirst)
 
         # Return the data
         return data
 
-    def get_fullname(self: "User", lastNameFirst: bool) -> str:
+    def get_fullname(
+        self: "User", lastNameFirst: bool = True, with_rank: bool = False
+    ) -> str:
         """Returns the user's full name"""
 
         # Get the user's names
         first_name = self.info.first_name
         last_name = self.info.last_name
+        rank = self.info.rank + " " if "rank" in self.info else ""
         middle_initial = ""
         if "middle_initial" in self.info:
             middle_initial = " " + self.info.middle_initial
 
-        # Return different styles based on given options
+        # Get the name in different styles based on given options
         if lastNameFirst:
-            return f"{last_name}, {first_name}{middle_initial}"
+            name = f"{last_name}, {first_name}{middle_initial}"
         else:
-            return f"{first_name}{middle_initial} {last_name}"
+            name = f"{first_name}{middle_initial} {last_name}"
+
+        # Add rank if true
+        if with_rank:
+            return rank + name
+        else:
+            return name
 
     def add_permission(self: "User", permission: str) -> bool:
         "Add new permissions to the user"

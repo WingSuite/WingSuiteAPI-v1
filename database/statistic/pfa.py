@@ -5,6 +5,7 @@ from models.statistic.pfa import PFA
 from typing import Any
 import uuid
 import math
+import time
 
 
 class PFAAccess(DataAccessBase):
@@ -39,6 +40,7 @@ class PFAAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
+        data["datetime_created"] = int(time.time())
         data["subscores"] = {
             "pushup": pushup,
             "situp": situp,
@@ -185,6 +187,10 @@ class PFAAccess(DataAccessBase):
             and kwargs["info"]["gender"] != "female"
         ):
             return DataAccessBase.sendError("Incorrect gender")
+
+        # Disable the changing of time_created attribute
+        if ("datetime_created" in kwargs):
+            return DataAccessBase.sendError("Cannot change creation datetime")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(

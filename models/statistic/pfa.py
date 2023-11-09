@@ -12,7 +12,7 @@ class PFA:
     REQ_ARGS = arguments.models.statistic
 
     def __init__(self: "PFA", **kwargs: Any) -> None:
-        """Constructor for base unit"""
+        """Constructor for base pfa"""
 
         # Check if kwargs has the minimum arguments
         for arg in PFA.REQ_ARGS.pfa.init:
@@ -54,7 +54,7 @@ class PFA:
     def get_scoring_domains() -> dict:
         """Return composite score and subscore ids' domain range"""
         return {
-            "composite_score": [0, 100],
+            "composite_score": [75, 100],
             "pushup": [0, 80],
             "situp": [0, 80],
             "run": [480, 900],

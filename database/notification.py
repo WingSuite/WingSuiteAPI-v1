@@ -1,6 +1,8 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
+from database.user import UserAccess
+from database.unit import UnitAccess
 from models.notification import Notification
 from typing import Any
 import uuid
@@ -13,11 +15,7 @@ class NotificationAccess(DataAccessBase):
     @staticmethod
     @DataAccessBase.dict_wrap
     def create_notification(
-        name: str,
-        unit: str,
-        notification: str,
-        author: str,
-        **kwargs: Any
+        name: str, unit: str, notification: str, author: str, **kwargs: Any
     ) -> DictParse:
         """Method to create a notification"""
 
@@ -28,6 +26,12 @@ class NotificationAccess(DataAccessBase):
         data.update(locals()["kwargs"])
         data["_id"] = uuid.uuid4().hex
         data["created_datetime"] = int(time.time())
+
+        # Throw error if the tag is one of the available keys
+        if data["tag"] not in Notification.get_available_tags():
+            return DataAccessBase.sendError(
+                f"{data['tag']} is not an available tag"
+            )
 
         # Insert into the collection
         DataAccessBase.NOTIFICATION_COL.insert_one(data)
@@ -57,6 +61,13 @@ class NotificationAccess(DataAccessBase):
         # Check if the notification based on its id does exist
         if DataAccessBase.NOTIFICATION_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Notification does not exist")
+
+        # Check if the given tag value is a proper tag
+        if "tag" in kwargs:
+            if kwargs["tag"] not in Notification.get_available_tags():
+                return DataAccessBase.sendError(
+                    f"{kwargs['tag']} is not an available tag"
+                )
 
         # Update the document and return a success message
         DataAccessBase.NOTIFICATION_COL.update_one(
@@ -106,8 +117,40 @@ class NotificationAccess(DataAccessBase):
                 "message": "No notifications found with given unit ID",
             }
 
-        # Cast every notification into an notification object
-        notifications = [Notification(**item) for item in notifications]
+        # Format the notifications for better readability
+        author_memoize = DictParse({})
+        unit_memoize = DictParse({})
+        for idx, i in enumerate(notifications):
+            # Get Notification representation of the iteration
+            item = Notification(**i).info
+
+            # Add author id if the iterated item's author is not memoized
+            if item.author not in author_memoize:
+                # Add author's formatted name to the memoization
+                author = UserAccess.get_user(
+                    item.author, check_former=True
+                ).message
+                author_memoize[item.author] = author.get_fullname(
+                    lastNameFirst=True, with_rank=True
+                )
+
+            # Add unit id if the iterated 8nit is not memoized
+            if item.unit not in unit_memoize:
+                # Add unit's formatted name to the memoization
+                unit = UnitAccess.get_unit(item.unit).message.info
+                unit_memoize[item.unit] = unit.name
+
+            # Add formatted information to the notifications
+            i["formatted_author"] = author_memoize[item.author]
+            i["formatted_unit"] = unit_memoize[item.unit]
+
+            # # Cast iterated item to model version
+            notifications[idx] = Notification(**i)
 
         # Return with a Notification object
         return DataAccessBase.sendSuccess(notifications)
+
+    @staticmethod
+    def get_notification_tags() -> DictParse:
+        """Method to return a dictionary of the available tags"""
+        return Notification.get_available_tags()

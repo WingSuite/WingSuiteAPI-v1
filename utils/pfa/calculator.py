@@ -56,8 +56,8 @@ def _in_range(range_str_map: dict, run_time: str) -> float:
             # Return
             return range_str_map[i]
 
-    # Return 0 if not in range
-    return 0
+    # Return large negative value if not in range
+    return -100000
 
 
 def calculate_pfa(
@@ -164,7 +164,7 @@ def calculate_pfa(
     #
 
     if pushups < pushup_keys[-1]:
-        pass
+        composite = -100000
     elif pushups >= pushup_keys[0]:
         composite += 20
     else:
@@ -175,7 +175,7 @@ def calculate_pfa(
     #
 
     if situps < situp_keys[-1]:
-        pass
+        composite = -100000
     elif situps >= situp_keys[0]:
         composite += 20
     else:
@@ -191,4 +191,4 @@ def calculate_pfa(
         composite += _in_range(run_map, run_time)
 
     # Return composite
-    return composite
+    return composite if composite > 0 else 0

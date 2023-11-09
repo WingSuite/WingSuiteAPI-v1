@@ -1,6 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from database.base import DataAccessBase
+from database.user import UserAccess
 from models.statistic.feedback import Feedback
 from typing import Any
 import uuid
@@ -55,6 +56,10 @@ class FeedbackAccess(DataAccessBase):
         # Check if the feedback based on its id does exist
         if DataAccessBase.CURRENT_STATS_COL.find_one({"_id": id}) is None:
             return DataAccessBase.sendError("Feedback does not exist")
+
+        # Disable the changing of time_created attribute
+        if ("datetime_created" in kwargs):
+            return DataAccessBase.sendError("Cannot change creation datetime")
 
         # Update the document and return a success message
         DataAccessBase.CURRENT_STATS_COL.update_one(
@@ -126,8 +131,22 @@ class FeedbackAccess(DataAccessBase):
                 "message": "Feedback not found",
             }
 
-        # Turn result into a list
+        # Add a formatted from_user key for each feedback
+        memoize = DictParse({})
         result = list(result)
+        for i in result:
+            # Add key if the iterated from_user is not memoized
+            if i["from_user"] not in memoize:
+                # Add user's formatted name to the memoization
+                from_user = UserAccess.get_user(
+                    i["from_user"], check_former=True
+                ).message
+                memoize[i["from_user"]] = from_user.get_fullname(
+                    lastNameFirst=True, with_rank=True
+                )
+
+            # Add formatted key
+            i["formatted_from_user"] = memoize[i["from_user"]]
 
         # Return with a Feedback object
         return DataAccessBase.sendSuccess(result, pages=pages)

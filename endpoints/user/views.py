@@ -18,6 +18,7 @@ from . import (
     get_notifications,
     get_pfa_data,
     get_warrior_data,
+    get_tasks,
     get_users_units,
     get_permissions_list,
     update_permissions,
@@ -28,6 +29,7 @@ from flask_jwt_extended import jwt_required, decode_token
 from flask import request
 from database.statistic.feedback import FeedbackAccess
 from database.statistic.warrior import WarriorAccess
+from database.statistic.task import TaskAccess
 from database.statistic.pfa import PFAAccess
 from database.notification import NotificationAccess
 from database.event import EventAccess
@@ -159,7 +161,7 @@ def everyone_endpoint(**kwargs):
 
     # Get the content information based on the given page size and
     # page index
-    results = UserAccess.get_users(**data)
+    results = UserAccess.get_all_users(**data)
 
     # If the resulting information is in error, respond with error
     if results.status == "error":
@@ -363,6 +365,7 @@ def get_notifications_endpoint(**kwargs):
     ]
 
     # Sort the user events by start datetime
+    # TODO: Have sorting be handled by user's end
     user_notifications = sorted(
         user_notifications,
         key=lambda x: x["created_datetime"],
@@ -431,6 +434,33 @@ def get_warrior_data_endpoint(**kwargs):
 
     # Return the information
     return result, 200
+
+
+@get_tasks.route("/get_tasks/", methods=["POST"])
+@param_check(ARGS.user.get_tasks)
+@jwt_required()
+@error_handler
+def get_tasks_endpoint(**kwargs):
+    """Endpoint to get user's task information"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the access token
+    token = request.headers.get("Authorization", None).split()[1]
+
+    # Decode the JWT Token and get the ID of the user
+    id = decode_token(token)["sub"]["_id"]
+
+    # Get warrior knowledge information based on the user's id
+    result = TaskAccess.get_own_task(id=id, **data)
+
+    # If the resulting information is in error, respond with error
+    if result.status == "error":
+        return client_error_response(result.message)
+
+    # Return the content of the information
+    return result, (200 if result.status == "success" else 400)
 
 
 @get_users_units.route("/get_users_units/", methods=["GET"])
@@ -535,7 +565,6 @@ def get_permissions_list_endpoint(**kwargs):
 
 
 #   endregion
-
 
 #
 #   UPDATE OPERATIONS

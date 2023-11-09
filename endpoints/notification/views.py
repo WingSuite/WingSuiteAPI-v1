@@ -10,6 +10,7 @@ from endpoints.base import (
 from . import (
     create_notification,
     get_notification_info,
+    get_notification_format,
     update_notification,
     delete_notification,
 )
@@ -20,6 +21,7 @@ from database.unit import UnitAccess
 from database.user import UserAccess
 from config.config import config
 from threading import Thread
+from flask_jwt_extended import jwt_required
 from flask import request
 
 #
@@ -127,6 +129,19 @@ def get_notification_info_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@get_notification_format.route("/get_notification_format/", methods=["GET"])
+@jwt_required()
+@error_handler
+def get_notification_format_endpoint(**kwargs):
+    """Endpoint to return a notification's format"""
+
+    # Build response message
+    result = {"tag_options": NotificationAccess.get_notification_tags()}
+
+    # Return response data
+    return result, 200
 
 
 #   endregion

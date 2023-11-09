@@ -27,6 +27,16 @@
         "update_pfa": ["id"],
         "delete_pfa": ["id"]
       },
+      "task": {
+        "create_task": ["users", "name", "description", "suspense",
+          "auto_accept_requests", "notify_email", "reminders"],
+        "get_task_info": ["id"],
+        "get_dispatched_tasks": ["page_size", "page_index"],
+        "update_task": ["id"],
+        "request_completion": ["id", "message"],
+        "change_status": ["task_id", "user_id", "message", "action"],
+        "delete_task": ["id"]
+      },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
           "composite_score"],
@@ -42,7 +52,8 @@
       "send_unit_discord_message": ["id", "title", "message"]
     },
     "notification": {
-      "create_notification": ["name", "unit", "notification", "notify_email"],
+      "create_notification": ["name", "unit", "notification", "notify_email",
+        "tag"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
@@ -63,6 +74,7 @@
       "get_all_units": ["page_size", "page_index"],
       "get_all_members": ["id"],
       "get_all_officers": ["id"],
+      "get_specified_personnel": ["raw"],
       "is_superior_officer": ["id"],
       "get_all_five_point_data": ["id"],
       "get_all_pfa_data": ["id"],
@@ -94,6 +106,7 @@
       "get_notifications": ["start_datetime", "end_datetime"],
       "get_pfa_data": ["page_size", "page_index"],
       "get_warrior_data": ["page_size", "page_index"],
+      "get_tasks": ["page_size", "page_index", "get_completed"],
       "update_permissions": ["id", "permissions"],
       "update_rank": ["id", "rank"],
       "delete_permissions": ["id", "permissions"]
@@ -105,18 +118,27 @@
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
           "feedback", "datetime_created"]
       },
+      "five_point": {
+        "init": ["_id", "stat_type", "from_user", "to_user", "name",
+          "datetime_taken", "datetime_created", "subscores", "info"]
+      },
       "pfa": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "datetime_taken", "subscores", "info"]
+          "datetime_taken", "datetime_created", "subscores", "info"]
+      },
+      "task": {
+        "init": ["_id", "stat_type", "datetime_created", "from_user", "name",
+        "description", "suspense", "auto_accept_requests", "incomplete",
+        "pending", "complete", "reminders"]
       },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "composite_score"]
+          "datetime_taken", "datetime_created", "composite_score"]
       }
     },
     "notification": {
       "init": ["_id", "name", "unit", "created_datetime", "notification",
-        "author"]
+        "author", "tag"]
     },
     "event": {
       "init": ["_id", "name", "unit", "location", "start_datetime",
