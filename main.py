@@ -38,6 +38,7 @@ from endpoints.user import (
     get_permissions_list,
     update_permissions,
     update_rank,
+    update_personal,
     delete_permissions,
 )
 from endpoints.unit import (
@@ -240,6 +241,7 @@ app.register_blueprint(get_users_units, url_prefix="/user/")
 app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
 app.register_blueprint(update_rank, url_prefix="/user/")
+app.register_blueprint(update_personal, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 # endregion
 

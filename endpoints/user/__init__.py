@@ -16,6 +16,7 @@ get_users_units = Blueprint("get_users_units", __name__)
 get_permissions_list = Blueprint("get_permissions_list", __name__)
 update_permissions = Blueprint("update_permissions", __name__)
 update_rank = Blueprint("update_rank", __name__)
+update_personal = Blueprint("update_personal", __name__)
 delete_permissions = Blueprint("delete_permissions", __name__)
 
 # Import views

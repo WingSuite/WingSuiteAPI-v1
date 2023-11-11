@@ -228,8 +228,19 @@ class UserAccess(DataAccessBase):
             del kwargs["id"]
 
         # Check if the unit based on its id does exist
-        if DataAccessBase.USER_COL.find_one({"_id": id}) is None:
+        user = DataAccessBase.USER_COL.find_one({"_id": id})
+        if user is None:
             return DataAccessBase.sendError("User does not exist")
+        user = User(**user)
+
+        # Update full_name if any of the names is different
+        if "first_name" in kwargs:
+            user.info.first_name = kwargs["first_name"]
+        if "middle_initial" in kwargs:
+            user.info.middle_initial = kwargs["middle_initial"]
+        if "last_name" in kwargs:
+            user.info.last_name = kwargs["last_name"]
+        kwargs["full_name"] = user.get_fullname()
 
         # Update the document and return a success message
         DataAccessBase.USER_COL.update_one({"_id": id}, {"$set": kwargs})

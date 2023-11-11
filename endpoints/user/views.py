@@ -23,6 +23,7 @@ from . import (
     get_permissions_list,
     update_permissions,
     update_rank,
+    update_personal,
     delete_permissions,
 )
 from flask_jwt_extended import jwt_required, decode_token
@@ -626,6 +627,39 @@ def update_rank_endpoint(**kwargs):
 
     # Update the user's info
     result = UserAccess.update_user(id=data["id"], rank=data["rank"])
+
+    # Return result
+    return result, (200 if result.status == "success" else 400)
+
+
+@update_personal.route("/update_personal/",  methods=["POST"])
+@is_root
+@error_handler
+def update_personal_endpoint(**kwargs):
+    """Method to update a user's own content"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the target user's object
+    user = UserAccess.get_user(kwargs["id"])
+
+    # If content is not in result of getting the user, return the
+    # error message
+    if user.status == "error":
+        return user, 400
+
+    # Get the content from the user fetch
+    user = user.message
+
+    # If the user has the email attribute in their body argument
+    for i in config.immutable_user_info:
+        if i in data:
+            print(i)
+            return client_error_response(f"Cannot change {i}")
+
+    # Update user's information
+    result = UserAccess.update_user(id=kwargs["id"], **data)
 
     # Return result
     return result, (200 if result.status == "success" else 400)
