@@ -38,7 +38,9 @@ class UserAccess(DataAccessBase):
                 for k, v in locals().items()
                 if k not in ["kwargs", "args"]
             }
-            data.update(locals()["kwargs"])
+            data.update(
+                {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+            )
             data["_id"] = uuid.uuid4().hex
             data["permissions"] = []
             data["units"] = []

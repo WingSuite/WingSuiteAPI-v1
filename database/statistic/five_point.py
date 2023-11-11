@@ -33,7 +33,9 @@ class FivePointAccess(DataAccessBase):
         }
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
         data["datetime_created"] = int(time.time())
@@ -144,7 +146,9 @@ class FivePointAccess(DataAccessBase):
         }
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "five_point"
         data["subscores"] = {

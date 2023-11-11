@@ -59,7 +59,7 @@
       "delete_notification": ["id"]
     },
     "event": {
-      "create_event": ["name", "unit", "location", "start_datetime",
+      "create_event": ["name", "unit", "tag", "location", "start_datetime",
         "end_datetime", "description", "notify_email"],
       "get_event_info": ["id"],
       "update_event": ["id"],
@@ -141,7 +141,7 @@
         "author", "tag"]
     },
     "event": {
-      "init": ["_id", "name", "unit", "location", "start_datetime",
+      "init": ["_id", "name", "unit", "tag", "location", "start_datetime",
         "end_datetime", "description"]
     },
     "unit": {

@@ -7,7 +7,7 @@ def isOfficerFromAbove(units: List[dict], user: str) -> str:
     """Check if the given user is an officer from a superior unit"""
 
     # Transform units to a list object if not provided as a list
-    if type(units) != list:
+    if type(units) is not list:
         units = [units]
 
     # Get the list of officers from superior units of the given units

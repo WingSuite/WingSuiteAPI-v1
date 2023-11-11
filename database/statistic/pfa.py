@@ -37,7 +37,9 @@ class PFAAccess(DataAccessBase):
             return DataAccessBase.sendError("Incorrect gender")
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
         data["datetime_created"] = int(time.time())
@@ -146,7 +148,9 @@ class PFAAccess(DataAccessBase):
             return DataAccessBase.sendError("Incorrect gender")
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
         data["subscores"] = {

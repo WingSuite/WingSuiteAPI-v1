@@ -29,7 +29,9 @@ class WarriorAccess(DataAccessBase):
         }
 
         # Prep data to be inserted
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["datetime_created"] = int(time.time())
         data["stat_type"] = "warrior"
@@ -118,7 +120,9 @@ class WarriorAccess(DataAccessBase):
         }
 
         # Prep data to be inserted
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "warrior"
         data["subscores"] = {}
