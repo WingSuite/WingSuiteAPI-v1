@@ -655,7 +655,6 @@ def update_personal_endpoint(**kwargs):
     # If the user has the email attribute in their body argument
     for i in config.immutable_user_info:
         if i in data:
-            print(i)
             return client_error_response(f"Cannot change {i}")
 
     # Update user's information
