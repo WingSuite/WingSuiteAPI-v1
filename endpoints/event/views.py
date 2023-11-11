@@ -7,13 +7,20 @@ from endpoints.base import (
     error_handler,
     ARGS,
 )
-from . import create_event, get_event_info, update_event, delete_event
+from . import (
+    create_event,
+    get_event_info,
+    get_event_format,
+    update_event,
+    delete_event,
+)
 from utils.communications.email import send_email_by_units
 from utils.permissions import isOfficerFromAbove
 from database.event import EventAccess
 from database.unit import UnitAccess
 from config.config import config
 from threading import Thread
+from flask_jwt_extended import jwt_required
 from flask import request
 
 #
@@ -113,6 +120,19 @@ def get_event_info_endpoint(**kwargs):
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
+
+
+@get_event_format.route("/get_event_format/", methods=["GET"])
+@jwt_required()
+@error_handler
+def get_event_format_endpoint(**kwargs):
+    """Endpoint to return a events's format"""
+
+    # Build response message
+    result = {"tag_options": config.tags}
+
+    # Return response data
+    return result, 200
 
 
 def event_dispatch(**kwargs):

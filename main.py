@@ -65,6 +65,7 @@ from endpoints.event.views import event_dispatch
 from endpoints.event import (
     create_event,
     get_event_info,
+    get_event_format,
     update_event,
     delete_event,
 )
@@ -271,6 +272,7 @@ app.register_blueprint(delete_officers, url_prefix="/unit/")
 # region
 app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
+app.register_blueprint(get_event_format, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
 # endregion

@@ -138,7 +138,7 @@ def get_notification_format_endpoint(**kwargs):
     """Endpoint to return a notification's format"""
 
     # Build response message
-    result = {"tag_options": config.tag}
+    result = {"tag_options": config.tags}
 
     # Return response data
     return result, 200

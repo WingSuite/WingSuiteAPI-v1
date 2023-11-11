@@ -3,9 +3,9 @@ from utils.dict_parse import DictParse
 from database.base import DataAccessBase
 from database.user import UserAccess
 from database.unit import UnitAccess
+from config.config import config
 from models.notification import Notification
 from typing import Any
-from config.config import config
 import uuid
 import time
 
@@ -31,7 +31,7 @@ class NotificationAccess(DataAccessBase):
         data["created_datetime"] = int(time.time())
 
         # Throw error if the tag is one of the available keys
-        if data["tag"] not in config.tag:
+        if data["tag"] not in config.tags:
             return DataAccessBase.sendError(
                 f"{data['tag']} is not an available tag"
             )
@@ -67,7 +67,7 @@ class NotificationAccess(DataAccessBase):
 
         # Check if the given tag value is a proper tag
         if "tag" in kwargs:
-            if kwargs["tag"] not in config.tag:
+            if kwargs["tag"] not in config.tags:
                 return DataAccessBase.sendError(
                     f"{kwargs['tag']} is not an available tag"
                 )
