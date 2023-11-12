@@ -37,7 +37,9 @@ class PFAAccess(DataAccessBase):
             return DataAccessBase.sendError("Incorrect gender")
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
         data["datetime_created"] = int(time.time())
@@ -51,7 +53,7 @@ class PFAAccess(DataAccessBase):
             "gender": gender.lower(),
         }
 
-        # Remove unncessary data
+        # Remove unnecessary data
         del data["pushup"]
         del data["situp"]
         del data["run"]
@@ -146,9 +148,12 @@ class PFAAccess(DataAccessBase):
             return DataAccessBase.sendError("Incorrect gender")
 
         # Add or update data
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
+        data["datetime_created"] = int(time.time())
         data["subscores"] = {
             "pushup": pushup,
             "situp": situp,

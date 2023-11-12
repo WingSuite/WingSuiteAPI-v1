@@ -1,6 +1,7 @@
 # Imports
 from utils.dict_parse import DictParse
 from .base import DataAccessBase
+from config.config import config
 from models.event import Event
 from typing import Any
 import time
@@ -19,16 +20,25 @@ class EventAccess(DataAccessBase):
         start_datetime: int,
         end_datetime: int,
         description: str,
+        tag: str,
         **kwargs: Any
     ) -> DictParse:
         """Method to create an event"""
 
         # Prep data to be inserted
         data = {
-            k: v for k, v in locals().items() if k not in ["kwargs", "args"]
+            k: v
+            for k, v in locals().items()
+            if k not in ["kwargs", "args"] and k[0] != "$"
         }
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
+
+        # Check if the tag is an authentic one
+        if data["tag"] not in config.tags:
+            return DataAccessBase.sendError("Tag is invalid")
 
         # Insert into the collection
         DataAccessBase.EVENT_COL.insert_one(data)

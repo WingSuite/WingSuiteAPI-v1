@@ -31,7 +31,9 @@ class TaskAccess(DataAccessBase):
         data = {
             k: v for k, v in locals().items() if k not in ["kwargs", "args"]
         }
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "task"
         data["datetime_created"] = int(time.time())

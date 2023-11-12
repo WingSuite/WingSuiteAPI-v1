@@ -17,6 +17,8 @@ class PFA:
         # Check if kwargs has the minimum arguments
         for arg in PFA.REQ_ARGS.pfa.init:
             if arg not in kwargs:
+                print(arg)
+                print(">>>>>>>>>>>>>>>>>>>>>>")
                 return False
 
         # Save info

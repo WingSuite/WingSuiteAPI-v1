@@ -38,6 +38,7 @@ from endpoints.user import (
     get_permissions_list,
     update_permissions,
     update_rank,
+    update_personal,
     delete_permissions,
 )
 from endpoints.unit import (
@@ -64,6 +65,7 @@ from endpoints.event.views import event_dispatch
 from endpoints.event import (
     create_event,
     get_event_info,
+    get_event_format,
     update_event,
     delete_event,
 )
@@ -240,6 +242,7 @@ app.register_blueprint(get_users_units, url_prefix="/user/")
 app.register_blueprint(get_permissions_list, url_prefix="/user/")
 app.register_blueprint(update_permissions, url_prefix="/user/")
 app.register_blueprint(update_rank, url_prefix="/user/")
+app.register_blueprint(update_personal, url_prefix="/user/")
 app.register_blueprint(delete_permissions, url_prefix="/user/")
 # endregion
 
@@ -269,6 +272,7 @@ app.register_blueprint(delete_officers, url_prefix="/unit/")
 # region
 app.register_blueprint(create_event, url_prefix="/event/")
 app.register_blueprint(get_event_info, url_prefix="/event/")
+app.register_blueprint(get_event_format, url_prefix="/event/")
 app.register_blueprint(update_event, url_prefix="/event/")
 app.register_blueprint(delete_event, url_prefix="/event/")
 # endregion

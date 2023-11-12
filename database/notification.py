@@ -3,6 +3,7 @@ from utils.dict_parse import DictParse
 from database.base import DataAccessBase
 from database.user import UserAccess
 from database.unit import UnitAccess
+from config.config import config
 from models.notification import Notification
 from typing import Any
 import uuid
@@ -23,12 +24,14 @@ class NotificationAccess(DataAccessBase):
         data = {
             k: v for k, v in locals().items() if k not in ["kwargs", "args"]
         }
-        data.update(locals()["kwargs"])
+        data.update(
+            {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
+        )
         data["_id"] = uuid.uuid4().hex
         data["created_datetime"] = int(time.time())
 
         # Throw error if the tag is one of the available keys
-        if data["tag"] not in Notification.get_available_tags():
+        if data["tag"] not in config.tags:
             return DataAccessBase.sendError(
                 f"{data['tag']} is not an available tag"
             )
@@ -64,7 +67,7 @@ class NotificationAccess(DataAccessBase):
 
         # Check if the given tag value is a proper tag
         if "tag" in kwargs:
-            if kwargs["tag"] not in Notification.get_available_tags():
+            if kwargs["tag"] not in config.tags:
                 return DataAccessBase.sendError(
                     f"{kwargs['tag']} is not an available tag"
                 )
@@ -149,8 +152,3 @@ class NotificationAccess(DataAccessBase):
 
         # Return with a Notification object
         return DataAccessBase.sendSuccess(notifications)
-
-    @staticmethod
-    def get_notification_tags() -> DictParse:
-        """Method to return a dictionary of the available tags"""
-        return Notification.get_available_tags()

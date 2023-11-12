@@ -88,7 +88,7 @@ def get_warrior_info_endpoint(**kwargs):
 @param_check(ARGS.statistic.warrior.get_user_warrior_info)
 @error_handler
 def get_user_warrior_info_endpoint(**kwargs):
-    """Method to get the info of an Warrior Knowledge"""
+    """Method to get the info of another user's Warrior Knowledge"""
 
     # Parse information from the call's body
     data = request.get_json()
@@ -199,12 +199,20 @@ def update_warrior_endpoint(**kwargs):
             "You don't have access to this information"
         )
 
-    # If composite score is provided, change it
-    if "composite_score" in data:
-        warrior.composite_score = data["composite_score"]
+    # Check if subscores is in the body contents and ensure it is OK
+    types = Warrior.get_scoring_type()[1:]
+    if "subscores" in data:
+        for idx, i in enumerate(Warrior.get_scoring_ids()[1:]):
+            if i in data["subscores"]:
+                print(i)
+                if types[idx] == "number":
+                    warrior.subscores[i] = float(data["subscores"][i])
+                elif types[idx] == "time":
+                    warrior.subscores[i] = str(data["subscores"][i])
 
     # Regenerate the warrior object and update warrior knowledge
     warrior = Warrior(**warrior)
+    del warrior.info.datetime_created
     result = WarriorAccess.update_warrior(data["id"], **warrior.info)
 
     # Return response data
