@@ -21,6 +21,19 @@ class Warrior:
         # Save info
         self.info = DictParse(kwargs)
 
+        # Calculate composite score
+        denominator = self.info.subscores.total_points
+        if (denominator == 0):
+            denominator = 1
+        self.info.composite_score = round(
+            (
+                self.info.subscores.points_earned
+                / denominator
+            )
+            * 100,
+            2,
+        )
+
     @staticmethod
     def get_metric_name() -> str:
         """Return metric name"""
@@ -29,12 +42,12 @@ class Warrior:
     @staticmethod
     def get_scoring_ids() -> List:
         """Return composite score and subscore ids"""
-        return ["composite_score"]
+        return ["composite_score", "points_earned", "total_points"]
 
     @staticmethod
     def get_scoring_type() -> List:
         """Return composite score and subscore datatypes"""
-        return ["number"]
+        return ["number", "number", "number"]
 
     @staticmethod
     def get_scoring_options() -> dict:
@@ -44,7 +57,7 @@ class Warrior:
     @staticmethod
     def get_scoring_formatted() -> List:
         """Return composite score and subscore ids, formatted"""
-        return ["Composite Score"]
+        return ["Composite Score", "Points Earned", "Total Points"]
 
     @staticmethod
     def get_scoring_domains() -> dict:

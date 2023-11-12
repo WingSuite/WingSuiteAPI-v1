@@ -53,7 +53,7 @@ class PFAAccess(DataAccessBase):
             "gender": gender.lower(),
         }
 
-        # Remove unncessary data
+        # Remove unnecessary data
         del data["pushup"]
         del data["situp"]
         del data["run"]

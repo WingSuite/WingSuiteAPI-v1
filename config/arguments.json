@@ -39,10 +39,10 @@
       },
       "warrior": {
         "create_warrior": ["to_user", "name", "datetime_taken",
-          "composite_score"],
+          "points_earned", "total_points"],
         "get_warrior_info": ["id"],
         "get_user_warrior_info": ["id", "page_size", "page_index"],
-        "get_test_warrior_score": ["composite_score"],
+        "get_test_warrior_score": ["points_earned", "total_points"],
         "update_warrior": ["id"],
         "delete_warrior": ["id"]
       }
@@ -133,7 +133,7 @@
       },
       "warrior": {
         "init": ["_id", "stat_type", "from_user", "to_user", "name",
-          "datetime_taken", "datetime_created", "composite_score"]
+          "datetime_taken", "datetime_created", "subscores"]
       }
     },
     "notification": {

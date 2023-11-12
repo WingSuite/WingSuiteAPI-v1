@@ -18,7 +18,8 @@ class WarriorAccess(DataAccessBase):
         to_user: str,
         name: str,
         datetime_taken: int,
-        composite_score: float,
+        points_earned: int,
+        total_points: int,
         **kwargs: Any
     ) -> DictParse:
         """Method to create a Warrior"""
@@ -35,11 +36,21 @@ class WarriorAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["datetime_created"] = int(time.time())
         data["stat_type"] = "warrior"
-        data["subscores"] = {}
+        data["subscores"] = {
+            "points_earned": points_earned,
+            "total_points": total_points,
+        }
         data["info"] = {}
 
+        # Remove unnecessary data
+        del data["points_earned"]
+        del data["total_points"]
+
+        # Get an object representation of the given info
+        warrior = Warrior(**data)
+
         # Insert into the collection
-        DataAccessBase.CURRENT_STATS_COL.insert_one(data)
+        DataAccessBase.CURRENT_STATS_COL.insert_one(warrior.info)
 
         # Return a statement
         return DataAccessBase.sendSuccess("Warrior knowledge created")
@@ -107,12 +118,14 @@ class WarriorAccess(DataAccessBase):
         # Turn result into a list
         result = list(result)
 
+        print(result)
+
         # Return with a warrior knowledge object
         return DataAccessBase.sendSuccess(result, pages=pages)
 
     @staticmethod
     @DataAccessBase.dict_wrap
-    def get_test_warrior(composite_score: float, **kwargs: Any):
+    def get_test_warrior(points_earned: int, total_points: int, **kwargs: Any):
         """Calculate the user's test PFA information"""
         # Combine kwargs and args
         data = {
@@ -126,8 +139,15 @@ class WarriorAccess(DataAccessBase):
         data["_id"] = uuid.uuid4().hex
         data["datetime_created"] = int(time.time())
         data["stat_type"] = "warrior"
-        data["subscores"] = {}
+        data["subscores"] = {
+            "points_earned": points_earned,
+            "total_points": total_points,
+        }
         data["info"] = {}
+
+        # Remove unnecessary data
+        del data["points_earned"]
+        del data["total_points"]
 
         # Get an object representation of the given info
         warrior_obj = Warrior(
@@ -147,7 +167,7 @@ class WarriorAccess(DataAccessBase):
             return DataAccessBase.sendError("Warrior knowledge does not exist")
 
         # Disable the changing of time_created attribute
-        if ("datetime_created" in kwargs):
+        if "datetime_created" in kwargs:
             return DataAccessBase.sendError("Cannot change creation datetime")
 
         # Update the document and return a success message
