@@ -153,6 +153,7 @@ class PFAAccess(DataAccessBase):
         )
         data["_id"] = uuid.uuid4().hex
         data["stat_type"] = "pfa"
+        data["datetime_created"] = int(time.time())
         data["subscores"] = {
             "pushup": pushup,
             "situp": situp,

@@ -224,6 +224,7 @@ def update_pfa_endpoint(**kwargs):
 
     # Regenerate the pfa object and update PFA
     pfa = PFA(**pfa)
+    del pfa.info.datetime_created
     result = PFAAccess.update_pfa(data["id"], **pfa.info)
 
     # Return response data

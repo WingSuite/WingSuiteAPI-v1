@@ -230,6 +230,7 @@ def update_five_point_endpoint(**kwargs):
 
     # Regenerate the five point object and update five point
     five_point = FivePoint(**five_point)
+    del five_point.info.datetime_created
     result = FivePointAccess.update_five_point(data["id"], **five_point.info)
 
     # Return response data

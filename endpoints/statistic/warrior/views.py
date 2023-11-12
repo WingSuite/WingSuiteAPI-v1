@@ -205,6 +205,7 @@ def update_warrior_endpoint(**kwargs):
 
     # Regenerate the warrior object and update warrior knowledge
     warrior = Warrior(**warrior)
+    del warrior.info.datetime_created
     result = WarriorAccess.update_warrior(data["id"], **warrior.info)
 
     # Return response data

@@ -150,6 +150,7 @@ class FivePointAccess(DataAccessBase):
             {k: v for k, v in locals()["kwargs"].items() if k[0] != "$"}
         )
         data["_id"] = uuid.uuid4().hex
+        data["datetime_created"] = int(time.time())
         data["stat_type"] = "five_point"
         data["subscores"] = {
             "professionalism": professionalism,
