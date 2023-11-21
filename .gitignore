@@ -2,3 +2,4 @@
 /.vscode/
 
 config/config.json
+mongo-init.js
