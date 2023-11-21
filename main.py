@@ -364,7 +364,7 @@ if os.environ.get(
     scheduler.start()
 
     # Schedule the event update function to run every minute
-    trigger = IntervalTrigger(seconds=10)
+    trigger = IntervalTrigger(seconds=60)
     scheduler.add_job(
         func=event_dispatch,
         trigger=trigger,
