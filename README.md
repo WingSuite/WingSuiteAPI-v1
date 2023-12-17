@@ -1,3 +1,5 @@
+© 2023 Benjamin Herrera. All Right's Reserved.
+
 # WingSuiteAPI
 API System that interacts with a majority of other systems for Det025
 
