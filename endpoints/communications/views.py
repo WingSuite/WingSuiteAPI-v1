@@ -9,7 +9,7 @@ from endpoints.base import (  # noqa
     ARGS,
 )
 from . import send_user_email_message, send_unit_discord_message
-from utils.communications.discord import send_discord_message_to_channel
+from utils.communications.discord import send_discord_message
 from utils.communications.email import send_email
 from database.unit import UnitAccess
 from database.user import UserAccess
@@ -80,7 +80,7 @@ def send_unit_discord_message_endpoint(**kwargs):
     url = unit.communications.discord.channel
 
     # Send message
-    result = send_discord_message_to_channel(
+    result = send_discord_message(
         url=url, title=data["title"], message=data["message"]
     )
 
