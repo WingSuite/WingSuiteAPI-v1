@@ -9,6 +9,7 @@ def send_discord_message(
     title: str,
     message: str,
     emoji: str = "🔔",
+    at_everyone: bool = False,
     fields: List[dict] = {},
 ) -> bool:
     """Sends a Discord embedded message with org name and icon"""
@@ -35,6 +36,10 @@ def send_discord_message(
             "avatar_url": image,
             "embeds": [embed],
         }
+
+        # Include @everyone if the at_everyone is provided
+        if at_everyone:
+            data["content"] = "@everyone"
 
         # Send the message with the defined content
         requests.post(url, json=data)
@@ -78,6 +83,7 @@ def send_discord_message_by_units(
                 title=title,
                 message=message,
                 fields=fields,
+                at_everyone=i.communications.discord.ping_everyone
             )
 
         # Return true
