@@ -53,14 +53,14 @@
     },
     "notification": {
       "create_notification": ["name", "unit", "notification", "notify_email",
-        "tag"],
+        "notify_discord", "tag"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
     },
     "event": {
       "create_event": ["name", "unit", "tag", "location", "start_datetime",
-        "end_datetime", "description", "notify_email"],
+        "end_datetime", "description", "notify_email", "notify_discord"],
       "get_event_info": ["id"],
       "update_event": ["id"],
       "delete_event": ["id"]
@@ -81,6 +81,7 @@
       "get_all_warrior_data": ["id"],
       "update_unit": ["id"],
       "update_frontpage": ["id", "frontpage"],
+      "update_communication_settings": ["id", "communication", "settings"],
       "delete_unit": ["id"],
       "delete_members": ["id", "users"],
       "delete_officers": ["id", "users"]

@@ -7,6 +7,9 @@ add_members = Blueprint("add_members", __name__)
 add_officers = Blueprint("add_officers", __name__)
 update_unit = Blueprint("update_unit", __name__)
 update_frontpage = Blueprint("update_frontpage", __name__)
+update_communication_settings = Blueprint(
+    "update_communication_settings", __name__
+)
 get_unit_info = Blueprint("get_unit_info", __name__)
 get_unit_types = Blueprint("get_unit_types", __name__)
 get_all_units = Blueprint("get_all_units", __name__)
@@ -22,4 +25,4 @@ delete_members = Blueprint("delete_members", __name__)
 delete_officers = Blueprint("delete_officers", __name__)
 
 # Import views
-from . import views   # noqa
+from . import views  # noqa

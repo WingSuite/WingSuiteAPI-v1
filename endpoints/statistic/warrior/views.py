@@ -204,7 +204,6 @@ def update_warrior_endpoint(**kwargs):
     if "subscores" in data:
         for idx, i in enumerate(Warrior.get_scoring_ids()[1:]):
             if i in data["subscores"]:
-                print(i)
                 if types[idx] == "number":
                     warrior.subscores[i] = float(data["subscores"][i])
                 elif types[idx] == "time":

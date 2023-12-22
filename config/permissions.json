@@ -22,6 +22,7 @@
     "unit.get_all_warrior_data",
     "unit.update_unit",
     "unit.update_frontpage",
+    "unit.update_communication_settings",
     "unit.delete_unit",
     "unit.delete_members",
     "unit.delete_officers",
