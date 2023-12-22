@@ -102,7 +102,7 @@ def create_notification_endpoint(**kwargs):
                 args=(
                     unit._id,
                     strip_text,
-                    data["name"],
+                    "NOTIFICATION // " + data["name"],
                     [
                         {
                             "name": "From",

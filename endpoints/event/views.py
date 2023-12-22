@@ -15,6 +15,8 @@ from . import (
     delete_event,
 )
 from utils.communications.email import send_email_by_units
+from utils.communications.discord import send_discord_message_by_units
+from utils.html import strip_html
 from utils.permissions import isOfficerFromAbove
 from database.event import EventAccess
 from database.unit import UnitAccess
@@ -54,10 +56,11 @@ def create_event_endpoint(**kwargs):
         # Add the event to the database
         result = EventAccess.create_event(**data)
 
+        # Get and prep metadata for the message
+        event = EventAccess.get_event_by_id(result.id).message
+
         # Check if the user wants to notify the people under this unit
         if result.status == "success" and data["notify_email"]:
-            # Get and prep metadata for the message
-            event = EventAccess.get_event_by_id(result.id).message
             msg_content = {
                 "template": "event.create",
                 "event_name": event.info.name,
@@ -76,6 +79,38 @@ def create_event_endpoint(**kwargs):
                     msg_content,
                     "New Event",
                     config.message_emoji.event,
+                ),
+            )
+            thread.start()
+
+        # Check if the user wants to notify the people under this unit
+        if result.status == "success" and data["notify_discord"]:
+            # Strip the text
+            strip_text = strip_html(event.info.description)
+
+            # Send Discord messages
+            thread = Thread(
+                target=send_discord_message_by_units,
+                args=(
+                    unit.info._id,
+                    strip_text,
+                    "NEW EVENT // " + event.info.name,
+                    [
+                        {
+                            "name": "Event Duration",
+                            "value": event.get_formatted_duration(
+                                time_only=False
+                            ),
+                        },
+                        {
+                            "name": "For Units Under",
+                            "value": unit.info.name,
+                        },
+                        {
+                            "name": "Location",
+                            "value": event.info.location,
+                        },
+                    ],
                 ),
             )
             thread.start()

@@ -60,7 +60,7 @@
     },
     "event": {
       "create_event": ["name", "unit", "tag", "location", "start_datetime",
-        "end_datetime", "description", "notify_email"],
+        "end_datetime", "description", "notify_email", "notify_discord"],
       "get_event_info": ["id"],
       "update_event": ["id"],
       "delete_event": ["id"]
