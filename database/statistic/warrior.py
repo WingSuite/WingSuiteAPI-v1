@@ -118,8 +118,6 @@ class WarriorAccess(DataAccessBase):
         # Turn result into a list
         result = list(result)
 
-        print(result)
-
         # Return with a warrior knowledge object
         return DataAccessBase.sendSuccess(result, pages=pages)
 

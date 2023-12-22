@@ -1,4 +1,6 @@
 # Flask Imports
+from flask_limiter.util import get_remote_address
+from flask_limiter import Limiter
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask import Flask
@@ -47,6 +49,7 @@ from endpoints.unit import (
     add_officers,
     update_unit,
     update_frontpage,
+    update_communication_settings,
     get_unit_info,
     get_unit_types,
     get_all_units,
@@ -136,6 +139,16 @@ FLASK APP CONFIGURATION
 
 # Make app instance
 app = Flask(__name__)
+
+# Set limiter
+if int(os.environ.get("RUN_MODE")):
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["60 per minute"],
+        storage_uri="memory://",
+    )
+
 
 # Set CORS for the application
 CORS(app, methods=["POST", "GET"])
@@ -263,6 +276,7 @@ app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")
 app.register_blueprint(get_all_warrior_data, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(update_frontpage, url_prefix="/unit/")
+app.register_blueprint(update_communication_settings, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")

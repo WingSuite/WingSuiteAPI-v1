@@ -1,5 +1,6 @@
 # Imports
 from config.config import html_map, config
+from bs4 import BeautifulSoup
 from typing import Any
 import re
 
@@ -20,3 +21,16 @@ def read_html_file(template: str, **kwargs: Any) -> str:
 
     # Return the contents of the file
     return content
+
+
+def strip_html(content: str) -> str:
+    """Helper function to strip away html tags from string content"""
+
+    # Use BeautifulSoup to parse the HTML content
+    soup = BeautifulSoup(content, "html.parser")
+
+    # Extract text from the parsed HTML
+    stripped_text = soup.get_text(separator=" ")
+
+    # Returned the stripped text
+    return stripped_text
