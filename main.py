@@ -1,4 +1,6 @@
 # Flask Imports
+from flask_limiter.util import get_remote_address
+from flask_limiter import Limiter
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask import Flask
@@ -136,6 +138,15 @@ FLASK APP CONFIGURATION
 
 # Make app instance
 app = Flask(__name__)
+
+# Set limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["60 per minute"],
+    storage_uri="memory://",
+)
+
 
 # Set CORS for the application
 CORS(app, methods=["POST", "GET"])
