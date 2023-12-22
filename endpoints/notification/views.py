@@ -17,6 +17,7 @@ from . import (
 from utils.communications.email import send_email_by_units
 from utils.communications.discord import send_discord_message_by_units
 from utils.permissions import isOfficerFromAbove
+from utils.html import strip_html
 from database.notification import NotificationAccess
 from database.unit import UnitAccess
 from database.user import UserAccess
@@ -92,12 +93,15 @@ def create_notification_endpoint(**kwargs):
 
         # Check if the user wants to notify the people under this unit
         if result.status == "success" and data["notify_discord"]:
+            # Strip the text
+            strip_text = strip_html(data["notification"])
+
             # Send Discord messages
             thread = Thread(
                 target=send_discord_message_by_units,
                 args=(
                     unit._id,
-                    data["notification"],
+                    strip_text,
                     data["name"],
                     [
                         {

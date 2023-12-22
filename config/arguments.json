@@ -53,7 +53,7 @@
     },
     "notification": {
       "create_notification": ["name", "unit", "notification", "notify_email",
-        "tag"],
+        "notify_discord", "tag"],
       "get_notification_info": ["id"],
       "update_notification": ["id"],
       "delete_notification": ["id"]
