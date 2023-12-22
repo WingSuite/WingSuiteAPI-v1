@@ -81,6 +81,7 @@
       "get_all_warrior_data": ["id"],
       "update_unit": ["id"],
       "update_frontpage": ["id", "frontpage"],
+      "update_communication_settings": ["id", "communication", "settings"],
       "delete_unit": ["id"],
       "delete_members": ["id", "users"],
       "delete_officers": ["id", "users"]

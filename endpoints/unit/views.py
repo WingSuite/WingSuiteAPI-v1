@@ -14,6 +14,7 @@ from . import (
     add_officers,
     update_unit,
     update_frontpage,
+    update_communication_settings,
     get_unit_info,
     get_unit_types,
     get_all_units,
@@ -275,6 +276,7 @@ def add_officers_endpoint(**kwargs):
 
 
 @get_unit_info.route("/get_unit_info/", methods=["POST"])
+@is_root
 @param_check(ARGS.unit.get_unit_info)
 @error_handler
 def get_unit_info_endpoint(**kwargs):
@@ -295,6 +297,33 @@ def get_unit_info_endpoint(**kwargs):
 
     # Serialize the Unit object instance
     result.message = result.message.info
+
+    # If the user requests for communication settings, check if they have
+    # proper permissions
+    if "communications" in data:
+        if data["communications"]:
+            # Check if the user is an officer of a superior unit
+            is_superior_officer = isOfficerFromAbove(
+                [data["id"]], kwargs["id"]
+            )
+
+            # If the user is not rooted nor is officer of the unit, err
+            if not (
+                kwargs["isRoot"]
+                or kwargs["id"] in result.message.officers
+                or is_superior_officer
+            ):
+                # Return error if not
+                return client_error_response(
+                    "You don't have access to this information with this query"
+                )
+
+            # Return response data
+            return result, (200 if result.status == "success" else 400)
+
+    # Delete the communication field
+    if data["communications"]:
+        del result.message.communications
 
     # Return response data
     return result, (200 if result.status == "success" else 400)
@@ -805,11 +834,13 @@ def update_unit_endpoint(**kwargs):
             UnitAccess.update_unit(new_unit.info._id, **new_unit.info)
 
     # Prevent certain attributes
-    if "children" in data or "members" in data or "officers" in data:
-        return client_error_response(
-            'You cannot change the "children", '
-            + '"members", or "officers" attributes'
-        )
+    if (
+        "children" in data
+        or "members" in data
+        or "officers" in data
+        or "communications" in data
+    ):
+        return client_error_response("Cannot change unit given attributes")
 
     # Get the id of the target unit
     id = data.pop("id")
@@ -861,6 +892,50 @@ def update_frontpage_endpoint(**kwargs):
 
     # Return error if not
     return client_error_response("You don't have access to this information")
+
+
+@update_communication_settings.route(
+    "/update_communication_settings/", methods=["POST"]
+)
+@is_root
+@permissions_required(["unit.update_communication_settings"])
+@param_check(ARGS.unit.update_communication_settings)
+@error_handler
+def update_communication_settings_endpoint(**kwargs):
+    """Endpoint to update a unit's communication settings"""
+
+    # Parse information from the call's body
+    data = request.get_json()
+
+    # Get the unit object of the target unit and return if error
+    unit = UnitAccess.get_unit(data["id"])
+    if unit.status == "error":
+        return client_error_response(unit.message)
+    unit = unit.message.info
+
+    # Check if the user is an officer of a superior unit
+    is_superior_officer = isOfficerFromAbove(data["id"], kwargs["id"])
+
+    # If the user is not rooted nor is officer of the unit, return error
+    if not (
+        kwargs["isRoot"]
+        or kwargs["id"] in unit.officers
+        or is_superior_officer
+    ):
+        # Return error if not
+        return client_error_response(
+            "You don't have access to this information"
+        )
+
+    # Update the unit's communication setting
+    update_data = {
+        f"communication.{data['communication']}.{nested_field}": new_value
+        for nested_field, new_value in data["settings"].items()
+    }
+    result = UnitAccess.update_unit(data["id"], **update_data)
+
+    # Return response data
+    return result, (200 if result.status == "success" else 400)
 
 
 #   endregion

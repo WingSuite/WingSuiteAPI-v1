@@ -49,6 +49,7 @@ from endpoints.unit import (
     add_officers,
     update_unit,
     update_frontpage,
+    update_communication_settings,
     get_unit_info,
     get_unit_types,
     get_all_units,
@@ -274,6 +275,7 @@ app.register_blueprint(get_all_pfa_data, url_prefix="/unit/")
 app.register_blueprint(get_all_warrior_data, url_prefix="/unit/")
 app.register_blueprint(update_unit, url_prefix="/unit/")
 app.register_blueprint(update_frontpage, url_prefix="/unit/")
+app.register_blueprint(update_communication_settings, url_prefix="/unit/")
 app.register_blueprint(delete_unit, url_prefix="/unit/")
 app.register_blueprint(delete_members, url_prefix="/unit/")
 app.register_blueprint(delete_officers, url_prefix="/unit/")
