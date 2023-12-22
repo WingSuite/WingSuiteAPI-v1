@@ -181,12 +181,15 @@ def event_dispatch(**kwargs):
 
     # Iterate through each event
     for i in events:
+        # Get targeted unit
+        target_unit = UnitAccess.get_unit(i.info.unit).message.info.name
+
         # Prep the contents of the message
         msg_content = {
             "template": "event.heads_up",
             "event_name": i.info.name,
             "duration": i.get_formatted_duration(),
-            "target_unit": UnitAccess.get_unit(i.info.unit).message.info.name,
+            "target_unit": target_unit,
             "location": i.info.location,
             "description": i.info.description,
             "event_link": f"{config.wingsuite_dashboard_link}/events",
@@ -200,6 +203,32 @@ def event_dispatch(**kwargs):
                 msg_content,
                 f"{i.info.name} Starting in {config.heads_up} Minutes",
                 config.message_emoji.event,
+            ),
+        )
+        thread.start()
+
+        # Send Discord messages
+        strip_text = strip_html(i.info.description)
+        thread = Thread(
+            target=send_discord_message_by_units,
+            args=(
+                i.info.unit,
+                f"HAPPENING IN {config.heads_up} MINUTES:\n" + strip_text,
+                "EVENT // " + i.info.name,
+                [
+                    {
+                        "name": "Event Duration",
+                        "value": i.get_formatted_duration(),
+                    },
+                    {
+                        "name": "For Units Under",
+                        "value": target_unit,
+                    },
+                    {
+                        "name": "Location",
+                        "value": i.info.location,
+                    },
+                ],
             ),
         )
         thread.start()
