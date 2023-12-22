@@ -69,11 +69,15 @@ def send_unit_discord_message_endpoint(**kwargs):
     unit = unit.message.info
 
     # Get unit's url link
-    if "update_channel" not in unit:
+    if "discord" not in unit.communications:
         return client_error_response(
-            "Unit does not have their notifier channel setup"
+            "Unit does not have a discord channel setup for notifications"
         )
-    url = unit.update_channel
+    if not unit.communications.discord.channel:
+        return client_error_response(
+            "Unit does not have a discord channel setup for notifications"
+        )
+    url = unit.communications.discord.channel
 
     # Send message
     result = send_discord_message_to_channel(

@@ -141,12 +141,13 @@ FLASK APP CONFIGURATION
 app = Flask(__name__)
 
 # Set limiter
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["60 per minute"],
-    storage_uri="memory://",
-)
+if int(os.environ.get("RUN_MODE")):
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["60 per minute"],
+        storage_uri="memory://",
+    )
 
 
 # Set CORS for the application

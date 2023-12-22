@@ -304,7 +304,7 @@ def get_unit_info_endpoint(**kwargs):
         if data["communications"]:
             # Check if the user is an officer of a superior unit
             is_superior_officer = isOfficerFromAbove(
-                [data["id"]], kwargs["id"]
+                [id], kwargs["id"]
             )
 
             # If the user is not rooted nor is officer of the unit, err
@@ -322,7 +322,7 @@ def get_unit_info_endpoint(**kwargs):
             return result, (200 if result.status == "success" else 400)
 
     # Delete the communication field
-    if data["communications"]:
+    if "communications" in result.message:
         del result.message.communications
 
     # Return response data
@@ -929,7 +929,7 @@ def update_communication_settings_endpoint(**kwargs):
 
     # Update the unit's communication setting
     update_data = {
-        f"communication.{data['communication']}.{nested_field}": new_value
+        f"communications.{data['communication']}.{nested_field}": new_value
         for nested_field, new_value in data["settings"].items()
     }
     result = UnitAccess.update_unit(data["id"], **update_data)
