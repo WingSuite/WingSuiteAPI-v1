@@ -1,18 +1,21 @@
 # Imports
-from utils.dict_parse import DictParse
 from utils.html import read_html_file
 from database.unit import UnitAccess
 from database.user import UserAccess
 from email.message import EmailMessage
 from config.config import config
-from typing import Any
+from typing import Any, Union
 import smtplib
 
 
 def send_email(
-    receiver: str, subject: str, content: str, emoji: str = "🔔"
+    receiver: Union[str, list], subject: str, content: str, emoji: str = "🔔"
 ) -> bool:
     """Helper function to send an email to a user"""
+
+    # Convert receivers to a list if it is a single string
+    if isinstance(receiver, str):
+        receiver = [receiver]
 
     # Create a new SMTP connection
     with smtplib.SMTP_SSL(
@@ -66,35 +69,18 @@ def send_email_by_units(
             personnel = personnel.union(i.members)
             personnel = personnel.union(i.officers)
         personnel = [UserAccess.get_user(i).message.info for i in personnel]
-        personnel = [
-            DictParse(
-                {
-                    "email": i.email,
-                    "full_name": (
-                        i.rank + " " + i.full_name
-                        if "rank" in i
-                        else i.first_name
-                    ),
-                }
-            )
-            for i in personnel
-        ]
+        personnel = [i.email for i in personnel]
 
-        # Iterate through the email list and send the emails
-        for i in personnel:
-            # Add to msg_content
-            msg_content["to_user"] = i.full_name
+        # Get feedback HTML content
+        content = read_html_file(**msg_content)
 
-            # Get feedback HTML content
-            content = read_html_file(**msg_content)
-
-            # Send an email with the HTML content
-            send_email(
-                receiver=i.email,
-                subject=subject,
-                content=content,
-                emoji=emoji,
-            )
+        # Send an email with the HTML content
+        send_email(
+            receiver=personnel,
+            subject=subject,
+            content=content,
+            emoji=emoji,
+        )
 
         # Return true
         return True
