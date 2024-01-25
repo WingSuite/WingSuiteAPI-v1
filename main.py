@@ -145,7 +145,7 @@ if int(os.environ.get("RUN_MODE")):
     limiter = Limiter(
         get_remote_address,
         app=app,
-        default_limits=["60 per minute"],
+        default_limits=["140 per minute"],
         storage_uri="memory://",
     )
 
