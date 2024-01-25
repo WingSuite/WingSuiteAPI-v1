@@ -33,7 +33,7 @@ def send_email(
             message[
                 "From"
             ] = f"{emoji}‎ WingSuite <{config.email.sender_email}>"
-            message["To"] = receiver
+            message["BCC"] = receiver
             message.set_content(content)
 
             # Add the HTML content as an alternative to plain text content
