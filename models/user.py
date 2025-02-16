@@ -36,7 +36,6 @@ class User:
         data = {
             k: v
             for k, v in self.info.items()
-            if k not in config.private_info + other_protections
         }
 
         # Append full name information to the data based on the
