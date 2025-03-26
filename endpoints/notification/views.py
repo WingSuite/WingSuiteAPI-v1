@@ -85,7 +85,7 @@ def create_notification_endpoint(**kwargs):
                 args=(
                     unit._id,
                     msg_content,
-                    "New Notification",
+                    "New Notification!",
                     config.message_emoji.notification,
                 ),
             )
