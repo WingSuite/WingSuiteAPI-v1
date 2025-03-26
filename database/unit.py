@@ -207,7 +207,9 @@ class UnitAccess(DataAccessBase):
 
         # Check if the page_index is outside the page range
         if page_index >= pages:
-            return DataAccessBase.sendError("Pagination index out of bounds")
+            return DataAccessBase.sendError(
+                [], additional_error="Pagination index out of bounds"
+            )
 
         # Calculate skip value
         skips = page_size * (page_index)
